@@ -93,6 +93,14 @@ extern "C" void walk_through(tree decl)
 		}
 
 	}
+	else if (decltc == MODIFY_EXPR) {
+		tree var = TREE_OPERAND(subdecl, 0);
+		tree val = TREE_OPERAND(subdecl, 1);
+
+		std::cerr << tree_code_name[TREE_CODE(var)] << " <- "
+			  << tree_code_name[TREE_CODE(val)] << std::endl;
+	}
+
 	std::cerr << std::endl;
 }
 
