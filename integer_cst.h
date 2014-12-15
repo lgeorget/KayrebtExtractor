@@ -14,7 +14,7 @@ class IntegerCst : public Value
 		std::string print() const override;
 
 	private:
-		int _inner;
+		int _integ;
 };
 
 #endif

@@ -6,18 +6,17 @@
 #include "value.h"
 #include "bad_tree_exception.h"
 
-IntegerCst::IntegerCst(tree t) : Value()
+IntegerCst::IntegerCst(tree t) : Value(t)
 {
 	if (TREE_CODE(t) != INTEGER_CST)
 		throw BadTreeException(t, "integer_cst");
 
-	std::cerr << "Building an int ";
-	_inner = (TREE_INT_CST_HIGH(t) << 32)
+	_integ = (TREE_INT_CST_HIGH(t) << 32)
 	       + TREE_INT_CST_LOW(t);
-	std::cerr << _inner << std::endl;
+	std::cerr << _integ << std::endl;
 }
 
 std::string IntegerCst::print() const
 {
-	return std::to_string(_inner);
+	return std::to_string(_integ);
 }

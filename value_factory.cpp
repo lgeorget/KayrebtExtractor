@@ -16,8 +16,11 @@ std::shared_ptr<Value> ValueFactory::build(tree t) const
 			return std::shared_ptr<Value>(new StringCst(t));
 		case INTEGER_CST:
 			return std::shared_ptr<Value>(new IntegerCst(t));
+		case NOP_EXPR:
+		case ADDR_EXPR:
+			return build(TREE_OPERAND(t,0));
 		default:
-			return std::shared_ptr<Value>(new Value());
+			return std::shared_ptr<Value>(new Value(t));
 	}
 }
 

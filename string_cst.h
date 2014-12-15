@@ -14,8 +14,7 @@ class StringCst : public Value
 		std::string print() const override;
 
 	private:
-		const char* _content;
-		int _length;
+		std::string _built_str;
 };
 
 #endif

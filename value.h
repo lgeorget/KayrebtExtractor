@@ -2,12 +2,17 @@
 #define VALUE_H
 
 #include <iostream>
+#include <gcc-plugin.h>
+#include <tree.h>
 
 class Value
 {
 	public:
-		Value() = default;
+		explicit Value(tree t);
 		virtual std::string print() const;
+
+	protected:
+		tree _inner;
 };
 
 std::ostream& operator<<(std::ostream& out, const Value* v);
