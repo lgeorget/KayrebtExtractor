@@ -10,6 +10,7 @@ class CallExpr : public Expression
 {
 	public:
 		explicit CallExpr(tree t);
+		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
 		int _nbArgs;

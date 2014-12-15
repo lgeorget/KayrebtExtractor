@@ -1,7 +1,9 @@
+#include <cstdlib>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "bad_tree_exception.h"
 #include "label_expr.h"
+#include "dumper.h"
 
 LabelExpr::LabelExpr(tree t) : Expression(t)
 {
@@ -9,4 +11,15 @@ LabelExpr::LabelExpr(tree t) : Expression(t)
 		throw BadTreeException(t,"label_tree");
 
 	_label = TREE_OPERAND(t, 0);
+}
+
+void LabelExpr::accept(Dumper& d)
+{
+	d.dumpLabelExpr(this);
+}
+
+std::ostream& operator<<(std::ostream& out, const LabelExpr& e)
+{
+	out << "<label>";
+	return out;
 }

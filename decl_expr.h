@@ -10,9 +10,12 @@ class DeclExpr : public Expression
 {
 	public:
 		explicit DeclExpr(tree t);
+		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
 		std::string _name;
+		
+	friend std::ostream& operator<<(std::ostream& out, const DeclExpr& e);
 };
 
 #endif

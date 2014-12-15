@@ -16,30 +16,38 @@
 
 const ExprFactory ExprFactory::INSTANCE;
 
-std::unique_ptr<Expression> ExprFactory::build(tree t) const
+std::shared_ptr<Expression> ExprFactory::build(tree t) const
 {
 	switch (TREE_CODE(t)) {
 		case DECL_EXPR:
-			return std::unique_ptr<Expression>(new DeclExpr(t));
+			std::cerr << "...building Decl" << std::endl;
+			return std::shared_ptr<Expression>(new DeclExpr(t));
 		case CALL_EXPR:
-			return std::unique_ptr<Expression>(new CallExpr(t));
+			std::cerr << "...building Call" << std::endl;
+			return std::shared_ptr<Expression>(new CallExpr(t));
 		case GOTO_EXPR:
-			return std::unique_ptr<Expression>(new GotoExpr(t));
+			std::cerr << "...building Goto" << std::endl;
+			return std::shared_ptr<Expression>(new GotoExpr(t));
 		case LABEL_EXPR:
-			return std::unique_ptr<Expression>(new LabelExpr(t));
+			std::cerr << "...building Label" << std::endl;
+			return std::shared_ptr<Expression>(new LabelExpr(t));
 		case MODIFY_EXPR:
-			return std::unique_ptr<Expression>(new ModifyExpr(t));
-		case PREINCREMENT_EXPR:
-			return std::unique_ptr<Expression>(new PreincrementExpr(t));
-		case RETURN_EXPR:
-			return std::unique_ptr<Expression>(new ReturnExpr(t));
+			std::cerr << "...building Modify" << std::endl;
+			return std::shared_ptr<Expression>(new ModifyExpr(t));
 		case PREDECREMENT_EXPR:
+			std::cerr << "...building Preincrement" << std::endl;
+			return std::shared_ptr<Expression>(new PreincrementExpr(t));
+		case RETURN_EXPR:
+			std::cerr << "...building Return" << std::endl;
+			return std::shared_ptr<Expression>(new ReturnExpr(t));
+		//case PREDECREMENT_EXPR:
 		case POSTDECREMENT_EXPR:
 		case POSTINCREMENT_EXPR:
 		case LOOP_EXPR:
 		case EXIT_EXPR:
 		default:
-			return std::unique_ptr<Expression>(new Expression(t));
+			std::cerr << "...building Expr" << std::endl;
+			return std::shared_ptr<Expression>(new Expression(t));
 	}
 }
 

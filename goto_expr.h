@@ -10,9 +10,12 @@ class GotoExpr : public Expression
 {
 	public:
 		explicit GotoExpr(tree t);
+		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
 		tree _label;
+
+	friend std::ostream& operator<<(std::ostream& out, const GotoExpr& e);
 };
 
 #endif

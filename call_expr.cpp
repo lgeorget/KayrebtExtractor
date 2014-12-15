@@ -1,8 +1,12 @@
+#include <iostream>
+#include <memory>
+#include <cstdlib>
 #include <list>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "call_expr.h"
 #include "bad_tree_exception.h"
+#include "dumper.h"
 
 CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr)
 {
@@ -14,8 +18,14 @@ CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr)
 		+ TREE_INT_CST_LOW(nb)
 		- 3;
 	tree fn = TREE_OPERAND(t,1);
-	_name = DECL_NAME(fn) ? IDENTIFIER_POINTER(DECL_NAME(fn)) : "<anonymous>";
+	//_name = DECL_NAME(fn) ? IDENTIFIER_POINTER(DECL_NAME(fn)) : "<anonymous>";
+	_name = "<anonymous>";
 
+}
+
+void CallExpr::accept(Dumper& d)
+{
+	d.dumpCallExpr(this);
 }
 
 std::ostream& operator<<(std::ostream& out, const CallExpr& e)

@@ -2,7 +2,6 @@
 #define DUMPER_H
 
 #include <iostream>
-#include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "call_expr.h"
@@ -17,19 +16,18 @@
 class Dumper
 {
 	public:
-		Dumper() = default;
-		void dumpCallExpr(std::shared_ptr<CallExpr> e);
-		void dumpDeclExpr(std::shared_ptr<DeclExpr> e);
-		void dumpGotoExpr(std::shared_ptr<GotoExpr> e);
-		void dumpLabelExpr(std::shared_ptr<LabelExpr> e);
-		void dumpModifyExpr(std::shared_ptr<ModifyExpr> e);
-		void dumpPreincrementExpr(std::shared_ptr<PreincrementExpr> e);
-		void dumpReturnExpr(std::shared_ptr<ReturnExpr> e);
-		void dumpExpression(std::shared_ptr<Expression> e);
+		Dumper();
+		void dumpCallExpr(CallExpr* const e);
+		void dumpDeclExpr(DeclExpr* const e);
+		void dumpGotoExpr(GotoExpr* const e);
+		void dumpLabelExpr(LabelExpr* const e);
+		void dumpModifyExpr(ModifyExpr* const e);
+		void dumpPreincrementExpr(PreincrementExpr* const e);
+		void dumpReturnExpr(ReturnExpr* const e);
+		void dumpExpression(Expression* const e);
 
 	private:
-		std::ostream& header();
-		std::ostream dumpChannel;
+		void header();
 };
 
 

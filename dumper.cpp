@@ -1,51 +1,64 @@
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <cstdlib>
 #include <memory>
 #include <gcc-plugin.h>
 #include "dumper.h"
 
-void Dumper::dumpExpression(std::shared_ptr<Expression> e)
+Dumper::Dumper()
+{}
+
+void Dumper::dumpExpression(Expression* const e)
 {
-	dumpChannel << header << "<Expression for which we have not yet a type>" <<
-		*e << std::endl;
+	header();
+	std::cout << "<Expression for which we have not yet a type>"
+		<< *e << std::endl;
 }
 
-void Dumper::dumpCallExpr(std::shared_ptr<CallExpr> e)
+void Dumper::dumpCallExpr(CallExpr* const e)
 {
-	dumpChannel << header << "Function call : " << *e;
+//	header();
+	std::cout << "Function call : " << *e;
 }
 
-void Dumper::dumpDeclExpr(std::shared_ptr<DeclExpr> e)
+void Dumper::dumpDeclExpr(DeclExpr* const e)
 {
-	dumpChannel << header << "Declaration : " << *e;
+	header();
+	std::cout << "Declaration : " << *e;
 }
 
-void Dumper::dumpGotoExpr(std::shared_ptr<GotoExpr> e)
+void Dumper::dumpGotoExpr(GotoExpr* const e)
 {
-	dumpChannel << header << "Goto : " << *e;
+	header();
+	std::cout << "Goto : " << *e;
 }
 
-void Dumper::dumpLabelExpr(std::shared_ptr<LabelExpr> e)
+void Dumper::dumpLabelExpr(LabelExpr* const e)
 {
-	dumpChannel << header << "Label : " << *e;
+	header();
+	std::cout << "Label : " << *e;
 }
 
-void Dumper::dumpModifyExpr(std::shared_ptr<ModifyExpr> e)
+void Dumper::dumpModifyExpr(ModifyExpr* const e)
 {
-	dumpChannel << header << "Affectation : " << *e;
+	header();
+	std::cout << "Affectation : " << *e;
 }
 
-void Dumper::dumpPreincrementExpr(std::shared_ptr<PreincrementExpr> e)
+void Dumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
-	dumpChanner << header << "Preincrementation : " << *e;
+	header();
+	std::cout << "Preincrementation : " << *e;
 }
 
-void Dumper::dumpReturnExpr(std::shared_ptr<ReturnExpr> e)
+void Dumper::dumpReturnExpr(ReturnExpr* const e)
 {
-	dumpChannel << header << "Return from function : " << *e;
+	header();
+	std::cout << "Return from function : " << *e;
 }
 
-std::ostream& Dumper::header()
+void Dumper::header()
 {
-	dumpChannel << "<" << main_input_filename << "> : ";
-	return dumpChannel;
+	std::cout << "<" << main_input_filename << "> : ";
 }

@@ -1,4 +1,4 @@
-SRCS := myplugin.cpp #$(wildcard *.cpp)
+SRCS := $(wildcard *.cpp)
 OBJS := $(SRCS:.cpp=.o)
 PLUGIN = myplugin
 EXEC = $(PLUGIN).so

@@ -12,7 +12,7 @@ class ExprFactory
 
 	public:
 		static const ExprFactory INSTANCE;
-		std::unique_ptr<Expression> build(tree t) const;
+		std::shared_ptr<Expression> build(tree t) const;
 };
 
 #endif

@@ -1,8 +1,10 @@
+#include <cstdlib>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "return_expr.h"
 #include "expression.h"
 #include "bad_tree_exception.h"
+#include "dumper.h"
 
 ReturnExpr::ReturnExpr(tree t) : Expression(t)
 {
@@ -12,4 +14,14 @@ ReturnExpr::ReturnExpr(tree t) : Expression(t)
 	_value = TREE_OPERAND(t,0);
 }
 
+void ReturnExpr::accept(Dumper& d)
+{
+	d.dumpReturnExpr(this);
+}
+
+std::ostream& operator<<(std::ostream& out, const ReturnExpr& e)
+{
+	out << "ret <val>";
+	return out;
+}
 

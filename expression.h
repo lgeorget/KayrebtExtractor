@@ -16,6 +16,8 @@ class Expression
 
 	private:
 		tree _expr;
+
+	friend std::ostream& operator<<(std::ostream& out, const Expression& e);
 };
 
 #endif
