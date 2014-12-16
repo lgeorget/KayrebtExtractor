@@ -6,15 +6,6 @@ int main(int argc, char** argv);
 void other_function();
 void say_hello_and_die_maybe(int s);
 
-void say_hello_and_check_if_equal(int s)
-{
-	exit(1);
-	printf("hello %i %i\n",s,a);
-	if (a == s)
-		printf("equal\n");	
-}
-
-
 int main(int argc, char** argv)
 {
 	int b = a;
@@ -34,3 +25,12 @@ void other_function()
 {
 	a;
 }
+
+void say_hello_and_check_if_equal(int s)
+{
+	exit(1);
+	printf("hello %i %i\n",s,a);
+	if (a == s)
+		printf("equal\n");	
+}
+

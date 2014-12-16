@@ -6,59 +6,82 @@
 #include <gcc-plugin.h>
 #include "dumper.h"
 
-Dumper::Dumper()
+Dumper::Dumper(std::ostream* const out, bool withHeader) : _out(out), _withHeader(withHeader)
 {}
 
 void Dumper::dumpExpression(Expression* const e)
 {
 	header();
-	std::cout << "<Expression for which we have not yet a type> : "
+	*_out << "<Expression for which we have not yet a type> : "
 		<< *e << std::endl;
 }
 
 void Dumper::dumpCallExpr(CallExpr* const e)
 {
-//	header();
-	std::cout << "Function call : " << *e;
+	header();
+	*_out << "Function call : " << *e;
+}
+
+void Dumper::dumpCondExpr(CondExpr* const e)
+{
+	header();
+	*_out << "Conditional : " << std::endl;
+	*_out << "\tif ";
+	e->_cond->accept(*this);
+	*_out << "\tthen ";
+	e->_then->accept(*this);
+	if (e->_else) {
+		*_out << "\n\telse ";
+		e->_else->accept(*this);
+	}
+}
+
+void Dumper::dumpCompareExpr(CompareExpr* const e)
+{
+	header();
+	*_out << "Comparison : " << e->_opl 
+		  << " " << e->_op << " "
+		  << e->_opr;
 }
 
 void Dumper::dumpDeclExpr(DeclExpr* const e)
 {
 	header();
-	std::cout << "Declaration : " << *e;
+	*_out << "Declaration : " << *e;
 }
 
 void Dumper::dumpGotoExpr(GotoExpr* const e)
 {
 	header();
-	std::cout << "Goto : " << *e;
+	*_out << "Goto : " << *e;
 }
 
 void Dumper::dumpLabelExpr(LabelExpr* const e)
 {
 	header();
-	std::cout << "Label : " << *e;
+	*_out << "Label : " << *e;
 }
 
 void Dumper::dumpModifyExpr(ModifyExpr* const e)
 {
 	header();
-	std::cout << "Affectation : " << *e;
+	*_out << "Affectation : " << *e;
 }
 
 void Dumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
 	header();
-	std::cout << "Preincrementation : " << *e;
+	*_out << "Preincrementation : " << *e;
 }
 
 void Dumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	header();
-	std::cout << "Return from function : " << *e;
+	*_out << "Return from function : " << *e;
 }
 
 void Dumper::header()
 {
-	std::cout << "<" << main_input_filename << "> : ";
+	if (_withHeader)
+		*_out << "<" << main_input_filename << "> : ";
 }

@@ -5,6 +5,8 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "call_expr.h"
+#include "cond_expr.h"
+#include "compare_expr.h"
 #include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
@@ -16,8 +18,10 @@
 class Dumper
 {
 	public:
-		Dumper();
+		Dumper(std::ostream* const out = &std::cout, bool withHeader = true);
 		void dumpCallExpr(CallExpr* const e);
+		void dumpCondExpr(CondExpr* const e);
+		void dumpCompareExpr(CompareExpr* const e);
 		void dumpDeclExpr(DeclExpr* const e);
 		void dumpGotoExpr(GotoExpr* const e);
 		void dumpLabelExpr(LabelExpr* const e);
@@ -28,6 +32,8 @@ class Dumper
 
 	private:
 		void header();
+		std::ostream* const _out;
+		bool _withHeader;
 };
 
 
