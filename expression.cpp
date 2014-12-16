@@ -16,6 +16,6 @@ void Expression::accept(Dumper& d)
 
 std::ostream& operator<<(std::ostream& out, const Expression& e)
 {
-	out << "expr";
+	out << TREE_CODE(e._expr) << " " << tree_code_name[TREE_CODE(e._expr)];
 	return out;
 }

@@ -23,7 +23,6 @@ CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr), _nbArgs(0)
 	_name = DECL_NAME(fn) ? IDENTIFIER_POINTER(DECL_NAME(fn)) : "<anonymous>";
 	for (int i = 0 ; i < _nbArgs ; i++) {
 		_args.push_back(ValueFactory::INSTANCE.build(TREE_OPERAND(t,i+3)));
-		std::cerr << tree_code_name[TREE_CODE(TREE_OPERAND(t,i+3))] << " ";
 	}
 }
 

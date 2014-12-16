@@ -12,7 +12,7 @@ Dumper::Dumper()
 void Dumper::dumpExpression(Expression* const e)
 {
 	header();
-	std::cout << "<Expression for which we have not yet a type>"
+	std::cout << "<Expression for which we have not yet a type> : "
 		<< *e << std::endl;
 }
 

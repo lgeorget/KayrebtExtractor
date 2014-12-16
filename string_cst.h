@@ -10,7 +10,7 @@
 class StringCst : public Value
 {
 	public:
-		explicit StringCst(tree t);
+		StringCst(tree t);
 		std::string print() const override;
 
 	private:

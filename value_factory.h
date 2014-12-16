@@ -2,6 +2,7 @@
 #define VALUE_FACTORY_H
 
 #include <memory>
+#include <map>
 #include <gcc-plugin.h>
 
 class Value;
@@ -12,8 +13,11 @@ class ValueFactory
 		ValueFactory() = default;
 
 	public:
-		static const ValueFactory INSTANCE;
-		std::shared_ptr<Value> build(tree t) const;
+		static ValueFactory INSTANCE;
+		std::shared_ptr<Value> build(tree t);
+		std::map<tree,std::shared_ptr<Value>> strings;
+		std::map<tree,std::shared_ptr<Value>> integers;
+		std::map<tree,std::shared_ptr<Value>> idents;
 };
 
 #endif

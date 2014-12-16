@@ -13,7 +13,6 @@ IntegerCst::IntegerCst(tree t) : Value(t)
 
 	_integ = (TREE_INT_CST_HIGH(t) << 32)
 	       + TREE_INT_CST_LOW(t);
-	std::cerr << _integ << std::endl;
 }
 
 std::string IntegerCst::print() const

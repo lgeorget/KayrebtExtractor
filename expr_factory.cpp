@@ -34,13 +34,12 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case MODIFY_EXPR:
 		//	std::cerr << "...building Modify" << std::endl;
 			return std::shared_ptr<Expression>(new ModifyExpr(t));
-		case PREDECREMENT_EXPR:
-		//	std::cerr << "...building Preincrement" << std::endl;
+		case 127: //PREINCREMENT_EXPR
 			return std::shared_ptr<Expression>(new PreincrementExpr(t));
 		case RETURN_EXPR:
 		//	std::cerr << "...building Return" << std::endl;
 			return std::shared_ptr<Expression>(new ReturnExpr(t));
-		//case PREDECREMENT_EXPR:
+		case PREDECREMENT_EXPR:
 		case POSTDECREMENT_EXPR:
 		case POSTINCREMENT_EXPR:
 		case LOOP_EXPR:

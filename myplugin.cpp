@@ -73,42 +73,17 @@ extern "C" void walk_through(tree decl, Dumper dumper)
 {
 	tree subdecl = BIND_EXPR_BODY(DECL_SAVED_TREE(decl));
 	int decltc = TREE_CODE(subdecl);
-	std::cerr << tree_code_name[decltc] << std::endl;
 
 	if (decltc == STATEMENT_LIST) {
-		std::cerr << "Parsing statement list" << std::endl;
 		for (tree_stmt_iterator it = tsi_start(subdecl) ;
 			!tsi_end_p(it) ;
 			tsi_next(&it)) {
 			tree inner = tsi_stmt(it);
 			std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(inner);
-			if (e.get())
-				std::cerr << "Initialized\n" << std::endl;
-			std::cerr << "e : " << *e << std::endl;
 			e->accept(dumper);
-//			int tcstmt = TREE_CODE(inner);
-//			std::cerr << tree_code_name[tcstmt] << std::endl;
-//
-//			if (tcstmt == DECL_EXPR) {
-//				tree d = TREE_OPERAND(inner, 0);
-//				tree id = DECL_NAME(d);
-//				const char* name (id ? IDENTIFIER_POINTER (id) : "<unnamed>");
-//				std::cerr << "\t" << tree_code_name[TREE_CODE(d)] << " " << name
-//					<< " at " << DECL_SOURCE_FILE (d) << ":"
-//					<< DECL_SOURCE_LINE (d) << std::endl;
-//			}
-//
+			std::cout << std::endl;
 		}
 	}
-//	else if (decltc == MODIFY_EXPR) {
-//		tree var = TREE_OPERAND(subdecl, 0);
-//		tree val = TREE_OPERAND(subdecl, 1);
-//
-//		std::cerr << tree_code_name[TREE_CODE(var)] << " <- "
-//			  << tree_code_name[TREE_CODE(val)] << std::endl;
-//	}
-//
-//	std::cerr << std::endl;
 }
 
 extern "C" void gate_callback (void* arg, void*)
@@ -136,6 +111,7 @@ extern "C" void gate_callback (void* arg, void*)
 
   Dumper dumper;
   walk_through(decl,dumper);
+  std::cout << std::endl;
 }
 
 
