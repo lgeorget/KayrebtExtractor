@@ -80,7 +80,12 @@ extern "C" void walk_through(tree decl, Dumper dumper)
 			tsi_next(&it)) {
 			tree inner = tsi_stmt(it);
 			std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(inner);
-			e->accept(dumper);
+			try {
+				e->accept(dumper);
+			} catch(BadTreeException& e) {
+				std::cerr << "***Error detected***\n" <<
+					  e.what() << std::endl;
+			}
 			std::cout << std::endl;
 		}
 	}

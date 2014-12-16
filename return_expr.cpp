@@ -5,13 +5,19 @@
 #include "expression.h"
 #include "bad_tree_exception.h"
 #include "dumper.h"
+#include "value_factory.h"
 
 ReturnExpr::ReturnExpr(tree t) : Expression(t)
 {
 	if (TREE_CODE(t) != RETURN_EXPR)
 		throw BadTreeException(t,"RETURN_EXPR");
 
-	_value = TREE_OPERAND(t,0);
+	//Flatten the tree, don't care about the location of the return value
+	tree ret = TREE_OPERAND(t,0);
+	if (TREE_CODE(ret) == MODIFY_EXPR)
+		_value = ValueFactory::INSTANCE.build(TREE_OPERAND(ret,1));
+	else
+		_value = ValueFactory::INSTANCE.build(ret);
 }
 
 void ReturnExpr::accept(Dumper& d)
@@ -21,7 +27,7 @@ void ReturnExpr::accept(Dumper& d)
 
 std::ostream& operator<<(std::ostream& out, const ReturnExpr& e)
 {
-	out << "ret <val>";
+	out << "ret " << e._value.get();
 	return out;
 }
 

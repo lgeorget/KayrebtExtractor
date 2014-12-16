@@ -9,6 +9,8 @@
 #include "integer_cst.h"
 #include "string_cst.h"
 #include "identifier.h"
+#include "rvalue.h"
+#include "modify_expr.h"
 
 //the instance itself is not const, due to the maps
 ValueFactory ValueFactory::INSTANCE;
@@ -34,11 +36,14 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			return build(TREE_OPERAND(t,0));
 		case VAR_DECL:
 		case PARM_DECL:
+		case RESULT_DECL:
 			it = idents.find(t);
 			if (it == idents.end())
 				it = idents.insert(std::make_pair(t,std::shared_ptr<Value>(new Identifier(DECL_NAME(t))))).first;
 			return it->second;
 
+		case MODIFY_EXPR:
+			return std::shared_ptr<Value>(new RValue<ModifyExpr>(t));
 		default:
 			return std::shared_ptr<Value>(new Value(t));
 	}

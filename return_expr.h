@@ -1,9 +1,12 @@
 #ifndef RETURN_EXPR_H
 #define RETURN_EXPR_H
 
+#include <iostream>
+#include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "expression.h"
+#include "value.h"
 
 class ReturnExpr : public Expression
 {
@@ -12,7 +15,7 @@ class ReturnExpr : public Expression
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		tree _value;
+		std::shared_ptr<Value> _value;
 
 	friend std::ostream& operator<<(std::ostream& out, const ReturnExpr& e);
 };

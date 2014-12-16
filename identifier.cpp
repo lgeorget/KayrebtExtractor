@@ -7,7 +7,7 @@
 
 Identifier::Identifier(tree t) : Value(t)
 {
-	if (TREE_CODE(t) != IDENTIFIER_NODE)
+	if (t && TREE_CODE(t) != IDENTIFIER_NODE)
 		throw BadTreeException(t,"decl_name");
 
 	if (t)
