@@ -2,6 +2,7 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include "compare_expr.h"
 #include "expression.h"
 #include "value.h"
 #include "value_factory.h"

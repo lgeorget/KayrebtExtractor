@@ -4,17 +4,19 @@
 #include <iostream>
 #include <gcc-plugin.h>
 #include <tree.h>
-#include "boolean_expr.h"
-#include "call_expr.h"
-#include "cond_expr.h"
-#include "compare_expr.h"
-#include "decl_expr.h"
-#include "expression.h"
-#include "goto_expr.h"
-#include "label_expr.h"
-#include "modify_expr.h"
-#include "preincrement_expr.h"
-#include "return_expr.h"
+
+class BooleanExpr;
+class CallExpr;
+class CondExpr;
+class CompareExpr;
+class DeclExpr;
+class GotoExpr;
+class LabelExpr;
+class ModifyExpr;
+class PreincrementExpr;
+class ReturnExpr;
+class SwitchExpr;
+class Expression;
 
 class Dumper
 {

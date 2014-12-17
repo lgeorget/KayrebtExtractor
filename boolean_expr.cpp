@@ -2,6 +2,7 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include "boolean_expr.h"
 #include "expression.h"
 #include "expr_factory.h"
 #include "dumper.h"

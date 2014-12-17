@@ -5,6 +5,18 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include "dumper.h"
+#include "boolean_expr.h"
+#include "call_expr.h"
+#include "cond_expr.h"
+#include "compare_expr.h"
+#include "decl_expr.h"
+#include "expression.h"
+#include "goto_expr.h"
+#include "label_expr.h"
+#include "modify_expr.h"
+#include "preincrement_expr.h"
+#include "return_expr.h"
+#include "switch_expr.h"
 
 Dumper::Dumper(std::ostream* const out, bool withHeader) : _out(out), _withHeader(withHeader)
 {}
