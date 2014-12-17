@@ -4,19 +4,18 @@
 #include <cstdlib>
 #include <memory>
 #include <gcc-plugin.h>
-#include "dumper.h"
-#include "boolean_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
-#include "compare_expr.h"
 #include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
 #include "label_expr.h"
+#include "leaf.h"
 #include "modify_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
+#include "dumper.h"
 
 Dumper::Dumper(std::ostream* const out, bool withHeader) : _out(out), _withHeader(withHeader)
 {}
@@ -26,16 +25,6 @@ void Dumper::dumpExpression(Expression* const e)
 	header();
 	*_out << "<Expression for which we have not yet a type> : "
 		<< *e << std::endl;
-}
-
-void Dumper::dumpBooleanExpr(BooleanExpr* const e)
-{
-	header();
-	*_out  << "(";
-	e->_opl->accept(*this);
-	*_out  << ") " << e->_op << " (";
-	e->_opr->accept(*this);
-	*_out << ")";
 }
 
 void Dumper::dumpCallExpr(CallExpr* const e)
@@ -58,14 +47,6 @@ void Dumper::dumpCondExpr(CondExpr* const e)
 	}
 }
 
-void Dumper::dumpCompareExpr(CompareExpr* const e)
-{
-	header();
-	*_out << "Comparison : " << e->_opl 
-		  << " " << e->_op << " "
-		  << e->_opr;
-}
-
 void Dumper::dumpDeclExpr(DeclExpr* const e)
 {
 	header();
@@ -84,6 +65,12 @@ void Dumper::dumpLabelExpr(LabelExpr* const e)
 	*_out << "Label : " << *e;
 }
 
+void Dumper::dumpLeaf(Leaf* const e)
+{
+	header();
+	*_out << e->_val->print();
+}
+
 void Dumper::dumpModifyExpr(ModifyExpr* const e)
 {
 	header();
@@ -100,6 +87,16 @@ void Dumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	header();
 	*_out << "Return from function : " << *e;
+}
+
+void Dumper::dumpSwitchExpr(SwitchExpr* const e)
+{
+	header();
+	*_out << "Switch : ";
+	e->_cond->accept(*this);
+	*_out << std::endl;
+	e->_body->accept(*this);
+	*_out << "*** end of switch ***" << std::endl;
 }
 
 void Dumper::header()

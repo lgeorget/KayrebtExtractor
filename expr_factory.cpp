@@ -4,10 +4,9 @@
 #include <tree.h>
 #include "expr_factory.h"
 #include "expression.h"
-#include "boolean_expr.h"
+#include "arith_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
-#include "compare_expr.h"
 #include "decl_expr.h"
 #include "expr_factory.h"
 #include "expression.h"
@@ -16,6 +15,8 @@
 #include "modify_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
+#include "switch_expr.h"
+#include "leaf.h"
 
 const ExprFactory ExprFactory::INSTANCE;
 
@@ -42,29 +43,12 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 			return std::shared_ptr<Expression>(new ModifyExpr(t));
 		case 127: //PREINCREMENT_EXPR
 			return std::shared_ptr<Expression>(new PreincrementExpr(t));
+		case SWITCH_EXPR:
+			return std::shared_ptr<Expression>(new SwitchExpr(t));
+
 		case RETURN_EXPR:
 		//	std::cerr << "...building Return" << std::endl;
 			return std::shared_ptr<Expression>(new ReturnExpr(t));
-		case TRUTH_ANDIF_EXPR:
-		case TRUTH_AND_EXPR:
-			return std::shared_ptr<Expression>(new BooleanExpr(t,"&&"));
-		case TRUTH_ORIF_EXPR:
-		case TRUTH_OR_EXPR:
-			return std::shared_ptr<Expression>(new BooleanExpr(t,"||"));
-		case TRUTH_XOR_EXPR: //Doesn't exist in C, AFAIR...
-			return std::shared_ptr<Expression>(new BooleanExpr(t,"^"));
-		case LT_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,"<"));
-		case LE_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,"<="));
-		case GT_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,">"));
-		case GE_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,">="));
-		case EQ_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,"=="));
-		case NE_EXPR:
-			return std::shared_ptr<Expression>(new CompareExpr(t,"!="));
 
 
 		case PREDECREMENT_EXPR:
@@ -74,7 +58,7 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case EXIT_EXPR:
 		default:
 		//	std::cerr << "...building Expr" << std::endl;
-			return std::shared_ptr<Expression>(new Expression(t));
+			return std::shared_ptr<Expression>(new Leaf(t));
 	}
 }
 

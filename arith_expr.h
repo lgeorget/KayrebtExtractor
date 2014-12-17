@@ -1,27 +1,25 @@
-#ifndef COMPARE_EXPR_H
-#define COMPARE_EXPR_H
+#ifndef ARITH_EXPR_H
+#define ARITH_EXPR_H
 
 #include <iostream>
+#include <string>
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
-#include "expression.h"
 #include "value.h"
 
 class Dumper;
 
-class CompareExpr : public Expression
+class ArithExpr : public Value
 {
 	public:
-		explicit CompareExpr(tree t, std::string op);
-		void accept(Dumper& d) override;
+		explicit ArithExpr(tree t, std::string op);
+		std::string print() const override;
 
 	private:
 		const std::string _op;
 		std::shared_ptr<Value> _opl;
 		std::shared_ptr<Value> _opr;
-
-	friend class Dumper;
 };
 
 #endif

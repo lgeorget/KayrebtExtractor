@@ -6,10 +6,10 @@
 #include <tree.h>
 #include "value.h"
 #include "value_factory.h"
+#include "arith_expr.h"
 #include "integer_cst.h"
 #include "string_cst.h"
 #include "identifier.h"
-#include "rvalue.h"
 #include "ternary_op.h"
 #include "modify_expr.h"
 #include "cond_expr.h"
@@ -34,6 +34,48 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			if (it == integers.end())
 				it = integers.insert(std::make_pair(t,std::shared_ptr<Value>(new IntegerCst(t)))).first;
 			return it->second;
+		case PLUS_EXPR:
+		case POINTER_PLUS_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"+"));
+		case MINUS_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"-"));
+		case MULT_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"*"));
+		case MULT_HIGHPART_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"*#"));
+		case TRUNC_DIV_EXPR:
+		case CEIL_DIV_EXPR:
+		case FLOOR_DIV_EXPR:
+		case ROUND_DIV_EXPR:
+		case RDIV_EXPR:
+		case EXACT_DIV_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"/"));
+		case TRUNC_MOD_EXPR:
+		case CEIL_MOD_EXPR:
+		case FLOOR_MOD_EXPR:
+		case ROUND_MOD_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"%"));
+		case TRUTH_ANDIF_EXPR:
+		case TRUTH_AND_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"&&"));
+		case TRUTH_ORIF_EXPR:
+		case TRUTH_OR_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"||"));
+		case TRUTH_XOR_EXPR: //Doesn't exist in C, AFAIR...
+			return std::shared_ptr<Value>(new ArithExpr(t,"^"));
+		case LT_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"<"));
+		case LE_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"<="));
+		case GT_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,">"));
+		case GE_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,">="));
+		case EQ_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"=="));
+		case NE_EXPR:
+			return std::shared_ptr<Value>(new ArithExpr(t,"!="));
+
 
 		case NOP_EXPR:
 		case ADDR_EXPR:
@@ -55,8 +97,6 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case COND_EXPR:
 			return std::shared_ptr<Value>(new TernaryOp(t));
 
-		case MODIFY_EXPR:
-			return std::shared_ptr<Value>(new RValue<ModifyExpr>(t));
 		default:
 			return std::shared_ptr<Value>(new Value(t));
 	}

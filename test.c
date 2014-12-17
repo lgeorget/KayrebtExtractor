@@ -38,7 +38,7 @@ void say_hello_and_check_if_equal(int s)
 			other_function();
 			break;
 	}
-	if (a && a == s)
+	if (a && a == (s+3))
 		printf("equal\n");	
 }
 
