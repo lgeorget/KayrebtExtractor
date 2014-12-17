@@ -13,6 +13,8 @@
 #include "ternary_op.h"
 #include "modify_expr.h"
 #include "cond_expr.h"
+#include "negate_op.h"
+#include "label.h"
 
 //the instance itself is not const, due to the maps
 ValueFactory ValueFactory::INSTANCE;
@@ -43,6 +45,12 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			if (it == idents.end())
 				it = idents.insert(std::make_pair(t,std::shared_ptr<Value>(new Identifier(DECL_NAME(t))))).first;
 			return it->second;
+
+		case LABEL_DECL:
+			return std::shared_ptr<Value>(new Label(t));
+
+		case NEGATE_EXPR:
+			return std::shared_ptr<Value>(new NegateOp(t));
 
 		case COND_EXPR:
 			return std::shared_ptr<Value>(new TernaryOp(t));

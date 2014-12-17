@@ -16,6 +16,16 @@ void Dumper::dumpExpression(Expression* const e)
 		<< *e << std::endl;
 }
 
+void Dumper::dumpBooleanExpr(BooleanExpr* const e)
+{
+	header();
+	*_out  << "(";
+	e->_opl->accept(*this);
+	*_out  << ") " << e->_op << " (";
+	e->_opr->accept(*this);
+	*_out << ")";
+}
+
 void Dumper::dumpCallExpr(CallExpr* const e)
 {
 	header();

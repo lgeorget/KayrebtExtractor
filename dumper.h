@@ -4,6 +4,7 @@
 #include <iostream>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include "boolean_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
 #include "compare_expr.h"
@@ -19,6 +20,7 @@ class Dumper
 {
 	public:
 		Dumper(std::ostream* const out = &std::cout, bool withHeader = true);
+		void dumpBooleanExpr(BooleanExpr* const e);
 		void dumpCallExpr(CallExpr* const e);
 		void dumpCondExpr(CondExpr* const e);
 		void dumpCompareExpr(CompareExpr* const e);

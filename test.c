@@ -30,7 +30,15 @@ void say_hello_and_check_if_equal(int s)
 {
 	exit(1);
 	printf("hello %i %i\n",s,a);
-	if (a == s)
+	switch (a * s) {
+		case 0:
+			printf("either a or s is null\n");
+			break;
+		default:
+			other_function();
+			break;
+	}
+	if (a && a == s)
 		printf("equal\n");	
 }
 

@@ -4,6 +4,7 @@
 #include <tree.h>
 #include "expr_factory.h"
 #include "expression.h"
+#include "boolean_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
 #include "compare_expr.h"
@@ -44,6 +45,14 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case RETURN_EXPR:
 		//	std::cerr << "...building Return" << std::endl;
 			return std::shared_ptr<Expression>(new ReturnExpr(t));
+		case TRUTH_ANDIF_EXPR:
+		case TRUTH_AND_EXPR:
+			return std::shared_ptr<Expression>(new BooleanExpr(t,"&&"));
+		case TRUTH_ORIF_EXPR:
+		case TRUTH_OR_EXPR:
+			return std::shared_ptr<Expression>(new BooleanExpr(t,"||"));
+		case TRUTH_XOR_EXPR: //Doesn't exist in C, AFAIR...
+			return std::shared_ptr<Expression>(new BooleanExpr(t,"^"));
 		case LT_EXPR:
 			return std::shared_ptr<Expression>(new CompareExpr(t,"<"));
 		case LE_EXPR:

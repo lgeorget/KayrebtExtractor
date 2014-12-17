@@ -1,10 +1,12 @@
 #ifndef GOTO_EXPR_H
 #define GOTO_EXPR_H
 
+#include <iostream>
+#include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "expression.h"
-
+#include "value.h"
 
 class GotoExpr : public Expression
 {
@@ -13,7 +15,7 @@ class GotoExpr : public Expression
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		tree _label;
+		std::shared_ptr<Value> _label;
 
 	friend std::ostream& operator<<(std::ostream& out, const GotoExpr& e);
 };
