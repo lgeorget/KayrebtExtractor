@@ -7,6 +7,7 @@
 #include "arith_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
+#include "case_label_expr.h"
 #include "decl_expr.h"
 #include "expr_factory.h"
 #include "expression.h"
@@ -16,6 +17,7 @@
 #include "preincrement_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
+#include "stmt_list.h"
 #include "leaf.h"
 
 const ExprFactory ExprFactory::INSTANCE;
@@ -29,6 +31,8 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case CALL_EXPR:
 		//	std::cerr << "...building Call" << std::endl;
 			return std::shared_ptr<Expression>(new CallExpr(t));
+		case CASE_LABEL_EXPR:
+			return std::shared_ptr<Expression>(new CaseLabelExpr(t));
 		case COND_EXPR:
 		//	std::cerr << "...building Cond" << std::endl;
 			return std::shared_ptr<Expression>(new CondExpr(t));
@@ -46,10 +50,12 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case SWITCH_EXPR:
 			return std::shared_ptr<Expression>(new SwitchExpr(t));
 
+		case STATEMENT_LIST:
+			return std::shared_ptr<Expression>(new StmtList(t));
+
 		case RETURN_EXPR:
 		//	std::cerr << "...building Return" << std::endl;
 			return std::shared_ptr<Expression>(new ReturnExpr(t));
-
 
 		case PREDECREMENT_EXPR:
 		case POSTDECREMENT_EXPR:

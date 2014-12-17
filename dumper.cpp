@@ -5,6 +5,7 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include "call_expr.h"
+#include "case_label_expr.h"
 #include "cond_expr.h"
 #include "decl_expr.h"
 #include "expression.h"
@@ -14,6 +15,7 @@
 #include "modify_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
+#include "stmt_list.h"
 #include "switch_expr.h"
 #include "dumper.h"
 
@@ -31,6 +33,21 @@ void Dumper::dumpCallExpr(CallExpr* const e)
 {
 	header();
 	*_out << "Function call : " << *e;
+}
+
+void Dumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
+{
+	header();
+	*_out << "Case label : ";
+	if (e->_lowValue) {
+		*_out << e->_lowValue->print();
+		if (e->_highValue) {
+			*_out <<  " ... " << e->_highValue->print();
+		}
+	} 
+	else 
+		*_out << "default";
+	*_out << e->_label->print();
 }
 
 void Dumper::dumpCondExpr(CondExpr* const e)
@@ -87,6 +104,14 @@ void Dumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	header();
 	*_out << "Return from function : " << *e;
+}
+
+void Dumper::dumpStmtList(StmtList* const e)
+{
+	for (auto expr : e->_exprs) {
+		expr->accept(*this);
+		*_out << std::endl;
+	}
 }
 
 void Dumper::dumpSwitchExpr(SwitchExpr* const e)

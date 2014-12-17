@@ -73,23 +73,16 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 extern "C" void walk_through(tree decl, Dumper dumper)
 {
 	tree subdecl = BIND_EXPR_BODY(DECL_SAVED_TREE(decl));
-	int decltc = TREE_CODE(subdecl);
 
-	if (decltc == STATEMENT_LIST) {
-		for (tree_stmt_iterator it = tsi_start(subdecl) ;
-			!tsi_end_p(it) ;
-			tsi_next(&it)) {
-			tree inner = tsi_stmt(it);
-			std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(inner);
-			try {
-				e->accept(dumper);
-			} catch(BadTreeException& e) {
-				std::cerr << "***Error detected***\n" <<
-					  e.what() << std::endl;
-			}
-			std::cout << std::endl;
-		}
+	std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(subdecl);
+	try {
+		e->accept(dumper);
+	} catch(BadTreeException& e) {
+		std::cerr << "***Error detected***\n" <<
+			e.what() << std::endl;
+		throw e;
 	}
+	std::cout << std::endl;
 }
 
 extern "C" void gate_callback (void* arg, void*)
