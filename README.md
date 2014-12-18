@@ -18,7 +18,7 @@ Next, change the path to the GCC plugins headers in the Makefile (in the CFLAGS
 definition). Yeah, I know, hardcoded path... I'll change it for version 1.0.
 
 Then, running `make` should leave you with a plugin, by the name of 
-`myplugin.so` or whatever the value of `EXEC` in the main file is. This .so file
+`myplugin.so` or whatever the value of `EXEC` in the Makefile is. This .so file
 is the GCC plugin, handle with care.
 
 Running
@@ -31,3 +31,6 @@ use other source files but the plugin currently doesn't handle anything else
 than C, not even C++. You can try any language supported by GCC as the AST are 
 all written in the same language, GENERIC. However, some syntactic constructs
 will not be supported. Even in C, you may find some lacking stuff.
+
+In short, change the `run` target to suit your needs, or just make your own 
+Makefile based on the shipped-in one and it should do the job.
