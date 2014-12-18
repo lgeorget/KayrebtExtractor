@@ -60,7 +60,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 
 	// Disable assembly output.
 	//
-	asm_file_name = HOST_BIT_BUCKET;
+//	asm_file_name = HOST_BIT_BUCKET;
 
 	// Register callbacks.
 	//
