@@ -15,7 +15,6 @@
 #include "goto_expr.h"
 #include "label_expr.h"
 #include "modify_expr.h"
-#include "nop_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
@@ -50,10 +49,9 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		//	std::cerr << "...building Modify" << std::endl;
 			return std::make_shared<ModifyExpr>(ModifyExpr(t));
 
+		case CONVERT_EXPR:
 		case NOP_EXPR:
-			if (!_nop)
-				_nop = std::make_shared<NopExpr>(NopExpr(t));
-			return _nop;
+			return build(TREE_OPERAND(t,0));
 
 		case 127: //PREINCREMENT_EXPR
 			return std::make_shared<PreincrementExpr>(PreincrementExpr(t));
