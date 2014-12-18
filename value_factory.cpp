@@ -83,6 +83,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case INDIRECT_REF:
 			return std::make_shared<Indirection>(Indirection(t,"*"));
 
+		case NOP_EXPR: //happens when functions arguments need trivial cast
+			return build(TREE_OPERAND(t,0));
+
 		case VAR_DECL:
 		case PARM_DECL:
 		case RESULT_DECL:
