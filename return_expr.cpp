@@ -14,10 +14,12 @@ ReturnExpr::ReturnExpr(tree t) : Expression(t)
 
 	//Flatten the tree, don't care about the location of the return value
 	tree ret = TREE_OPERAND(t,0);
-	if (TREE_CODE(ret) == MODIFY_EXPR)
-		_value = ExprFactory::INSTANCE.build(TREE_OPERAND(ret,1));
-	else
-		_value = ExprFactory::INSTANCE.build(ret);
+	if (ret) {
+		if (TREE_CODE(ret) == MODIFY_EXPR)
+			_value = ExprFactory::INSTANCE.build(TREE_OPERAND(ret,1));
+		else
+			_value = ExprFactory::INSTANCE.build(ret);
+	}
 }
 
 void ReturnExpr::accept(Dumper& d)

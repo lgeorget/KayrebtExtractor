@@ -40,9 +40,9 @@ void say_hello_and_check_if_equal(int s)
 			break;
 		default:
 			other_function();
-			break;
+			return;
 	}
 	if (a && a == (s+3))
-		printf("equal\n");	
+		printf("a is equal to 3\n");	
 }
 
