@@ -8,6 +8,7 @@
 #include "value_factory.h"
 #include "arith_expr.h"
 #include "integer_cst.h"
+#include "indirection.h"
 #include "string_cst.h"
 #include "identifier.h"
 #include "ternary_op.h"
@@ -76,10 +77,12 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case NE_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"!="));
 
-
-		case NOP_EXPR:
 		case ADDR_EXPR:
-			return build(TREE_OPERAND(t,0));
+			return std::make_shared<Indirection>(Indirection(t,"&"));
+
+		case INDIRECT_REF:
+			return std::make_shared<Indirection>(Indirection(t,"*"));
+
 		case VAR_DECL:
 		case PARM_DECL:
 		case RESULT_DECL:

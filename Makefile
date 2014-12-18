@@ -21,7 +21,6 @@ run: $(EXEC)
 clean :
 	rm -rf $(OBJS)
 
-
 arith_expr.o: arith_expr.cpp arith_expr.h value.h value_factory.h \
  dumper.h bad_tree_exception.h
 bad_tree_exception.o: bad_tree_exception.cpp bad_tree_exception.h
@@ -41,12 +40,15 @@ dumper.o: dumper.cpp bind_expr.h expression.h value.h call_expr.h \
  return_expr.h stmt_list.h switch_expr.h
 expr_factory.o: expr_factory.cpp expr_factory.h expression.h arith_expr.h \
  value.h bind_expr.h call_expr.h cond_expr.h case_label_expr.h \
- decl_expr.h goto_expr.h label_expr.h modify_expr.h preincrement_expr.h \
- return_expr.h switch_expr.h stmt_list.h leaf.h dumper.h
+ decl_expr.h goto_expr.h label_expr.h modify_expr.h nop_expr.h \
+ preincrement_expr.h return_expr.h switch_expr.h stmt_list.h leaf.h \
+ dumper.h
 expression.o: expression.cpp expression.h dumper.h
 goto_expr.o: goto_expr.cpp bad_tree_exception.h goto_expr.h expression.h \
  value.h dumper.h value_factory.h
 identifier.o: identifier.cpp value.h identifier.h bad_tree_exception.h
+indirection.o: indirection.cpp value.h value_factory.h \
+ bad_tree_exception.h indirection.h
 integer_cst.o: integer_cst.cpp integer_cst.h value.h bad_tree_exception.h
 label.o: label.cpp value.h value_factory.h bad_tree_exception.h label.h
 label_expr.o: label_expr.cpp bad_tree_exception.h label_expr.h \
@@ -73,5 +75,5 @@ ternary_op.o: ternary_op.cpp ternary_op.h value.h expression.h \
  bad_tree_exception.h expr_factory.h value_factory.h dumper.h
 value.o: value.cpp value.h
 value_factory.o: value_factory.cpp value.h value_factory.h arith_expr.h \
- integer_cst.h string_cst.h identifier.h ternary_op.h expression.h \
- modify_expr.h cond_expr.h negate_op.h label.h
+ integer_cst.h indirection.h string_cst.h identifier.h ternary_op.h \
+ expression.h modify_expr.h cond_expr.h negate_op.h label.h

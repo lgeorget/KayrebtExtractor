@@ -9,8 +9,9 @@ void say_hello_and_die_maybe(int s);
 int main(int argc, char** argv)
 {
 	int b = a;
+	int* c = &b;
 	int i;
-	for (i = b>a?-b:b ; i < 10 ; ++i) {
+	for (i = b>a?-b:*c ; i < 10 ; ++i) {
 		printf("coucou %i %i\n", b, a);
 		printf("coucou %i %i\n", a, b);
 	}
