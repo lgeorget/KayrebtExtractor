@@ -26,55 +26,55 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case STRING_CST:
 			it = strings.find(t);
 			if (it == strings.end())
-				it = strings.insert(std::make_pair(t,std::shared_ptr<Value>(new StringCst(t)))).first;
+				it = strings.insert(std::make_pair(t,std::make_shared<StringCst>(StringCst(t)))).first;
 			return it->second;
 
 		case INTEGER_CST:
 			it = integers.find(t);
 			if (it == integers.end())
-				it = integers.insert(std::make_pair(t,std::shared_ptr<Value>(new IntegerCst(t)))).first;
+				it = integers.insert(std::make_pair(t,std::make_shared<IntegerCst>(IntegerCst(t)))).first;
 			return it->second;
 		case PLUS_EXPR:
 		case POINTER_PLUS_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"+"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"+"));
 		case MINUS_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"-"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"-"));
 		case MULT_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"*"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"*"));
 		case MULT_HIGHPART_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"*#"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"*#"));
 		case TRUNC_DIV_EXPR:
 		case CEIL_DIV_EXPR:
 		case FLOOR_DIV_EXPR:
 		case ROUND_DIV_EXPR:
 		case RDIV_EXPR:
 		case EXACT_DIV_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"/"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"/"));
 		case TRUNC_MOD_EXPR:
 		case CEIL_MOD_EXPR:
 		case FLOOR_MOD_EXPR:
 		case ROUND_MOD_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"%"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"%"));
 		case TRUTH_ANDIF_EXPR:
 		case TRUTH_AND_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"&&"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"&&"));
 		case TRUTH_ORIF_EXPR:
 		case TRUTH_OR_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"||"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"||"));
 		case TRUTH_XOR_EXPR: //Doesn't exist in C, AFAIR...
-			return std::shared_ptr<Value>(new ArithExpr(t,"^"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"^"));
 		case LT_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"<"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"<"));
 		case LE_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"<="));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"<="));
 		case GT_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,">"));
+			return std::make_shared<ArithExpr>(ArithExpr(t,">"));
 		case GE_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,">="));
+			return std::make_shared<ArithExpr>(ArithExpr(t,">="));
 		case EQ_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"=="));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"=="));
 		case NE_EXPR:
-			return std::shared_ptr<Value>(new ArithExpr(t,"!="));
+			return std::make_shared<ArithExpr>(ArithExpr(t,"!="));
 
 
 		case NOP_EXPR:
@@ -85,20 +85,20 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case RESULT_DECL:
 			it = idents.find(t);
 			if (it == idents.end())
-				it = idents.insert(std::make_pair(t,std::shared_ptr<Value>(new Identifier(DECL_NAME(t))))).first;
+				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(DECL_NAME(t))))).first;
 			return it->second;
 
 		case LABEL_DECL:
-			return std::shared_ptr<Value>(new Label(t));
+			return std::make_shared<Label>(Label(t));
 
 		case NEGATE_EXPR:
-			return std::shared_ptr<Value>(new NegateOp(t));
+			return std::make_shared<NegateOp>(NegateOp(t));
 
 		case COND_EXPR:
-			return std::shared_ptr<Value>(new TernaryOp(t));
+			return std::make_shared<TernaryOp>(TernaryOp(t));
 
 		default:
-			return std::shared_ptr<Value>(new Value(t));
+			return std::make_shared<Value>(Value(t));
 	}
 }
 

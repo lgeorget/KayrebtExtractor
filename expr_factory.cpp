@@ -27,38 +27,38 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 {
 	switch (TREE_CODE(t)) {
 		case BIND_EXPR:
-			return std::shared_ptr<Expression>(new BindExpr(t));
+			return std::make_shared<BindExpr>(BindExpr(t));
 		case DECL_EXPR:
 		//	std::cerr << "...building Decl" << std::endl;
-			return std::shared_ptr<Expression>(new DeclExpr(t));
+			return std::make_shared<DeclExpr>(DeclExpr(t));
 		case CALL_EXPR:
 		//	std::cerr << "...building Call" << std::endl;
-			return std::shared_ptr<Expression>(new CallExpr(t));
+			return std::make_shared<CallExpr>(CallExpr(t));
 		case CASE_LABEL_EXPR:
-			return std::shared_ptr<Expression>(new CaseLabelExpr(t));
+			return std::make_shared<CaseLabelExpr>(CaseLabelExpr(t));
 		case COND_EXPR:
 		//	std::cerr << "...building Cond" << std::endl;
-			return std::shared_ptr<Expression>(new CondExpr(t));
+			return std::make_shared<CondExpr>(CondExpr(t));
 		case GOTO_EXPR:
 		//	std::cerr << "...building Goto" << std::endl;
-			return std::shared_ptr<Expression>(new GotoExpr(t));
+			return std::make_shared<GotoExpr>(GotoExpr(t));
 		case LABEL_EXPR:
 		//	std::cerr << "...building Label" << std::endl;
-			return std::shared_ptr<Expression>(new LabelExpr(t));
+			return std::make_shared<LabelExpr>(LabelExpr(t));
 		case MODIFY_EXPR:
 		//	std::cerr << "...building Modify" << std::endl;
-			return std::shared_ptr<Expression>(new ModifyExpr(t));
+			return std::make_shared<ModifyExpr>(ModifyExpr(t));
 		case 127: //PREINCREMENT_EXPR
-			return std::shared_ptr<Expression>(new PreincrementExpr(t));
+			return std::make_shared<PreincrementExpr>(PreincrementExpr(t));
 		case SWITCH_EXPR:
-			return std::shared_ptr<Expression>(new SwitchExpr(t));
+			return std::make_shared<SwitchExpr>(SwitchExpr(t));
 
 		case STATEMENT_LIST:
-			return std::shared_ptr<Expression>(new StmtList(t));
+			return std::make_shared<StmtList>(StmtList(t));
 
 		case RETURN_EXPR:
 		//	std::cerr << "...building Return" << std::endl;
-			return std::shared_ptr<Expression>(new ReturnExpr(t));
+			return std::make_shared<ReturnExpr>(ReturnExpr(t));
 
 		case PREDECREMENT_EXPR:
 		case POSTDECREMENT_EXPR:
@@ -67,7 +67,7 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case EXIT_EXPR:
 		default:
 		//	std::cerr << "...building Expr" << std::endl;
-			return std::shared_ptr<Expression>(new Leaf(t));
+			return std::make_shared<Leaf>(Leaf(t));
 	}
 }
 
