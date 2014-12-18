@@ -9,10 +9,11 @@ class ExprFactory
 {
 	private:
 		ExprFactory() = default;
+		std::shared_ptr<Expression> _nop;
 
 	public:
-		static const ExprFactory INSTANCE;
-		std::shared_ptr<Expression> build(tree t) const;
+		static ExprFactory INSTANCE;
+		std::shared_ptr<Expression> build(tree t);
 };
 
 #endif

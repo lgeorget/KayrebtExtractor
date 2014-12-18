@@ -23,7 +23,9 @@ int main(int argc, char** argv)
 
 void other_function()
 {
-	a;
+	while(1)
+		for (;;)
+			a;
 }
 
 void say_hello_and_check_if_equal(int s)

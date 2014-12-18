@@ -13,6 +13,7 @@ class DeclExpr;
 class GotoExpr;
 class LabelExpr;
 class ModifyExpr;
+class NopExpr;
 class PreincrementExpr;
 class ReturnExpr;
 class Leaf;
@@ -33,6 +34,7 @@ class Dumper
 		void dumpLabelExpr(LabelExpr* const e);
 		void dumpLeaf(Leaf* const e);
 		void dumpModifyExpr(ModifyExpr* const e);
+		void dumpNopExpr(NopExpr* const e);
 		void dumpPreincrementExpr(PreincrementExpr* const e);
 		void dumpReturnExpr(ReturnExpr* const e);
 		void dumpStmtList(StmtList* const e);

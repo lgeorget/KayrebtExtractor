@@ -15,15 +15,16 @@
 #include "goto_expr.h"
 #include "label_expr.h"
 #include "modify_expr.h"
+#include "nop_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
 #include "stmt_list.h"
 #include "leaf.h"
 
-const ExprFactory ExprFactory::INSTANCE;
+ExprFactory ExprFactory::INSTANCE;
 
-std::shared_ptr<Expression> ExprFactory::build(tree t) const
+std::shared_ptr<Expression> ExprFactory::build(tree t)
 {
 	switch (TREE_CODE(t)) {
 		case BIND_EXPR:
@@ -48,6 +49,12 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case MODIFY_EXPR:
 		//	std::cerr << "...building Modify" << std::endl;
 			return std::make_shared<ModifyExpr>(ModifyExpr(t));
+
+		case NOP_EXPR:
+			if (!_nop)
+				_nop = std::make_shared<NopExpr>(NopExpr(t));
+			return _nop;
+
 		case 127: //PREINCREMENT_EXPR
 			return std::make_shared<PreincrementExpr>(PreincrementExpr(t));
 		case SWITCH_EXPR:
@@ -63,8 +70,6 @@ std::shared_ptr<Expression> ExprFactory::build(tree t) const
 		case PREDECREMENT_EXPR:
 		case POSTDECREMENT_EXPR:
 		case POSTINCREMENT_EXPR:
-		case LOOP_EXPR:
-		case EXIT_EXPR:
 		default:
 		//	std::cerr << "...building Expr" << std::endl;
 			return std::make_shared<Leaf>(Leaf(t));

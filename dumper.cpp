@@ -14,6 +14,7 @@
 #include "label_expr.h"
 #include "leaf.h"
 #include "modify_expr.h"
+#include "nop_expr.h"
 #include "preincrement_expr.h"
 #include "return_expr.h"
 #include "stmt_list.h"
@@ -106,6 +107,10 @@ void Dumper::dumpModifyExpr(ModifyExpr* const e)
 {
 	header();
 	*_out << "Affectation : " << *e;
+}
+
+void Dumper::dumpNopExpr(NopExpr* const e)
+{
 }
 
 void Dumper::dumpPreincrementExpr(PreincrementExpr* const e)
