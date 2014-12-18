@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <memory>
 #include <gcc-plugin.h>
+#include "text_dumper.h"
 #include "bind_expr.h"
 #include "call_expr.h"
 #include "case_label_expr.h"
@@ -21,17 +22,17 @@
 #include "switch_expr.h"
 #include "dumper.h"
 
-Dumper::Dumper(std::ostream* const out, bool withHeader) : _out(out), _withHeader(withHeader)
+TextDumper::TextDumper(std::ostream* const out, bool withHeader) : Dumper(), _out(out), _withHeader(withHeader)
 {}
 
-void Dumper::dumpExpression(Expression* const e)
+void TextDumper::dumpExpression(Expression* const e)
 {
 	header();
 	*_out << "<Expression for which we have not yet a type> : "
 		<< *e << std::endl;
 }
 
-void Dumper::dumpBindExpr(BindExpr* const e)
+void TextDumper::dumpBindExpr(BindExpr* const e)
 {
 	header();
 	*_out << "*** start of inner scope ***" << std::endl;
@@ -41,13 +42,13 @@ void Dumper::dumpBindExpr(BindExpr* const e)
 	*_out << "*** end of inner scope ***" << std::endl;
 }
 
-void Dumper::dumpCallExpr(CallExpr* const e)
+void TextDumper::dumpCallExpr(CallExpr* const e)
 {
 	header();
 	*_out << "Function call : " << *e;
 }
 
-void Dumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
+void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 {
 	header();
 	*_out << "Case label : ";
@@ -62,7 +63,7 @@ void Dumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 	*_out << e->_label->print();
 }
 
-void Dumper::dumpCondExpr(CondExpr* const e)
+void TextDumper::dumpCondExpr(CondExpr* const e)
 {
 	header();
 	*_out << "Conditional : " << std::endl;
@@ -76,7 +77,7 @@ void Dumper::dumpCondExpr(CondExpr* const e)
 	}
 }
 
-void Dumper::dumpDeclExpr(DeclExpr* const e)
+void TextDumper::dumpDeclExpr(DeclExpr* const e)
 {
 	header();
 	*_out << "Declaration : " << e->_name->print();
@@ -84,47 +85,47 @@ void Dumper::dumpDeclExpr(DeclExpr* const e)
 		*_out << " = " << e->_init->print();
 }
 
-void Dumper::dumpGotoExpr(GotoExpr* const e)
+void TextDumper::dumpGotoExpr(GotoExpr* const e)
 {
 	header();
 	*_out << "Goto : " << *e;
 }
 
-void Dumper::dumpLabelExpr(LabelExpr* const e)
+void TextDumper::dumpLabelExpr(LabelExpr* const e)
 {
 	header();
 	*_out << "Label : " << *e;
 }
 
-void Dumper::dumpLeaf(Leaf* const e)
+void TextDumper::dumpLeaf(Leaf* const e)
 {
 	header();
 	*_out << e->_val->print();
 }
 
-void Dumper::dumpModifyExpr(ModifyExpr* const e)
+void TextDumper::dumpModifyExpr(ModifyExpr* const e)
 {
 	header();
 	*_out << "Affectation : " << *e;
 }
 
-void Dumper::dumpNopExpr(NopExpr* const e)
+void TextDumper::dumpNopExpr(NopExpr* const e)
 {
 }
 
-void Dumper::dumpPreincrementExpr(PreincrementExpr* const e)
+void TextDumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
 	header();
 	*_out << "Preincrementation : " << *e;
 }
 
-void Dumper::dumpReturnExpr(ReturnExpr* const e)
+void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	header();
 	*_out << "Return from function : " << *e;
 }
 
-void Dumper::dumpStmtList(StmtList* const e)
+void TextDumper::dumpStmtList(StmtList* const e)
 {
 	for (auto expr : e->_exprs) {
 		expr->accept(*this);
@@ -132,7 +133,7 @@ void Dumper::dumpStmtList(StmtList* const e)
 	}
 }
 
-void Dumper::dumpSwitchExpr(SwitchExpr* const e)
+void TextDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
 	header();
 	*_out << "Switch : ";
@@ -142,7 +143,7 @@ void Dumper::dumpSwitchExpr(SwitchExpr* const e)
 	*_out << "*** end of switch ***";
 }
 
-void Dumper::header()
+void TextDumper::header()
 {
 	if (_withHeader)
 		*_out << "<" << main_input_filename << "> : ";

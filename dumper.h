@@ -1,10 +1,6 @@
 #ifndef DUMPER_H
 #define DUMPER_H
 
-#include <iostream>
-#include <gcc-plugin.h>
-#include <tree.h>
-
 class BindExpr;
 class CallExpr;
 class CaseLabelExpr;
@@ -24,27 +20,22 @@ class Expression;
 class Dumper
 {
 	public:
-		Dumper(std::ostream* const out = &std::cout, bool withHeader = true);
-		void dumpBindExpr(BindExpr* const e);
-		void dumpCallExpr(CallExpr* const e);
-		void dumpCaseLabelExpr(CaseLabelExpr* const e);
-		void dumpCondExpr(CondExpr* const e);
-		void dumpDeclExpr(DeclExpr* const e);
-		void dumpGotoExpr(GotoExpr* const e);
-		void dumpLabelExpr(LabelExpr* const e);
-		void dumpLeaf(Leaf* const e);
-		void dumpModifyExpr(ModifyExpr* const e);
-		void dumpNopExpr(NopExpr* const e);
-		void dumpPreincrementExpr(PreincrementExpr* const e);
-		void dumpReturnExpr(ReturnExpr* const e);
-		void dumpStmtList(StmtList* const e);
-		void dumpSwitchExpr(SwitchExpr* const e);
-		void dumpExpression(Expression* const e);
-
-	private:
-		void header();
-		std::ostream* const _out;
-		bool _withHeader;
+		Dumper() = default;
+		virtual void dumpBindExpr(BindExpr* const e) = 0;
+		virtual void dumpCallExpr(CallExpr* const e) = 0;
+		virtual void dumpCaseLabelExpr(CaseLabelExpr* const e) = 0;
+		virtual void dumpCondExpr(CondExpr* const e) = 0;
+		virtual void dumpDeclExpr(DeclExpr* const e) = 0;
+		virtual void dumpGotoExpr(GotoExpr* const e) = 0;
+		virtual void dumpLabelExpr(LabelExpr* const e) = 0;
+		virtual void dumpLeaf(Leaf* const e) = 0;
+		virtual void dumpModifyExpr(ModifyExpr* const e) = 0;
+		virtual void dumpNopExpr(NopExpr* const e) = 0;
+		virtual void dumpPreincrementExpr(PreincrementExpr* const e) = 0;
+		virtual void dumpReturnExpr(ReturnExpr* const e) = 0;
+		virtual void dumpStmtList(StmtList* const e) = 0;
+		virtual void dumpSwitchExpr(SwitchExpr* const e) = 0;
+		virtual void dumpExpression(Expression* const e) = 0;
 };
 
 

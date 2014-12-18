@@ -24,6 +24,7 @@
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"
+#include "text_dumper.h"
 #include "bad_tree_exception.h"
 
 int plugin_is_GPL_compatible;
@@ -70,7 +71,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 	return 0;
 }
 
-extern "C" void walk_through(tree decl, Dumper dumper)
+extern "C" void walk_through(tree decl, Dumper& dumper)
 {
 	tree subdecl = BIND_EXPR_BODY(DECL_SAVED_TREE(decl));
 
@@ -108,8 +109,8 @@ extern "C" void gate_callback (void* arg, void*)
        << " at " << DECL_SOURCE_FILE (decl) << ":"
        << DECL_SOURCE_LINE (decl) << std::endl;
 
-  Dumper dumper;
-  walk_through(decl,dumper);
+  auto dumper = std::unique_ptr<Dumper>(new TextDumper());
+  walk_through(decl,*dumper);
   std::cout << std::endl;
 }
 

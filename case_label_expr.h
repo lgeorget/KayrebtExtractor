@@ -19,7 +19,7 @@ class CaseLabelExpr : public Expression
 		std::shared_ptr<Value> _lowValue;
 		std::shared_ptr<Value> _label;
 
-	friend class Dumper;
+	friend class TextDumper;
 };
 
 #endif

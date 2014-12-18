@@ -22,7 +22,7 @@ class CondExpr : public Expression
 		std::shared_ptr<Expression> _else;
 
 	friend std::ostream& operator<<(std::ostream& out, const CondExpr& e);
-	friend class Dumper;
+	friend class TextDumper;
 };
 
 #endif

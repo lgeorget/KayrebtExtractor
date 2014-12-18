@@ -14,7 +14,7 @@ class NopExpr : public Expression
 		explicit NopExpr(tree t);
 		void accept(Dumper& d) override;
 
-	friend class Dumper;
+	friend class TextDumper;
 };
 
 #endif

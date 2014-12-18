@@ -9,7 +9,7 @@
 #include "bad_tree_exception.h"
 #include "expr_factory.h"
 #include "value_factory.h"
-#include "dumper.h"
+#include "text_dumper.h"
 
 TernaryOp::TernaryOp(tree t) : Value(t)
 {
@@ -24,7 +24,7 @@ TernaryOp::TernaryOp(tree t) : Value(t)
 std::string TernaryOp::print() const
 {
 	std::ostringstream out;
-	Dumper d(&out, false);
+	TextDumper d(&out, false);
 	_cond->accept(d);
 	out << " ? " << _yes->print() << " : " << _no->print();
 	return out.str();

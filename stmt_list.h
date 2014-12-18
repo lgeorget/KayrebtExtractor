@@ -19,7 +19,7 @@ class StmtList : public Expression
 	private:
 		std::list<std::shared_ptr<Expression>> _exprs;
 
-	friend class Dumper;
+	friend class TextDumper;
 };
 
 #endif
