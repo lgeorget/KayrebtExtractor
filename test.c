@@ -3,7 +3,7 @@
 
 static int a = 'c';
 int main(int argc, char** argv);
-void other_function();
+int other_function();
 void say_hello_and_die_maybe(int s);
 
 int main(int argc, char** argv)
@@ -22,11 +22,12 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void other_function()
+int other_function()
 {
 	while(1)
 		for (;;)
 			a;
+	return main(0,(char**)0);
 }
 
 void say_hello_and_check_if_equal(int s)

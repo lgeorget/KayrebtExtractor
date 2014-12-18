@@ -122,7 +122,8 @@ void TextDumper::dumpPreincrementExpr(PreincrementExpr* const e)
 void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	header();
-	*_out << "Return from function : " << *e;
+	*_out << "Return from function : ";
+	e->_value->accept(*this);
 }
 
 void TextDumper::dumpStmtList(StmtList* const e)

@@ -15,9 +15,9 @@ class ReturnExpr : public Expression
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		std::shared_ptr<Value> _value;
+		std::shared_ptr<Expression> _value;
 
-	friend std::ostream& operator<<(std::ostream& out, const ReturnExpr& e);
+	friend class TextDumper;
 };
 
 #endif
