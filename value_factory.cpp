@@ -8,6 +8,7 @@
 #include "value_factory.h"
 #include "array_ref.h"
 #include "arith_expr.h"
+#include "component_ref.h"
 #include "integer_cst.h"
 #include "indirection.h"
 #include "string_cst.h"
@@ -39,6 +40,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 
 		case ARRAY_REF:
 			return std::make_shared<ArrayRef>(ArrayRef(t));
+
+		case COMPONENT_REF:
+			return std::make_shared<ComponentRef>(ComponentRef(t));
 
 		case PLUS_EXPR:
 		case POINTER_PLUS_EXPR:
@@ -107,6 +111,7 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case VAR_DECL:
 		case PARM_DECL:
 		case RESULT_DECL:
+		case FIELD_DECL:
 			it = idents.find(t);
 			if (it == idents.end())
 				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(DECL_NAME(t))))).first;
