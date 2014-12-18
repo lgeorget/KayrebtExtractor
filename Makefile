@@ -1,5 +1,6 @@
 SRCS := $(wildcard *.cpp)
 OBJS := $(SRCS:.cpp=.o)
+DEPS := $(SRCS:.cpp=.d)
 PLUGIN = myplugin
 EXEC = $(PLUGIN).so
 
@@ -16,7 +17,14 @@ $(EXEC): $(OBJS)
 run: $(EXEC)
 	gcc -iplugindir=. -fplugin=$(PLUGIN) -shared -fPIC -x c -S test.c
 
+%.o: %.cpp
+	$(CXX) $< -MM -MF $(patsubst %.cpp,%.d,$<)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
 .PHONY : clean
 
 clean :
 	rm -rf $(OBJS)
+	rm -rf $(DEPS)
+
+-include $(wildcard *.d)
