@@ -49,9 +49,14 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		//	std::cerr << "...building Modify" << std::endl;
 			return std::make_shared<ModifyExpr>(ModifyExpr(t));
 
+		// 'don't care'-expressions
 		case CONVERT_EXPR:
 		case NOP_EXPR:
 			return build(TREE_OPERAND(t,0));
+
+		// 'really don't care'-expressions
+		case PREDICT_EXPR:
+			return std::make_shared<Expression>(Expression(t));
 
 		case 127: //PREINCREMENT_EXPR
 			return std::make_shared<PreincrementExpr>(PreincrementExpr(t));

@@ -37,7 +37,8 @@ char other_function()
 {
 	while(1)
 		for (;;)
-			a;
+			continue;
+
 	return main(0,(char**)0);
 }
 

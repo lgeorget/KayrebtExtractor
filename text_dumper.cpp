@@ -29,7 +29,7 @@ void TextDumper::dumpExpression(Expression* const e)
 {
 	header();
 	*_out << "<Expression for which we have not yet a type> : "
-		<< *e << std::endl;
+		<< *e;
 }
 
 void TextDumper::dumpBindExpr(BindExpr* const e)
