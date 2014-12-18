@@ -45,7 +45,17 @@ void TextDumper::dumpBindExpr(BindExpr* const e)
 void TextDumper::dumpCallExpr(CallExpr* const e)
 {
 	header();
-	*_out << "Function call : " << *e;
+	*_out << "Function call : "
+	      << e->_name << "_" << e->_nbArgs << "_(";
+	if (e->_nbArgs > 0) {
+		e->_args.front()->accept(*this);
+		auto it = e->_args.cbegin();
+		for (++it ; it != e->_args.cend() ; ++it) {
+			*_out << ", ";
+			(*it)->accept(*this);
+		}
+	}
+	*_out << ")";
 }
 
 void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)

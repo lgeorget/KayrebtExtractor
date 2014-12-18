@@ -7,7 +7,7 @@
 #include "call_expr.h"
 #include "bad_tree_exception.h"
 #include "dumper.h"
-#include "value_factory.h"
+#include "expr_factory.h"
 #include "value.h"
 
 CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr), _nbArgs(0)
@@ -22,24 +22,11 @@ CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr), _nbArgs(0)
 	tree fn = TREE_OPERAND(TREE_OPERAND(t,1),0);
 	_name = DECL_NAME(fn) ? IDENTIFIER_POINTER(DECL_NAME(fn)) : "<anonymous>";
 	for (int i = 0 ; i < _nbArgs ; i++) {
-		_args.push_back(ValueFactory::INSTANCE.build(TREE_OPERAND(t,i+3)));
+		_args.push_back(ExprFactory::INSTANCE.build(TREE_OPERAND(t,i+3)));
 	}
 }
 
 void CallExpr::accept(Dumper& d)
 {
 	d.dumpCallExpr(this);
-}
-
-std::ostream& operator<<(std::ostream& out, const CallExpr& e)
-{
-	out << e._name << "_" << e._nbArgs << "_(";
-	if (e._nbArgs > 0) {
-		out << e._args.front().get();
-		auto it = e._args.cbegin();
-		for (++it ; it != e._args.cend() ; ++it)
-			out << ", " << it->get();
-	}
-	out << ")";
-	return out;
 }

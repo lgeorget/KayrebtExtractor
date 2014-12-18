@@ -7,7 +7,6 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "expression.h"
-#include "value.h"
 
 class CallExpr : public Expression
 {
@@ -18,9 +17,9 @@ class CallExpr : public Expression
 	private:
 		long int _nbArgs;
 		const char* _name;
-		std::list<std::shared_ptr<Value>> _args;
+		std::list<std::shared_ptr<Expression>> _args;
 
-	friend std::ostream& operator<<(std::ostream& out, const CallExpr& e);
+	friend class TextDumper;
 };
 
 #endif
