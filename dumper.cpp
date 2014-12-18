@@ -82,7 +82,6 @@ void Dumper::dumpDeclExpr(DeclExpr* const e)
 	*_out << "Declaration : " << e->_name->print();
 	if (e->_init)
 		*_out << " = " << e->_init->print();
-	*_out << std::endl;
 }
 
 void Dumper::dumpGotoExpr(GotoExpr* const e)
@@ -140,7 +139,7 @@ void Dumper::dumpSwitchExpr(SwitchExpr* const e)
 	e->_cond->accept(*this);
 	*_out << std::endl;
 	e->_body->accept(*this);
-	*_out << "*** end of switch ***" << std::endl;
+	*_out << "*** end of switch ***";
 }
 
 void Dumper::header()
