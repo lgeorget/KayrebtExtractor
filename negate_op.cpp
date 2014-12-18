@@ -7,15 +7,16 @@
 #include "bad_tree_exception.h"
 #include "negate_op.h"
 
-NegateOp::NegateOp(tree t) : Value(t)
+NegateOp::NegateOp(tree t, std::string op) : Value(t), _op(op)
 {
-	if (TREE_CODE(t) != NEGATE_EXPR)
-		throw BadTreeException(t,"negate_expr");
+	if (TREE_CODE(t) != NEGATE_EXPR &&
+	    TREE_CODE(t) != BIT_NOT_EXPR)
+		throw BadTreeException(t,"one of : negate_expr, bit_not_expr");
 
-	_op = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));
+	_val = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));
 }
 
 std::string NegateOp::print() const
 {
-	return "-" + _op->print();
+	return _op + _val->print();
 }

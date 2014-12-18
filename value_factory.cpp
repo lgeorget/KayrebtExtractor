@@ -56,6 +56,19 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case FLOOR_MOD_EXPR:
 		case ROUND_MOD_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"%"));
+
+		case LSHIFT_EXPR:
+			return std::make_shared<ArithExpr>(ArithExpr(t,"<<"));
+                case RSHIFT_EXPR:
+			return std::make_shared<ArithExpr>(ArithExpr(t,">>"));
+		
+		case BIT_IOR_EXPR:
+			return std::make_shared<ArithExpr>(ArithExpr(t,"|"));
+		case BIT_XOR_EXPR:
+			return std::make_shared<ArithExpr>(ArithExpr(t,"^"));
+		case BIT_AND_EXPR:
+			return std::make_shared<ArithExpr>(ArithExpr(t,"&"));
+
 		case TRUTH_ANDIF_EXPR:
 		case TRUTH_AND_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"&&"));
@@ -97,8 +110,10 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case LABEL_DECL:
 			return std::make_shared<Label>(Label(t));
 
+		case BIT_NOT_EXPR:
+			return std::make_shared<NegateOp>(NegateOp(t,"~"));
 		case NEGATE_EXPR:
-			return std::make_shared<NegateOp>(NegateOp(t));
+			return std::make_shared<NegateOp>(NegateOp(t,"-"));
 
 		case COND_EXPR:
 			return std::make_shared<TernaryOp>(TernaryOp(t));

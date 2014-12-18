@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 static int a = 'c';
+static int arr[12] = {0};
+
 int main(int argc, char** argv);
 char other_function();
 void say_hello_and_die_maybe(int s);
@@ -11,13 +13,14 @@ int main(int argc, char** argv)
 	int b = a;
 	int* c = &b;
 	int i;
+	arr[8] = 9+(6 & a); 
 	for (i = b>a?-b:*c ; i < 10 ; ++i) {
 		printf("coucou %i %i\n", b, a);
 		printf("coucou %i %i\n", a, b);
 	}
 	{
 		int t = 0;
-		b = i+a -t;
+		b = i+arr[7] -t;
 	}
 	return 0;
 }
