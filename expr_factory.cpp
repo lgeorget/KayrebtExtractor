@@ -5,6 +5,7 @@
 #include "expr_factory.h"
 #include "expression.h"
 #include "arith_expr.h"
+#include "bind_expr.h"
 #include "call_expr.h"
 #include "cond_expr.h"
 #include "case_label_expr.h"
@@ -25,6 +26,8 @@ const ExprFactory ExprFactory::INSTANCE;
 std::shared_ptr<Expression> ExprFactory::build(tree t) const
 {
 	switch (TREE_CODE(t)) {
+		case BIND_EXPR:
+			return std::shared_ptr<Expression>(new BindExpr(t));
 		case DECL_EXPR:
 		//	std::cerr << "...building Decl" << std::endl;
 			return std::shared_ptr<Expression>(new DeclExpr(t));

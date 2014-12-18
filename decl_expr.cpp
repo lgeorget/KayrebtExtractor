@@ -13,15 +13,12 @@ DeclExpr::DeclExpr(tree t) : Expression(t)
 		throw BadTreeException(t,"decl_expr");
 
 	_name = ValueFactory::INSTANCE.build(DECL_EXPR_DECL(t));
+	tree init = DECL_INITIAL(DECL_EXPR_DECL(t));
+	if (init)
+		_init = ValueFactory::INSTANCE.build(init);
 }
 
 void DeclExpr::accept(Dumper& d)
 {
 	d.dumpDeclExpr(this);
-}
-
-std::ostream& operator<<(std::ostream& out, const DeclExpr& e)
-{
-	out << e._name.get();
-	return out;
 }

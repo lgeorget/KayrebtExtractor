@@ -1,5 +1,5 @@
-#ifndef DECL_EXPR_H
-#define DECL_EXPR_H
+#ifndef BIND_EXPR_H
+#define BIND_EXPR_H
 
 #include <iostream>
 #include <memory>
@@ -8,17 +8,18 @@
 #include "expression.h"
 #include "value.h"
 
-class DeclExpr : public Expression
+class BindExpr : public Expression
 {
 	public:
-		explicit DeclExpr(tree t);
+		explicit BindExpr(tree t);
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		std::shared_ptr<Value> _name;
-		std::shared_ptr<Value> _init;
-		
+		std::shared_ptr<Expression> _vars;
+		std::shared_ptr<Expression> _body;
+
 	friend class Dumper;
 };
 
 #endif
+

@@ -5,6 +5,7 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 
+class BindExpr;
 class CallExpr;
 class CaseLabelExpr;
 class CondExpr;
@@ -23,6 +24,7 @@ class Dumper
 {
 	public:
 		Dumper(std::ostream* const out = &std::cout, bool withHeader = true);
+		void dumpBindExpr(BindExpr* const e);
 		void dumpCallExpr(CallExpr* const e);
 		void dumpCaseLabelExpr(CaseLabelExpr* const e);
 		void dumpCondExpr(CondExpr* const e);

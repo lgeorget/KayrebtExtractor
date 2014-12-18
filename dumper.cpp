@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <memory>
 #include <gcc-plugin.h>
+#include "bind_expr.h"
 #include "call_expr.h"
 #include "case_label_expr.h"
 #include "cond_expr.h"
@@ -27,6 +28,16 @@ void Dumper::dumpExpression(Expression* const e)
 	header();
 	*_out << "<Expression for which we have not yet a type> : "
 		<< *e << std::endl;
+}
+
+void Dumper::dumpBindExpr(BindExpr* const e)
+{
+	header();
+	*_out << "*** start of inner scope ***" << std::endl;
+// Vars are declared in body too
+//	e->_vars->accept(*this);
+	e->_body->accept(*this);
+	*_out << "*** end of inner scope ***" << std::endl;
 }
 
 void Dumper::dumpCallExpr(CallExpr* const e)
@@ -67,7 +78,10 @@ void Dumper::dumpCondExpr(CondExpr* const e)
 void Dumper::dumpDeclExpr(DeclExpr* const e)
 {
 	header();
-	*_out << "Declaration : " << *e;
+	*_out << "Declaration : " << e->_name->print();
+	if (e->_init)
+		*_out << " = " << e->_init->print();
+	*_out << std::endl;
 }
 
 void Dumper::dumpGotoExpr(GotoExpr* const e)
