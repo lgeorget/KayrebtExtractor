@@ -6,6 +6,7 @@
 #include <tree.h>
 #include "value.h"
 #include "value_factory.h"
+#include "array_ref.h"
 #include "arith_expr.h"
 #include "integer_cst.h"
 #include "indirection.h"
@@ -35,6 +36,10 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			if (it == integers.end())
 				it = integers.insert(std::make_pair(t,std::make_shared<IntegerCst>(IntegerCst(t)))).first;
 			return it->second;
+
+		case ARRAY_REF:
+			return std::make_shared<ArrayRef>(ArrayRef(t));
+
 		case PLUS_EXPR:
 		case POINTER_PLUS_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"+"));
