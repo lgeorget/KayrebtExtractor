@@ -87,6 +87,14 @@ void TextDumper::dumpCondExpr(CondExpr* const e)
 	}
 }
 
+void TextDumper::dumpCompoundExpr(CompoundExpr* const e)
+{
+	header();
+	e->_first->accept(*this);
+	*_out << ", ";
+	e->_second->accept(*this);
+}
+
 void TextDumper::dumpDeclExpr(DeclExpr* const e)
 {
 	header();

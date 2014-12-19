@@ -44,6 +44,13 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case COMPONENT_REF:
 			return std::make_shared<ComponentRef>(ComponentRef(t));
 
+		case CALL_EXPR:
+			return std::make_shared<CallExpr>(CallExpr(t));
+
+		case COMPOUND_EXPR: //It's a kind of arithmetic operation
+				    //a sequential composition
+			return std::make_shared<ArithExpr>(ArithExpr(t,","));
+
 		case PLUS_EXPR:
 		case POINTER_PLUS_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"+"));

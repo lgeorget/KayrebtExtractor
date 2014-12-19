@@ -22,8 +22,8 @@ class Dumper
 	public:
 		Dumper() = default;
 		virtual void dumpBindExpr(BindExpr* const e) = 0;
-		virtual void dumpCallExpr(CallExpr* const e) = 0;
 		virtual void dumpCaseLabelExpr(CaseLabelExpr* const e) = 0;
+		virtual void dumpCompoundExpr(CompoundExpr* const e) = 0;
 		virtual void dumpCondExpr(CondExpr* const e) = 0;
 		virtual void dumpDeclExpr(DeclExpr* const e) = 0;
 		virtual void dumpGotoExpr(GotoExpr* const e) = 0;

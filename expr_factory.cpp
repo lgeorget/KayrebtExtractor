@@ -39,6 +39,8 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		case COND_EXPR:
 		//	std::cerr << "...building Cond" << std::endl;
 			return std::make_shared<CondExpr>(CondExpr(t));
+		case COMPOUND_EXPR:
+			return std::make_shared<CompoundExpr>(CompoundExpr(t));
 		case GOTO_EXPR:
 		//	std::cerr << "...building Goto" << std::endl;
 			return std::make_shared<GotoExpr>(GotoExpr(t));

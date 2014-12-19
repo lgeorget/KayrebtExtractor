@@ -25,9 +25,9 @@ class TextDumper : public Dumper
 	public:
 		TextDumper(std::ostream* const out = &std::cout, bool withHeader = true);
 		void dumpBindExpr(BindExpr* const e) override;
-		void dumpCallExpr(CallExpr* const e) override;
 		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
+		void dumpCompoundExpr(CompoundExpr* const e) override;
 		void dumpDeclExpr(DeclExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
 		void dumpLabelExpr(LabelExpr* const e) override;
