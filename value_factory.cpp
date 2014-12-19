@@ -112,6 +112,7 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case PARM_DECL:
 		case RESULT_DECL:
 		case FIELD_DECL:
+		case FUNCTION_DECL:
 			it = idents.find(t);
 			if (it == idents.end())
 				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(DECL_NAME(t))))).first;

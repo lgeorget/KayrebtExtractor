@@ -10,7 +10,7 @@ Identifier::Identifier(tree t) : Value(t)
 	if (t && TREE_CODE(t) != IDENTIFIER_NODE)
 		throw BadTreeException(t,"decl_name");
 
-	if (t)
+	if (t && t != NULL_TREE)
 		_name = IDENTIFIER_POINTER(t);
 	else
 		_name = "<anonymous>";

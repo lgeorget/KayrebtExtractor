@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 /* We are going to overwrite all passes, in order to be called just after the
  * C++ AST construction. */
@@ -56,8 +57,6 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 		return -1; // incompatible
 	}
 
-	std::cout << "Plugin loaded" << std::endl;
-
 	// Disable assembly output.
 	//
 //	asm_file_name = HOST_BIT_BUCKET;
@@ -83,7 +82,6 @@ extern "C" void walk_through(tree decl, Dumper& dumper)
 			e.what() << std::endl;
 		throw e;
 	}
-	std::cout << std::endl;
 }
 
 extern "C" void gate_callback (void* arg, void*)
@@ -109,9 +107,11 @@ extern "C" void gate_callback (void* arg, void*)
        << " at " << DECL_SOURCE_FILE (decl) << ":"
        << DECL_SOURCE_LINE (decl) << std::endl;
 
-  auto dumper = std::unique_ptr<Dumper>(new TextDumper());
+  std::ofstream out(std::string(main_input_filename) + "_" + std::string(name) + ".dump");
+  auto dumper = std::unique_ptr<Dumper>(new TextDumper(&out));
   walk_through(decl,*dumper);
-  std::cout << std::endl;
+  out.close();
+  std::cerr << std::endl;
 }
 
 

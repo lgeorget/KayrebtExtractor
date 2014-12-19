@@ -38,7 +38,7 @@ void TextDumper::dumpBindExpr(BindExpr* const e)
 	*_out << "*** start of inner scope ***" << std::endl;
 // Vars are declared in body too
 //	e->_vars->accept(*this);
-	e->_body->accept(*this);
+	//e->_body->accept(*this);
 	*_out << "*** end of inner scope ***" << std::endl;
 }
 
@@ -46,7 +46,7 @@ void TextDumper::dumpCallExpr(CallExpr* const e)
 {
 	header();
 	*_out << "Function call : "
-	      << e->_name << "_" << e->_nbArgs << "_(";
+	      << e->_name->print() << "_" << e->_nbArgs << "_(";
 	if (e->_nbArgs > 0) {
 		e->_args.front()->accept(*this);
 		auto it = e->_args.cbegin();
