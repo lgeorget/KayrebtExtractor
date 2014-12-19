@@ -5,9 +5,9 @@
 #include "dumper.h"
 
 class BindExpr;
-class CallExpr;
 class CaseLabelExpr;
 class CondExpr;
+class CompoundExpr;
 class DeclExpr;
 class GotoExpr;
 class LabelExpr;

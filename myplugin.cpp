@@ -1,6 +1,6 @@
-#include <cstring>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 /* We are going to overwrite all passes, in order to be called just after the
  * C++ AST construction. */
@@ -67,6 +67,11 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 			PLUGIN_PRE_GENERICIZE,
 			&gate_callback,
 			0);
+	register_callback(plugin_info->base_name,
+			PLUGIN_START_UNIT,
+			&prepare_dump_file,
+			0);
+
 	return 0;
 }
 
@@ -91,12 +96,6 @@ extern "C" void gate_callback (void* arg, void*)
   //
   if (errorcount || sorrycount)
     return;
- 
-  //
-  // Process AST. Issue diagnostics and set r
-  // to 1 in case of an error.
-  //
-  std::cerr << "processing " << main_input_filename << std::endl;
 
   tree decl = (tree) arg;
   int tc = TREE_CODE(decl);
@@ -107,12 +106,26 @@ extern "C" void gate_callback (void* arg, void*)
        << " at " << DECL_SOURCE_FILE (decl) << ":"
        << DECL_SOURCE_LINE (decl) << std::endl;
 
-  std::ofstream out(std::string(main_input_filename) + "_" + std::string(name) + ".dump");
-  auto dumper = std::unique_ptr<Dumper>(new TextDumper(&out));
-  walk_through(decl,*dumper);
+  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
+  if (!out) {
+	  std::cerr << "Couldn't open dump file, skipping." << std::endl;
+	  return;
+  }
+
+  out << "Function " << name << std::endl;
+  auto dumper = TextDumper(&out);
+  walk_through(decl,dumper);
+  out << std::endl << "-------------------------" << std::endl << std::endl;
   out.close();
-  std::cerr << std::endl;
 }
 
+extern "C" void prepare_dump_file (void*, void*)
+{
+  std::cerr << "processing " << main_input_filename << std::endl;
+
+  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
+  if (!out)
+	  std::cerr << "Couldn't open dump file." << std::endl;
+}
 
 

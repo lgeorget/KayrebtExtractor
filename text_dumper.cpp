@@ -9,6 +9,7 @@
 #include "call_expr.h"
 #include "case_label_expr.h"
 #include "cond_expr.h"
+#include "compound_expr.h"
 #include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
@@ -38,24 +39,8 @@ void TextDumper::dumpBindExpr(BindExpr* const e)
 	*_out << "*** start of inner scope ***" << std::endl;
 // Vars are declared in body too
 //	e->_vars->accept(*this);
-	//e->_body->accept(*this);
-	*_out << "*** end of inner scope ***" << std::endl;
-}
-
-void TextDumper::dumpCallExpr(CallExpr* const e)
-{
-	header();
-	*_out << "Function call : "
-	      << e->_name->print() << "_" << e->_nbArgs << "_(";
-	if (e->_nbArgs > 0) {
-		e->_args.front()->accept(*this);
-		auto it = e->_args.cbegin();
-		for (++it ; it != e->_args.cend() ; ++it) {
-			*_out << ", ";
-			(*it)->accept(*this);
-		}
-	}
-	*_out << ")";
+	e->_body->accept(*this);
+	*_out << "*** end of inner scope ***";
 }
 
 void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)

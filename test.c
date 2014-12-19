@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 	int* c = &b;
 	int i;
 	arr[8] = 9+(6 & a); 
-	for (i = b>a?-b:*c ; i < 10 ; ++i) {
+	for (i = b>a?-b:*c, b = 0 ; i < 10 ; ++i) {
 		r.hello = i;
 		printf("coucou %i %i\n", b, a);
 		printf("coucou %i %i\n", a, b);

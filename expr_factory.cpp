@@ -6,8 +6,8 @@
 #include "expression.h"
 #include "arith_expr.h"
 #include "bind_expr.h"
-#include "call_expr.h"
 #include "cond_expr.h"
+#include "compound_expr.h"
 #include "case_label_expr.h"
 #include "decl_expr.h"
 #include "expr_factory.h"
@@ -31,9 +31,6 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		case DECL_EXPR:
 		//	std::cerr << "...building Decl" << std::endl;
 			return std::make_shared<DeclExpr>(DeclExpr(t));
-		case CALL_EXPR:
-		//	std::cerr << "...building Call" << std::endl;
-			return std::make_shared<CallExpr>(CallExpr(t));
 		case CASE_LABEL_EXPR:
 			return std::make_shared<CaseLabelExpr>(CaseLabelExpr(t));
 		case COND_EXPR:

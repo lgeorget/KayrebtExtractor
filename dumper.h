@@ -2,9 +2,9 @@
 #define DUMPER_H
 
 class BindExpr;
-class CallExpr;
 class CaseLabelExpr;
 class CondExpr;
+class CompoundExpr;
 class DeclExpr;
 class GotoExpr;
 class LabelExpr;

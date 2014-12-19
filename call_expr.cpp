@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <cstdlib>
 #include <list>
@@ -6,13 +7,12 @@
 #include <tree.h>
 #include "call_expr.h"
 #include "bad_tree_exception.h"
-#include "dumper.h"
-#include "expr_factory.h"
 #include "value_factory.h"
 #include "value.h"
 #include "debug.h"
+#include "text_dumper.h"
 
-CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr), _nbArgs(0)
+CallExpr::CallExpr(tree t) : Value(t), _name(nullptr), _nbArgs(0)
 {
 	assert_tree(t);
 	if (TREE_CODE(t) != CALL_EXPR)
@@ -29,11 +29,23 @@ CallExpr::CallExpr(tree t) : Expression(t), _name(nullptr), _nbArgs(0)
 	_name = ValueFactory::INSTANCE.build(fn);
 	for (int i = 0 ; i < _nbArgs ; i++) {
 		assert_tree(TREE_OPERAND(t,i+3));
-		_args.push_back(ExprFactory::INSTANCE.build(TREE_OPERAND(t,i+3)));
+		_args.push_back(ValueFactory::INSTANCE.build(TREE_OPERAND(t,i+3)));
 	}
+
+	std::stringstream out;
+	out << _name->print() << "_" << _nbArgs << "_(";
+	if (_nbArgs > 0) {
+		out << _args.front()->print();
+		auto it = _args.cbegin();
+		for (++it ; it != _args.cend() ; ++it) {
+			out << ", " << (*it)->print();
+		}
+	}
+	out << ")";
+	_built_str = out.str();
 }
 
-void CallExpr::accept(Dumper& d)
+std::string CallExpr::print() const
 {
-	d.dumpCallExpr(this);
+	return _built_str;
 }

@@ -8,6 +8,7 @@
 #include "value_factory.h"
 #include "array_ref.h"
 #include "arith_expr.h"
+#include "call_expr.h"
 #include "component_ref.h"
 #include "integer_cst.h"
 #include "indirection.h"
@@ -113,6 +114,7 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			return std::make_shared<Indirection>(Indirection(t,"*"));
 
 		case NOP_EXPR: //happens when functions arguments need trivial cast
+		case CONVERT_EXPR:
 			return build(TREE_OPERAND(t,0));
 
 		case VAR_DECL:

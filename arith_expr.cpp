@@ -10,7 +10,8 @@
 
 ArithExpr::ArithExpr(tree t, std::string op) : Value(t), _op(op)
 {
-	if (!(TREE_CODE(t) >= TRUTH_ANDIF_EXPR &&
+	if (TREE_CODE(t) != COMPOUND_EXPR
+	    && !(TREE_CODE(t) >= TRUTH_ANDIF_EXPR &&
 	    TREE_CODE(t) <= TRUTH_XOR_EXPR)
 	    && !(TREE_CODE(t) >= PLUS_EXPR &&
 		 TREE_CODE(t) <= EXACT_DIV_EXPR)
@@ -21,7 +22,8 @@ ArithExpr::ArithExpr(tree t, std::string op) : Value(t), _op(op)
 	    && !(TREE_CODE(t) >= BIT_IOR_EXPR &&
 		 TREE_CODE(t) <= BIT_AND_EXPR))
 		throw BadTreeException(t,
-			"one of : TRUTH_ANDIF_EXPR, "
+			"one of : COMPOUND_EXPR, " 
+				 "TRUTH_ANDIF_EXPR, "
 				 "TRUTH_ORIF_EXPR, "
 				 "TRUTH_AND_EXPR, "
 				 "TRUTH_OR_EXPR, "
