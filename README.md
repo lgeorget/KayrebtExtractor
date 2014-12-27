@@ -15,8 +15,11 @@ change a lot from major version to major version so it's highly probable that
 this code won't compile either on GCC 4.7 or GCC 4.9.
 
 Next, change the path to the GCC plugins headers in the Makefile (in the CFLAGS
-definition). Yeah, I know, hardcoded path... I'll change it for version 1.0.
+definition). (You could also use pkg-config, as proper developpers do...
+I'll change it for version 1.0.)
 
+The last version pushed to repo is not guaranteed to compile. You should
+checkout tag "compilable" for an almost-stable version.
 Then, running `make` should leave you with a plugin, by the name of 
 `myplugin.so` or whatever the value of `EXEC` in the Makefile is. This .so file
 is the GCC plugin, handle with care.
