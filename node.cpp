@@ -14,5 +14,5 @@ unsigned int Node::getLevel()
 void Node::setLevelAfter(std::shared_ptr<Node> other)
 {
 	if (other->_level > _level)
-		_level _other->_level+1;
+		_level = other->_level+1;
 }

@@ -18,7 +18,7 @@ class BindExpr : public Expression
 		std::shared_ptr<Expression> _vars;
 		std::shared_ptr<Expression> _body;
 
-	friend class TextDumper;
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

@@ -18,7 +18,7 @@ class Leaf : public Expression
 	private:
 		std::shared_ptr<Value> _val;
 
-	friend class TextDumper;
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

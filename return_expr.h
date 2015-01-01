@@ -17,7 +17,7 @@ class ReturnExpr : public Expression
 	private:
 		std::shared_ptr<Expression> _value;
 
-	friend class TextDumper;
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

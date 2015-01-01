@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <memory>
 
+class Node;
+
 class ActivityGraph
 {
 	public:

@@ -19,7 +19,7 @@ class SwitchExpr : public Expression
 		std::shared_ptr<Expression> _cond;
 		std::shared_ptr<Expression> _body;
 
-	friend class TextDumper;
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

@@ -17,7 +17,7 @@ class CompoundExpr : public Expression
 		std::shared_ptr<Expression> _first;
 		std::shared_ptr<Expression> _second;
 
-	friend class TextDumper;
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

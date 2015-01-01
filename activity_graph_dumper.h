@@ -1,8 +1,8 @@
 #ifndef ACTIVITY_DUMPER_H
 #define ACTIVITY_DUMPER_H
 
-#include <boost/graph/adjacency_list.hpp>
-#include "graph.h"
+#include "activity_graph.h"
+#include "dumper.h"
 
 class BindExpr;
 class CaseLabelExpr;
@@ -20,7 +20,7 @@ class StmtList;
 class SwitchExpr;
 class Expression;
 
-class ActivityGraphDumper
+class ActivityGraphDumper : public Dumper
 {
 	public:
 		ActivityGraphDumper() = default;
@@ -42,8 +42,7 @@ class ActivityGraphDumper
 
 	private:
 		void updateCurrent();
-		ActivityGraph _g();
-		graph_traits<adjacency_list>::vertex_iterator _currentNode;
+		ActivityGraph _g;
 
 };
 

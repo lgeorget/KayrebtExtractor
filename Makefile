@@ -18,7 +18,7 @@ run: $(EXEC)
 	gcc -iplugindir=. -fplugin=$(PLUGIN) -shared -fPIC -x c -S test.c
 
 %.o: %.cpp
-	$(CXX) $< -MM -MF $(patsubst %.cpp,%.d,$<)
+	$(CXX) -std=c++11 $< -MM -MF $(patsubst %.cpp,%.d,$<)
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 .PHONY : clean

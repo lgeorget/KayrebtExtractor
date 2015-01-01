@@ -22,6 +22,8 @@
 #include "stmt_list.h"
 #include "switch_expr.h"
 #include "dumper.h"
+#include "node.h"
+#include "activity_graph.h"
 
 //ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 //{}
@@ -32,6 +34,7 @@ void ActivityGraphDumper::dumpExpression(Expression* const e)
 
 void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 {
+	e->_body->accept(*this);
 	/*
 	*_out << "*** start of inner scope ***" << std::endl;
 // Vars are declared in body too
@@ -43,6 +46,7 @@ void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 
 void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_label->print(), reinterpret_cast<uintptr_t>(e->_label.get())));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
