@@ -20,6 +20,7 @@ class PreincrementExpr : public Expression
 		std::shared_ptr<Value> _variable;
 
 	friend std::ostream& operator<<(std::ostream& out, const PreincrementExpr& e);
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

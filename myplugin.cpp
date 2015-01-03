@@ -25,7 +25,7 @@
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"
-#include "text_dumper.h"
+#include "activity_graph_dumper.h"
 #include "bad_tree_exception.h"
 
 int plugin_is_GPL_compatible;
@@ -113,8 +113,9 @@ extern "C" void gate_callback (void* arg, void*)
   }
 
   out << "Function " << name << std::endl;
-  auto dumper = TextDumper(&out);
+  auto dumper = ActivityGraphDumper();
   walk_through(decl,dumper);
+  out << dumper.graph();
   out << std::endl << "-------------------------" << std::endl << std::endl;
   out.close();
 }

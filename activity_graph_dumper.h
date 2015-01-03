@@ -39,9 +39,9 @@ class ActivityGraphDumper : public Dumper
 		void dumpStmtList(StmtList* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
+		inline const ActivityGraph& graph() { return _g; }
 
 	private:
-		void updateCurrent();
 		ActivityGraph _g;
 
 };

@@ -18,6 +18,7 @@ class GotoExpr : public Expression
 		std::shared_ptr<Value> _label;
 
 	friend std::ostream& operator<<(std::ostream& out, const GotoExpr& e);
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

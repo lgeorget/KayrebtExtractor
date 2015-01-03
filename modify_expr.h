@@ -19,6 +19,7 @@ class ModifyExpr : public Expression
 		std::shared_ptr<Value> _newValue;
 
 	friend std::ostream& operator<<(std::ostream& out, const ModifyExpr& e);
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif

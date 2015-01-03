@@ -35,13 +35,6 @@ void ActivityGraphDumper::dumpExpression(Expression* const e)
 void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 {
 	e->_body->accept(*this);
-	/*
-	*_out << "*** start of inner scope ***" << std::endl;
-// Vars are declared in body too
-//	e->_vars->accept(*this);
-	e->_body->accept(*this);
-	*_out << "*** end of inner scope ***";
-	*/
 }
 
 void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
@@ -51,42 +44,43 @@ void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
-	/*
 	e->_cond->accept(*this);
 	e->_then->accept(*this);
 	if (e->_else) {
-		*_out << "\n\telse ";
 		e->_else->accept(*this);
 	}
-	*/
 }
 
 void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
 {
-	/*
 	e->_first->accept(*this);
 	e->_second->accept(*this);
-	*/
 }
 
 void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_name->print(), reinterpret_cast<uintptr_t>(e)));
 }
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
+	_g.fork(_g.getCurrent(), reinterpret_cast<uintptr_t>(e->_label.get()));
 }
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_label->print(), reinterpret_cast<uintptr_t>(e->_label.get())));
 }
 
 void ActivityGraphDumper::dumpLeaf(Leaf* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_val->print(), reinterpret_cast<uintptr_t>(e)));
 }
 
 void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_whatToSet->print() + " = " + e->_newValue->print(),
+				reinterpret_cast<uintptr_t>(e)));
 }
 
 void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
@@ -95,38 +89,24 @@ void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 
 void ActivityGraphDumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
+	_g.addNode(std::make_shared<Node>(e->_variable->print() + "++",
+				reinterpret_cast<uintptr_t>(e)));
 }
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
-	/*
-	if (e->_value) {
-		*_out << " : ";
-		e->_value->accept(*this);
-	}
-	*/
+	e->_value->accept(*this);
 }
 
 void ActivityGraphDumper::dumpStmtList(StmtList* const e)
 {
-	/*
 	for (auto expr : e->_exprs) {
 		expr->accept(*this);
-		*_out << std::endl;
 	}
-	*/
 }
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
-	/*
 	e->_cond->accept(*this);
 	e->_body->accept(*this);
-	*_out << "*** end of switch ***";
-	*/
 }
-
-void ActivityGraphDumper::updateCurrent()
-{
-}
-

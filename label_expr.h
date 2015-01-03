@@ -18,6 +18,7 @@ class LabelExpr : public Expression
 		std::shared_ptr<Value> _label;
 
 	friend std::ostream& operator<<(std::ostream& out, const LabelExpr& e);
+	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 
 #endif
