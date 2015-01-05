@@ -17,5 +17,5 @@ Label::Label(tree t) : Value(t)
 
 std::string Label::print() const
 {
-	return "[label" + std::to_string(_uid) +"]";
+	return std::to_string(_uid);
 }

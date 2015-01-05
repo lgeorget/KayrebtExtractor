@@ -14,6 +14,6 @@ void Node::setLevelAfter(std::shared_ptr<Node> other)
 
 std::ostream& operator<<(std::ostream& out, const Node& n)
 {
-	out << n._nid << " [label=\"" << n._label << "\"];" << std::endl;
+	out << std::to_string(n._nid) << " [label=\"" << n._label << "\"];" << std::endl;
 	return out;
 }

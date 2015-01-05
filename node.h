@@ -5,13 +5,14 @@
 #include <string>
 #include <memory>
 
-class Node : public std::enable_shared_from_this<Node>
+class Node
 {
 	public:
 		explicit Node(std::string&& label, uintptr_t nid);
 		void setLevelAfter(std::shared_ptr<Node> other);
-		inline unsigned int getLevel() { return _level; }
-		inline uintptr_t getNid() { return _nid; }
+		inline unsigned int getLevel() const { return _level; }
+		inline uintptr_t getNid() const { return _nid; }
+		void setLabel(std::string&& newLabel) { _label = newLabel; }
 
 	protected:
 		std::string _label;

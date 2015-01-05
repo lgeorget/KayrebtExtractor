@@ -7,6 +7,7 @@
 #include <tree.h>
 #include "expression.h"
 #include "value.h"
+#include "label.h"
 
 class GotoExpr : public Expression
 {
