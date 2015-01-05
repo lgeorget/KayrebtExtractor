@@ -19,7 +19,7 @@ definition). (You could also use pkg-config, as proper developpers do...
 I'll change it for version 1.0.)
 
 The last version pushed to repo is not guaranteed to compile. You should
-checkout tag "compilable" for an almost-stable version.
+checkout tag "compilable" if it exists for an almost-stable version.
 Then, running `make` should leave you with a plugin, by the name of 
 `myplugin.so` or whatever the value of `EXEC` in the Makefile is. This .so file
 is the GCC plugin, handle with care.
