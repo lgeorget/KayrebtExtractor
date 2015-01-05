@@ -40,7 +40,9 @@ void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 
 void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 {
-	_g.addNode(std::make_shared<Node>(e->_label->print(), reinterpret_cast<uintptr_t>(e)));
+	auto node = std::make_shared<Node>(e->_label->print(), reinterpret_cast<uintptr_t>(e));
+	_g.addNode(node);
+	_g.fork(_switchs.top(), node->getNid());
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
@@ -48,8 +50,8 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	e->_cond->accept(*this);
 	std::shared_ptr<Node> curr = _g.getCurrent();
 	e->_then->accept(*this);
+	_g.setCurrent(curr);
 	if (e->_else) {
-		_g.setCurrent(curr);
 		e->_else->accept(*this);
 	}
 }
@@ -67,7 +69,9 @@ void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
-	_g.fork(_g.getCurrent(), std::stoull(e->_label->print()));
+	auto node =  _g.getLabel(std::stoull(e->_label->print()));
+	_g.fork(_g.getCurrent(), node->getNid());
+	_g.invalidateCurrent();
 }
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
@@ -102,6 +106,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	if (e->_value)
 		e->_value->accept(*this);
+	_g.invalidateCurrent();
 }
 
 void ActivityGraphDumper::dumpStmtList(StmtList* const e)
@@ -114,5 +119,7 @@ void ActivityGraphDumper::dumpStmtList(StmtList* const e)
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
 	e->_cond->accept(*this);
+	_switchs.push(_g.getCurrent());
 	e->_body->accept(*this);
+	_switchs.pop();
 }

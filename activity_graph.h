@@ -20,6 +20,8 @@ class ActivityGraph
 		void addNode(std::shared_ptr<Node> newNode);
 		std::shared_ptr<Node>& getCurrent() { return _current; }
 		void setCurrent(std::shared_ptr<Node>& newCurr);
+		void invalidateCurrent();
+		void closeBranch();
 
 
 	private:

@@ -10,8 +10,6 @@
 
 ActivityGraph::ActivityGraph()
 {
-	_vertices.push_back(std::make_shared<Node>("init",0));
-	_current = _vertices.back();
 }
 
 std::shared_ptr<Node> ActivityGraph::getLabel(uintptr_t nid)
@@ -29,13 +27,15 @@ std::shared_ptr<Node> ActivityGraph::getLabel(uintptr_t nid)
 
 void ActivityGraph::fork(std::shared_ptr<Node> newBranch, uintptr_t dest)
 {
-	_edges.emplace(newBranch,getLabel(dest));
+	if (newBranch)
+		_edges.emplace(newBranch,getLabel(dest));
 }
 
 void ActivityGraph::addNode(std::shared_ptr<Node> newNode)
 {
 	_vertices.push_back(newNode);
-	_edges.emplace(_current,newNode);
+	if (_current)
+		_edges.emplace(_current,newNode);
 	_current = newNode;
 }
 
@@ -43,6 +43,16 @@ void ActivityGraph::setCurrent(std::shared_ptr<Node>& newCurr)
 {
 	if (std::find(_vertices.cbegin(), _vertices.cend(), newCurr) != _vertices.cend())
 		_current = newCurr;
+}
+
+void ActivityGraph::invalidateCurrent()
+{
+	_current.reset();
+}
+
+void ActivityGraph::closeBranch()
+{
+	//TODO
 }
 
 std::ostream& operator<<(std::ostream& out, const ActivityGraph& g)

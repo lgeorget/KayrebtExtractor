@@ -1,6 +1,8 @@
 #ifndef ACTIVITY_DUMPER_H
 #define ACTIVITY_DUMPER_H
 
+#include <iostream>
+#include <stack>
 #include "activity_graph.h"
 #include "dumper.h"
 
@@ -43,7 +45,7 @@ class ActivityGraphDumper : public Dumper
 
 	private:
 		ActivityGraph _g;
-
+		std::stack<std::shared_ptr<Node>> _switchs;
 };
 
 
