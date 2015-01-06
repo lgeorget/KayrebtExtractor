@@ -1,5 +1,5 @@
-#ifndef PREINCREMENT_EXPR_H
-#define PREINCREMENT_EXPR_H
+#ifndef PREDECREMENT_EXPR_H
+#define PREDECREMENT_EXPR_H
 
 #include <iostream>
 #include <memory>
@@ -10,16 +10,16 @@
 
 class Value;
 
-class PreincrementExpr : public Expression
+class PredecrementExpr : public Expression
 {
 	public:
-		explicit PreincrementExpr(tree t);
+		explicit PredecrementExpr(tree t);
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
 		std::shared_ptr<Value> _variable;
 
-	friend std::ostream& operator<<(std::ostream& out, const PreincrementExpr& e);
+	friend std::ostream& operator<<(std::ostream& out, const PredecrementExpr& e);
 	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 

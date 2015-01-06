@@ -18,6 +18,9 @@
 #include "modify_expr.h"
 #include "nop_expr.h"
 #include "preincrement_expr.h"
+#include "predecrement_expr.h"
+#include "postincrement_expr.h"
+#include "postdecrement_expr.h"
 #include "return_expr.h"
 #include "stmt_list.h"
 #include "switch_expr.h"
@@ -120,6 +123,24 @@ void TextDumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
 	header();
 	*_out << "Preincrementation : " << *e;
+}
+
+void TextDumper::dumpPredecrementExpr(PredecrementExpr* const e)
+{
+	header();
+	*_out << "Predecrementation : " << *e;
+}
+
+void TextDumper::dumpPostincrementExpr(PostincrementExpr* const e)
+{
+	header();
+	*_out << "Postincrementation : " << *e;
+}
+
+void TextDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
+{
+	header();
+	*_out << "Postdecrementation : " << *e;
 }
 
 void TextDumper::dumpReturnExpr(ReturnExpr* const e)

@@ -16,6 +16,9 @@
 #include "label_expr.h"
 #include "modify_expr.h"
 #include "preincrement_expr.h"
+#include "predecrement_expr.h"
+#include "postincrement_expr.h"
+#include "postdecrement_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
 #include "stmt_list.h"
@@ -57,8 +60,18 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		case PREDICT_EXPR:
 			return std::make_shared<Expression>(Expression(t));
 
-		case 127: //PREINCREMENT_EXPR
+		case PREINCREMENT_EXPR:
 			return std::make_shared<PreincrementExpr>(PreincrementExpr(t));
+
+		case PREDECREMENT_EXPR:
+			return std::make_shared<PredecrementExpr>(PredecrementExpr(t));
+
+		case POSTDECREMENT_EXPR:
+			return std::make_shared<PostdecrementExpr>(PostdecrementExpr(t));
+
+		case POSTINCREMENT_EXPR:
+			return std::make_shared<PostincrementExpr>(PostincrementExpr(t));
+
 		case SWITCH_EXPR:
 			return std::make_shared<SwitchExpr>(SwitchExpr(t));
 
@@ -69,9 +82,6 @@ std::shared_ptr<Expression> ExprFactory::build(tree t)
 		//	std::cerr << "...building Return" << std::endl;
 			return std::make_shared<ReturnExpr>(ReturnExpr(t));
 
-		case PREDECREMENT_EXPR:
-		case POSTDECREMENT_EXPR:
-		case POSTINCREMENT_EXPR:
 		default:
 		//	std::cerr << "...building Expr" << std::endl;
 			return std::make_shared<Leaf>(Leaf(t));

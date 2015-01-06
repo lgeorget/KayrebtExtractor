@@ -1,5 +1,5 @@
-#ifndef PREINCREMENT_EXPR_H
-#define PREINCREMENT_EXPR_H
+#ifndef POSTINCREMENT_EXPR_H
+#define POSTINCREMENT_EXPR_H
 
 #include <iostream>
 #include <memory>
@@ -10,16 +10,16 @@
 
 class Value;
 
-class PreincrementExpr : public Expression
+class PostincrementExpr : public Expression
 {
 	public:
-		explicit PreincrementExpr(tree t);
+		explicit PostincrementExpr(tree t);
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
 		std::shared_ptr<Value> _variable;
 
-	friend std::ostream& operator<<(std::ostream& out, const PreincrementExpr& e);
+	friend std::ostream& operator<<(std::ostream& out, const PostincrementExpr& e);
 	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 

@@ -18,6 +18,9 @@
 #include "modify_expr.h"
 #include "nop_expr.h"
 #include "preincrement_expr.h"
+#include "predecrement_expr.h"
+#include "postincrement_expr.h"
+#include "postdecrement_expr.h"
 #include "return_expr.h"
 #include "stmt_list.h"
 #include "switch_expr.h"
@@ -106,6 +109,24 @@ void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 }
 
 void ActivityGraphDumper::dumpPreincrementExpr(PreincrementExpr* const e)
+{
+	_g.addNode(std::make_shared<Node>("++" + e->_variable->print(),
+				reinterpret_cast<uintptr_t>(e)));
+}
+
+void ActivityGraphDumper::dumpPredecrementExpr(PredecrementExpr* const e)
+{
+	_g.addNode(std::make_shared<Node>("--" + e->_variable->print(),
+				reinterpret_cast<uintptr_t>(e)));
+}
+
+void ActivityGraphDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
+{
+	_g.addNode(std::make_shared<Node>(e->_variable->print() + "--",
+				reinterpret_cast<uintptr_t>(e)));
+}
+
+void ActivityGraphDumper::dumpPostincrementExpr(PostincrementExpr* const e)
 {
 	_g.addNode(std::make_shared<Node>(e->_variable->print() + "++",
 				reinterpret_cast<uintptr_t>(e)));

@@ -9,7 +9,7 @@
 
 PreincrementExpr::PreincrementExpr(tree t) : Expression(t)
 {
-	if (TREE_CODE(t) != 127) //PREINCREMENT_EXPR
+	if (TREE_CODE(t) != PREINCREMENT_EXPR)
 		throw BadTreeException(t,"preincrement_tree");
 
 	_variable = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));
