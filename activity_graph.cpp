@@ -10,6 +10,9 @@
 
 ActivityGraph::ActivityGraph()
 {
+	_vertices.push_back(std::make_shared<Node>("init",0));
+	_vertices.push_back(std::make_shared<Node>("end",1));
+	_current = _vertices.front();
 }
 
 std::shared_ptr<Node> ActivityGraph::getLabel(uintptr_t nid)
@@ -52,7 +55,10 @@ void ActivityGraph::invalidateCurrent()
 
 void ActivityGraph::closeBranch()
 {
-	//TODO
+	if (_current) {
+		_edges.emplace(_current, _vertices[END]);
+		invalidateCurrent();
+	}
 }
 
 std::ostream& operator<<(std::ostream& out, const ActivityGraph& g)

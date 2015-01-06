@@ -26,8 +26,8 @@
 #include "activity_graph.h"
 #include "label.h"
 
-//ActivityGraphDumper::ActivityGraphDumper() : Dumper()
-//{}
+ActivityGraphDumper::ActivityGraphDumper() : Dumper(), _counter(2)
+{}
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
@@ -50,9 +50,15 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	e->_cond->accept(*this);
 	std::shared_ptr<Node> curr = _g.getCurrent();
 	e->_then->accept(*this);
+	std::shared_ptr<Node> pending = _g.getCurrent();
 	_g.setCurrent(curr);
 	if (e->_else) {
 		e->_else->accept(*this);
+	}
+	if (pending) {
+		_g.addNode(std::make_shared<Node>("endif",_counter));
+		_g.fork(pending,_counter);
+		_counter++;
 	}
 }
 
@@ -106,7 +112,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
 	if (e->_value)
 		e->_value->accept(*this);
-	_g.invalidateCurrent();
+	_g.closeBranch();
 }
 
 void ActivityGraphDumper::dumpStmtList(StmtList* const e)
@@ -122,4 +128,10 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	_switchs.push(_g.getCurrent());
 	e->_body->accept(*this);
 	_switchs.pop();
+}
+
+ActivityGraph& ActivityGraphDumper::graph()
+{
+	_g.closeBranch();
+	return _g;
 }

@@ -25,7 +25,7 @@ class Expression;
 class ActivityGraphDumper : public Dumper
 {
 	public:
-		ActivityGraphDumper() = default;
+		ActivityGraphDumper();
 		void dumpBindExpr(BindExpr* const e) override;
 		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
 		void dumpCompoundExpr(CompoundExpr* const e) override;
@@ -41,11 +41,12 @@ class ActivityGraphDumper : public Dumper
 		void dumpStmtList(StmtList* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
-		inline const ActivityGraph& graph() { return _g; }
+		ActivityGraph& graph();
 
 	private:
 		ActivityGraph _g;
 		std::stack<std::shared_ptr<Node>> _switchs;
+		unsigned int _counter;
 };
 
 

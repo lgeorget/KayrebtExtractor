@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
 #include <set>
 #include <utility>
 #include <unordered_map>
@@ -25,9 +25,11 @@ class ActivityGraph
 
 
 	private:
-		std::list<std::shared_ptr<Node>> _vertices;
+		std::vector<std::shared_ptr<Node>> _vertices;
 		std::set<std::pair<std::shared_ptr<Node>,std::shared_ptr<Node>>> _edges;
 		std::shared_ptr<Node> _current;
+		const int INIT = 0;
+		const int END = 1;
 		
 	friend std::ostream& operator<<(std::ostream& out, const ActivityGraph& g);
 };
