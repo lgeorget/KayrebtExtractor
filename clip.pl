@@ -18,5 +18,9 @@ while (<>)
 	{
 		print $output $_ if ($output);
 	}
+	else
+	{
+		close $output if $output;
+	}
 }
 0;
