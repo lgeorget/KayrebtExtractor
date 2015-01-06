@@ -2,9 +2,6 @@
 #include <fstream>
 #include <string>
 
-/* We are going to overwrite all passes, in order to be called just after the
- * C++ AST construction. */
-
 #include <gcc-plugin.h>
  
 #include <config.h>
