@@ -70,7 +70,10 @@ void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
 
 void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
 {
-	_g.addNode(std::make_shared<Node>(e->_name->print(), reinterpret_cast<uintptr_t>(e)));
+	if (e->_init)
+		_g.addNode(std::make_shared<Node>(e->_name->print() + " = " + e->_init->print(), reinterpret_cast<uintptr_t>(e)));
+	else
+		_g.addNode(std::make_shared<Node>(e->_name->print(), reinterpret_cast<uintptr_t>(e)));
 }
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
