@@ -9,7 +9,7 @@
 
 PostdecrementExpr::PostdecrementExpr(tree t) : Expression(t)
 {
-	if (TREE_CODE(t) != POSTINCREMENT_EXPR)
+	if (TREE_CODE(t) != POSTDECREMENT_EXPR)
 		throw BadTreeException(t,"postdecrement_tree");
 
 	_variable = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));
