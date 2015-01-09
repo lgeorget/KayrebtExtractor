@@ -17,7 +17,7 @@ class DeclExpr : public Expression
 	private:
 		std::shared_ptr<Value> _name;
 		std::shared_ptr<Value> _init;
-		
+
 	friend class TextDumper;	friend class ActivityGraphDumper;
 };
 

@@ -3,13 +3,13 @@
 #include <string>
 
 #include <gcc-plugin.h>
- 
+
 #include <config.h>
 #include <system.h>
 #include <coretypes.h>
 #include <tree.h>
 #include <intl.h>
- 
+
 #include <c-tree.h>
 #include <c-family/c-common.h>
 #include <c-family/c-pragma.h>
@@ -28,8 +28,8 @@
 int plugin_is_GPL_compatible;
 
 extern "C" {
-	
-static struct plugin_info myplugin_info = 
+
+static struct plugin_info myplugin_info =
 {
 	"0.0.1", // version
 	"Later...", //help

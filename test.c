@@ -14,7 +14,7 @@ struct greetings r;
 int main(int argc, char** argv);
 char other_function();
 void say_hello_and_die_maybe(int s);
-void function_with_numerous_args(int a, char b, struct greetings* c, int* d, 
+void function_with_numerous_args(int a, char b, struct greetings* c, int* d,
 		unsigned long long int e, char f, char* g, int h);
 
 int main(int argc, char** argv)
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	int b = a;
 	int* c = &b;
 	int i;
-	arr[8] = 9+(6 & a); 
+	arr[8] = 9+(6 & a);
 	for (i = b>a?-b:*c, b = 0 ; i < 10 ; ++i) {
 		r.hello = i;
 		printf("coucou %i %i\n", b, a);
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 }
 
 
-void function_with_numerous_args(int a, char b, struct greetings* c, int* d, 
+void function_with_numerous_args(int a, char b, struct greetings* c, int* d,
 		unsigned long long int e, char f, char* g, int h)
 {
 	exit(3);

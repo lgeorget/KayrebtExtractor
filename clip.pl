@@ -9,7 +9,7 @@ my $output;
 
 while (<>)
 {
-	if (/^Function (\w+)/) 
+	if (/^Function (\w+)/)
 	{
 		$function = $1;
 		open($output, ">$function.dot") or warn "Couldn't open output file for $function";

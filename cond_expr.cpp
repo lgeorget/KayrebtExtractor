@@ -31,7 +31,7 @@ void CondExpr::accept(Dumper& d)
 
 std::ostream& operator<<(std::ostream& out, const CondExpr& e)
 {
-	out << "if " << *e._cond 
+	out << "if " << *e._cond
 	    << " then : "
 	    << *e._then;
 	if (e._else)

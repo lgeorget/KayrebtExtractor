@@ -15,7 +15,6 @@ StmtList::StmtList(tree t) : Expression(t)
 	if (TREE_CODE(t) != STATEMENT_LIST)
 		throw BadTreeException(t,"statement_list");
 
-		
 	for (tree_stmt_iterator it = tsi_start(t) ;
 			!tsi_end_p(it) ;
 			tsi_next(&it)) {

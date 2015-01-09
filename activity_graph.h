@@ -30,7 +30,7 @@ class ActivityGraph
 		std::shared_ptr<Node> _current;
 		const int INIT = 0;
 		const int END = 1;
-		
+
 	friend std::ostream& operator<<(std::ostream& out, const ActivityGraph& g);
 };
 
