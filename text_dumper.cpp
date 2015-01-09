@@ -55,8 +55,8 @@ void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 		if (e->_highValue) {
 			*_out <<  " ... " << e->_highValue->print();
 		}
-	} 
-	else 
+	}
+	else
 		*_out << "default";
 	*_out << e->_label->print();
 }

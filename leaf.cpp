@@ -8,7 +8,7 @@
 #include "leaf.h"
 #include "value_factory.h"
 
-Leaf::Leaf(tree t) : Expression(t) 
+Leaf::Leaf(tree t) : Expression(t)
 {
 	_val = ValueFactory::INSTANCE.build(t);
 }

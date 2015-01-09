@@ -16,19 +16,19 @@ ArithExpr::ArithExpr(tree t, std::string op) : Value(t), _op(op)
 	    && !(TREE_CODE(t) >= PLUS_EXPR &&
 		 TREE_CODE(t) <= EXACT_DIV_EXPR)
 	    && !(TREE_CODE(t) >= LT_EXPR &&
-		 TREE_CODE(t) <= NE_EXPR) 
+		 TREE_CODE(t) <= NE_EXPR)
 	    && !(TREE_CODE(t) >= LSHIFT_EXPR &&
 		 TREE_CODE(t) <= RSHIFT_EXPR)
 	    && !(TREE_CODE(t) >= BIT_IOR_EXPR &&
 		 TREE_CODE(t) <= BIT_AND_EXPR))
 		throw BadTreeException(t,
-			"one of : COMPOUND_EXPR, " 
+			"one of : COMPOUND_EXPR, "
 				 "TRUTH_ANDIF_EXPR, "
 				 "TRUTH_ORIF_EXPR, "
 				 "TRUTH_AND_EXPR, "
 				 "TRUTH_OR_EXPR, "
 				 "TRUTH_XOR_EXPR, "
-				
+
 				 "LSHIFT_EXPR, "
 				 "RSHIFT_EXPR, "
 				 "BIT_IOR_EXPR, "

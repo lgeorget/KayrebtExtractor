@@ -78,7 +78,7 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			return std::make_shared<ArithExpr>(ArithExpr(t,"<<"));
                 case RSHIFT_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,">>"));
-		
+
 		case BIT_IOR_EXPR:
 			return std::make_shared<ArithExpr>(ArithExpr(t,"|"));
 		case BIT_XOR_EXPR:
