@@ -11,6 +11,13 @@ struct greetings {
 
 struct greetings r;
 
+void minifunc()
+{
+	int a;
+	int b;
+	return minifunc();
+}
+
 int main(int argc, char** argv);
 char other_function();
 void say_hello_and_die_maybe(int s);

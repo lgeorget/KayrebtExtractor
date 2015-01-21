@@ -109,8 +109,8 @@ extern "C" void gate_callback (void* arg, void*)
 	  return;
   }
 
-  out << "Function " << name << std::endl;
   auto dumper = ActivityGraphDumper();
+  std::cerr << "Ready to dump" << std::endl;
   walk_through(decl,dumper);
   out << dumper.graph();
   out << std::endl << "-------------------------" << std::endl << std::endl;

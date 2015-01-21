@@ -1,10 +1,15 @@
 #ifndef ACTIVITY_DUMPER_H
 #define ACTIVITY_DUMPER_H
 
+#include <cstdlib>
 #include <iostream>
+#include <map>
+#include <vector>
 #include <stack>
-#include "activity_graph.h"
+#include <utility>
+#include <activity_graph.h>
 #include "dumper.h"
+#include "label.h"
 
 class BindExpr;
 class CaseLabelExpr;
@@ -24,6 +29,7 @@ class Leaf;
 class StmtList;
 class SwitchExpr;
 class Expression;
+class Value;
 
 class ActivityGraphDumper : public Dumper
 {
@@ -47,12 +53,15 @@ class ActivityGraphDumper : public Dumper
 		void dumpStmtList(StmtList* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
-		ActivityGraph& graph();
+		kayrebt::ActivityGraph& graph();
 
 	private:
-		ActivityGraph _g;
-		std::stack<std::shared_ptr<Node>> _switchs;
-		unsigned int _counter;
+		kayrebt::ActivityGraph _g;
+		std::stack<std::pair<kayrebt::MergeIdentifier,std::string>> _switchs;
+		std::stack<std::vector<kayrebt::Identifier>> _branches;
+		std::stack<std::string> _values;
+		std::map<std::shared_ptr<Value>,kayrebt::MergeIdentifier> _labels;
+		bool _end;
 };
 
 
