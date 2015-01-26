@@ -19,3 +19,8 @@ std::string Label::print() const
 {
 	return std::to_string(_uid);
 }
+
+bool Label::operator<(const Label& other) const
+{
+	return _uid < other._uid;
+}

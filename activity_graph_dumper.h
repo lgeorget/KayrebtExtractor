@@ -60,8 +60,10 @@ class ActivityGraphDumper : public Dumper
 		std::stack<std::pair<kayrebt::MergeIdentifier,std::string>> _switchs;
 		std::stack<std::vector<kayrebt::Identifier>> _branches;
 		std::stack<std::string> _values;
-		std::map<std::shared_ptr<Value>,kayrebt::MergeIdentifier> _labels;
+		std::map<Value,kayrebt::MergeIdentifier> _labels;
 		bool _end;
+		bool _skip;
+		bool _buildLeaf;
 };
 
 

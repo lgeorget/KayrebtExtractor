@@ -17,3 +17,8 @@ std::ostream& operator<<(std::ostream& out, const Value* v)
 	out << v->print();
 	return out;
 }
+
+bool Value::operator<(const Value& other) const
+{
+	return reinterpret_cast<uintptr_t>(_inner) < reinterpret_cast<uintptr_t>(other._inner);
+}

@@ -10,6 +10,7 @@ class Value
 	public:
 		explicit Value(tree t);
 		virtual std::string print() const;
+		bool operator<(const Value& other) const;
 
 	protected:
 		tree _inner;

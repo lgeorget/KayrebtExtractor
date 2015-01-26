@@ -22,6 +22,7 @@
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"
+#include "text_dumper.h"
 #include "activity_graph_dumper.h"
 #include "bad_tree_exception.h"
 

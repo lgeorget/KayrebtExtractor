@@ -33,14 +33,15 @@ using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 {
-	std::cerr << "Dumping" << std::endl;
-	_branches.push(std::vector<Identifier>(1,_g.initialNode()));
+	_branches.emplace(1,_g.initialNode());
 	_end = false;
-	std::cerr << "Ready" << std::endl;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
+	std::cerr << "Discarded: " << *e  << std::endl;
+	_skip = true;
 }
 
 void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
@@ -50,10 +51,20 @@ void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 
 void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
 {
-	ActionIdentifier node = _g.addAction(e->_label->print());
-	_g.addGuard(_switchs.top().first, node, "[" + _switchs.top().second + " == " + e->_label->print() + "]");
+	MergeIdentifier node = _g.addDecision();
+	std::string condition;
+	if (e->_lowValue)
+		if (e->_highValue)
+			condition = "[" + _switchs.top().second + " between " + e->_lowValue->print() + " and " + e->_highValue->print() + "]";
+		else
+			condition = "[" + _switchs.top().second + " == " + e->_lowValue->print() + "]";
+	else
+		condition = "[otherwise]";
+
+	_g.addGuard(_switchs.top().first, node, condition);
 	_branches.emplace(1,node);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
@@ -62,20 +73,23 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	std::vector<Identifier> condBranch;
 	auto decision = _g.addDecision();
 	auto fusion = _g.addDecision();
-
 	condBranch.push_back(decision);
+
+	_buildLeaf = false;
 	e->_cond->accept(*this);
 	std::string condition = std::move(_values.top());
 	_values.pop();
-	e->_then->accept(*this);
+	_buildLeaf = true;
 
-	std::vector<Identifier> bthen(std::move(_branches.top()));
+	e->_then->accept(*this);
+	std::vector<Identifier> bthen;
+	bthen = std::move(_branches.top());
+	_branches.pop();
 	_g.addGuard(decision, bthen.front(), "[" + condition + "]");
 	end = _end;
 	if (!_end)
 		_g.addEdge(bthen.back(), fusion);
 	std::move(bthen.begin(), bthen.end(), std::back_inserter(condBranch));
-	_branches.pop();
 
 	if (e->_else) {
 		e->_else->accept(*this);
@@ -93,6 +107,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	_end = end;
 	condBranch.push_back(fusion);
 	_branches.push(std::move(condBranch));
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
@@ -110,140 +125,170 @@ void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
 	_branches.pop();
 
 	_branches.push(compoundBranch);
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
 {
-	std::unique_ptr<ObjectIdentifier> o;
 	if (e->_init) {
-		o = std::unique_ptr<ObjectIdentifier>(new ObjectIdentifier(_g.addObject(e->_name->print() + " = " + e->_init->print())));
+		ObjectIdentifier o(_g.addObject(e->_name->print() + " = " + e->_init->print()));
+		_branches.emplace(1,o);
 	} else {
-		o = std::unique_ptr<ObjectIdentifier>(new ObjectIdentifier(_g.addObject(e->_name->print())));
+		ObjectIdentifier o(_g.addObject(e->_name->print()));
+		_branches.emplace(1,o);
 	}
-	_branches.push(std::vector<Identifier>(1,*o));
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
-	auto label = _labels.find(e->_label);
+	std::cerr << "Looking for label " << e->_label->print() << std::endl;
+	auto label = _labels.find(*(e->_label));
 	if (label == _labels.end()) {
+		std::cerr << "Not found!" << std::endl;
 		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(e->_label,labelNode)).first;
+		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
 	}
 	MergeIdentifier gotoNode(_g.addDecision());
 	_g.addEdge(gotoNode, label->second);
-	_branches.push(std::vector<Identifier>(1,gotoNode));
+	_branches.emplace(1,gotoNode);
 	_end = true;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
-	auto label = _labels.find(e->_label);
+	std::cerr << "Check for already existing label " << e->_label->print() << std::endl;
+	auto label = _labels.find(*(e->_label));
 	if (label == _labels.end()) {
+		std::cerr << "Label not found" << std::endl;
 		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(e->_label,labelNode)).first;
-		_branches.push(std::vector<Identifier>(1,labelNode));
+		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
+		_branches.emplace(1,labelNode);
 	} else {
 		MergeIdentifier& labelNode = label->second;
-		_branches.push(std::vector<Identifier>(1,labelNode));
+		_branches.emplace(1,labelNode);
 	}
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpLeaf(Leaf* const e)
 {
-	ObjectIdentifier o(_g.addObject(e->_val->print()));
-	_branches.push(std::vector<Identifier>(1,o));
-	_values.push(e->_val->print());
-	_end = false;
+		ObjectIdentifier o(_g.addObject(e->_val->print()));
+		_branches.emplace(1,o);
+		_end = false;
+		_values.push(e->_val->print());
+	_skip = !_buildLeaf;
 }
 
 void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
 {
 	ActionIdentifier a(_g.addAction(e->_whatToSet->print() + " = " + e->_newValue->print()));
-	_branches.push(std::vector<Identifier>(1,a));
+	_branches.emplace(1,a);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 {
+	_skip = true;
 }
 
 void ActivityGraphDumper::dumpPreincrementExpr(PreincrementExpr* const e)
 {
 	ActionIdentifier a(_g.addAction("++" + e->_variable->print()));
-	_branches.push(std::vector<Identifier>(1,a));
+	_branches.emplace(1,a);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpPredecrementExpr(PredecrementExpr* const e)
 {
 	ActionIdentifier a(_g.addAction("--" + e->_variable->print()));
-	_branches.push(std::vector<Identifier>(1,a));
+	_branches.emplace(1,a);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
 {
 	ActionIdentifier a(_g.addAction(e->_variable->print() + "--"));
-	_branches.push(std::vector<Identifier>(1,a));
+	_branches.emplace(1,a);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpPostincrementExpr(PostincrementExpr* const e)
 {
 	ActionIdentifier a(_g.addAction(e->_variable->print() + "++"));
-	_branches.push(std::vector<Identifier>(1,a));
+	_branches.emplace(1,a);
 	_end = false;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
-	if (e->_value)
+	std::vector<Identifier> returnBranch;
+	auto endingNode = _g.terminateActivity();
+	if (e->_value) {
 		e->_value->accept(*this);
-	_branches.push(std::vector<Identifier>(1,_g.terminateActivity()));
+		returnBranch = std::move(_branches.top());
+		_branches.pop();
+		_g.addEdge(returnBranch.back(),endingNode);
+	}
+	returnBranch.push_back(endingNode);
+	_branches.push(std::move(returnBranch));
 	_end = true;
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpStmtList(StmtList* const e)
 {
-	std::vector<Identifier> stmtBranch(_branches.top());
-	_branches.pop();
+	std::vector<Identifier> stmtBranch;
+	if (!_skip) {
+		stmtBranch = std::move(_branches.top());
+		_branches.pop();
+	}
 
 	bool end = _end;
 	for (auto expr : e->_exprs) {
 		expr->accept(*this);
-		auto after = _branches.top();
-		_branches.pop();
-		if (!end)
-			_g.addEdge(stmtBranch.back(), after.front());
+		if (!_skip)
+		{
+			auto after = _branches.top();
+			_branches.pop();
+			if (!end && !stmtBranch.empty())
+				_g.addEdge(stmtBranch.back(), after.front());
+			std::move(after.begin(), after.end(), std::back_inserter(stmtBranch));
+		}
 		end = _end;
-		std::move(after.begin(), after.end(), std::back_inserter(stmtBranch));
 	}
 	_branches.push(std::move(stmtBranch));
 	//_end is untouched
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
+	_buildLeaf = false;
 	e->_cond->accept(*this);
-	_branches.pop(); // condition is not represented as a node
-			 // so discard it
 	auto cond = _g.addDecision();
 	_switchs.push(std::make_pair(cond,_values.top()));
 	_values.pop();
+	_buildLeaf = true;
 
 	std::vector<Identifier> switchBranch;
 	switchBranch.push_back(cond);
 	e->_body->accept(*this);
-	auto switchBody = _branches.top();
+	std::move(_branches.top().begin(), _branches.top().end(), std::back_inserter(switchBranch));
 	_branches.pop();
-	std::move(switchBody.begin(), switchBody.end(), std::back_inserter(switchBranch));
 	_switchs.pop();
 
 	_branches.push(std::move(switchBranch));
 	//_end is untouched
+	_skip = false;
 }
 
 ActivityGraph& ActivityGraphDumper::graph()
