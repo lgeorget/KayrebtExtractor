@@ -36,6 +36,7 @@ ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 	_branches.emplace(1,_g.initialNode());
 	_end = false;
 	_skip = false;
+	_buildLeaf = true;
 }
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
@@ -46,6 +47,7 @@ void ActivityGraphDumper::dumpExpression(Expression* const e)
 
 void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
 {
+	_skip = true;
 	e->_body->accept(*this);
 }
 
@@ -176,10 +178,13 @@ void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 
 void ActivityGraphDumper::dumpLeaf(Leaf* const e)
 {
+	if (_buildLeaf) {
 		ObjectIdentifier o(_g.addObject(e->_val->print()));
 		_branches.emplace(1,o);
 		_end = false;
+	} else {
 		_values.push(e->_val->print());
+	}
 	_skip = !_buildLeaf;
 }
 
