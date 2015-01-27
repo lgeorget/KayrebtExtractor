@@ -15,7 +15,7 @@ $(EXEC): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
 run: $(EXEC)
-	gcc -iplugindir=. -fplugin=$(PLUGIN) -shared -fPIC -x c -S test.c
+	gcc -iplugindir=. -fplugin=$(PLUGIN) -fplugin-arg-$(PLUGIN)-other_function -shared -fPIC -x c -S test.c
 
 %.o: %.cpp
 	$(CXX) -std=c++11 $< -MM -MF $(patsubst %.cpp,%.d,$<)

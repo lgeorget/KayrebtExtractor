@@ -64,7 +64,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 	register_callback(plugin_info->base_name,
 			PLUGIN_PRE_GENERICIZE,
 			&gate_callback,
-			0);
+			(void*) plugin_info);
 	register_callback(plugin_info->base_name,
 			PLUGIN_START_UNIT,
 			&prepare_dump_file,
@@ -87,7 +87,7 @@ extern "C" void walk_through(tree decl, Dumper& dumper)
 	}
 }
 
-extern "C" void gate_callback (void* arg, void*)
+extern "C" void gate_callback (void* arg, void* plugin_args)
 {
   // If there were errors during compilation,
   // let GCC handle the exit.
@@ -96,6 +96,8 @@ extern "C" void gate_callback (void* arg, void*)
     return;
 
   tree decl = (tree) arg;
+  struct plugin_name_args* functions = (struct plugin_name_args*) plugin_args;
+
   int tc = TREE_CODE(decl);
   tree id = DECL_NAME(decl);
   const char* name (id ? IDENTIFIER_POINTER (id) : "<unnamed>");
@@ -104,18 +106,26 @@ extern "C" void gate_callback (void* arg, void*)
        << " at " << DECL_SOURCE_FILE (decl) << ":"
        << DECL_SOURCE_LINE (decl) << std::endl;
 
-  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
-  if (!out) {
-	  std::cerr << "Couldn't open dump file, skipping." << std::endl;
-	  return;
+  bool found = false;
+  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
+	found = strcmp(name,functions->argv->key) == 0;
   }
 
-  auto dumper = ActivityGraphDumper();
-  std::cerr << "Ready to dump" << std::endl;
-  walk_through(decl,dumper);
-  out << dumper.graph();
-  out << std::endl << "-------------------------" << std::endl << std::endl;
-  out.close();
+  if (found)
+  {
+	  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
+	  if (!out) {
+		  std::cerr << "Couldn't open dump file, skipping." << std::endl;
+		  return;
+	  }
+
+	  out << "Function " << name << std::endl;
+	  auto dumper = ActivityGraphDumper();
+	  walk_through(decl,dumper);
+	  out << dumper.graph();
+	  out << std::endl << "-------------------------" << std::endl << std::endl;
+	  out.close();
+  }
 }
 
 extern "C" void prepare_dump_file (void*, void*)
