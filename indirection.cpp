@@ -17,5 +17,5 @@ Indirection::Indirection(tree t, std::string&& op) : Value(t), _op(op)
 
 std::string Indirection::print() const
 {
-	return _op + _val->print();
+	return _op + "(" + _val->print() + ")";
 }
