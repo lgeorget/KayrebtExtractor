@@ -117,6 +117,7 @@ void TextDumper::dumpModifyExpr(ModifyExpr* const e)
 
 void TextDumper::dumpNopExpr(NopExpr* const e)
 {
+	*_out << "No-op";
 }
 
 void TextDumper::dumpPreincrementExpr(PreincrementExpr* const e)
@@ -155,10 +156,12 @@ void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 
 void TextDumper::dumpStmtList(StmtList* const e)
 {
+	*_out << "***Statements***" << std::endl;
 	for (auto expr : e->_exprs) {
 		expr->accept(*this);
 		*_out << std::endl;
 	}
+	*_out << "***end of statements***" << std::endl;
 }
 
 void TextDumper::dumpSwitchExpr(SwitchExpr* const e)

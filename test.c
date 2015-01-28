@@ -29,6 +29,13 @@ int main(int argc, char** argv)
 	int b = a;
 	int* c = &b;
 	int i;
+	if (i == b)
+	{
+	}
+	else
+	{
+	}
+
 	arr[8] = 9+(6 & a);
 	for (i = b>a?-b:*c, b = 0 ; i < 10 ; ++i) {
 		r.hello = i;

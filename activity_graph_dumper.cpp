@@ -83,17 +83,19 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	_values.pop();
 	_buildLeaf = true;
 
+	_skip = true;
 	e->_then->accept(*this);
 	std::vector<Identifier> bthen;
 	bthen = std::move(_branches.top());
-	_branches.pop();
 	_g.addGuard(decision, bthen.front(), "[" + condition + "]");
-	end = _end;
 	if (!_end)
 		_g.addEdge(bthen.back(), fusion);
 	std::move(bthen.begin(), bthen.end(), std::back_inserter(condBranch));
+	_branches.pop();
+	end = _end;
 
 	if (e->_else) {
+		_skip = true;
 		e->_else->accept(*this);
 		std::vector<Identifier> belse(std::move(_branches.top()));
 		_g.addGuard(decision, belse.front(), "[!" + condition + "]");
@@ -255,7 +257,10 @@ void ActivityGraphDumper::dumpStmtList(StmtList* const e)
 	if (!_skip) {
 		stmtBranch = std::move(_branches.top());
 		_branches.pop();
+	} else {
+		stmtBranch.push_back(_g.addDecision());
 	}
+	_skip = false;
 
 	bool end = _end;
 	for (auto expr : e->_exprs) {
