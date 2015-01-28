@@ -108,7 +108,7 @@ extern "C" void gate_callback (void* arg, void* plugin_args)
 
   bool found = false;
   for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
-	found = strcmp(name,functions->argv->key) == 0;
+	found = strcmp(name,functions->argv[i].key) == 0;
   }
 
   if (found)
