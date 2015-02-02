@@ -8,6 +8,7 @@
 #include "value_factory.h"
 #include "array_ref.h"
 #include "arith_expr.h"
+#include "asm_expr.h"
 #include "call_expr.h"
 #include "component_ref.h"
 #include "integer_cst.h"
@@ -41,6 +42,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 
 		case ARRAY_REF:
 			return std::make_shared<ArrayRef>(ArrayRef(t));
+
+		case ASM_EXPR:
+			return std::make_shared<AsmExpr>(AsmExpr(t));
 
 		case COMPONENT_REF:
 			return std::make_shared<ComponentRef>(ComponentRef(t));
