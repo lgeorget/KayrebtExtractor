@@ -303,5 +303,6 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 
 ActivityGraph& ActivityGraphDumper::graph()
 {
+	_g.simplifyMergeNodes();
 	return _g;
 }
