@@ -18,7 +18,7 @@
 
 #include <tree-iterator.h>
 
-#include "myplugin.h"
+#include "cgrapher4gcc.h"
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"

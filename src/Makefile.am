@@ -1,3 +1,4 @@
+SUBDIRS = ../activity_diagram/
 lib_LTLIBRARIES=libcgrapher4gcc.la
 libcgrapher4gcc_la_SOURCES=\
 	activity_graph_dumper.cpp\
@@ -78,6 +79,6 @@ libcgrapher4gcc_la_SOURCES=\
 	value.h\
 	value_factory.cpp\
 	value_factory.h
-libcgrapher4gcc_la_CXXFLAGS = -std=c++11
+libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I ${gcc_includes} -I $(srcdir)/../activity_diagram/src/
 libcgrapher4gcc_la_LDFLAGS  = -version-info 0:0:0
 

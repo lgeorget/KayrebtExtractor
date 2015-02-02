@@ -1,5 +1,7 @@
 *.o
 *.so
+*.lo
+*.la
 .*
 *tags*
 *.d
@@ -7,6 +9,7 @@
 *.dump
 *.dot
 doc/
+Makefile
 Makefile.in
 aclocal.m4
 ar-lib
