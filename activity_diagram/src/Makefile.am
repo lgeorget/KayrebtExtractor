@@ -1,5 +1,5 @@
-lib_LTLIBRARIES=libactivity_graph.la
-libactivity_graph_la_SOURCES=\
+lib_LTLIBRARIES=libactivity_diagram.la
+libactivity_diagram_la_SOURCES=\
 	action_identifier.h\
 	activity_graph.cpp\
 	activity_graph.h\
@@ -18,9 +18,9 @@ libactivity_graph_la_SOURCES=\
 	object_identifier.h\
 	sync_identifier.h\
 	types.h
-libactivity_graph_la_CPPFLAGS = $(BOOST_CPPFLAGS)
-libactivity_graph_la_CXXFLAGS = -std=c++11
-libactivity_graph_la_LDFLAGS = -version-info 0:2:0
+libactivity_diagram_la_CPPFLAGS = $(BOOST_CPPFLAGS)
+libactivity_diagram_la_CXXFLAGS = -std=c++11
+libactivity_diagram_la_LDFLAGS = -version-info 0:2:0
 pkginclude_HEADERS =\
 	action_identifier.h\
 	activity_graph.h\
