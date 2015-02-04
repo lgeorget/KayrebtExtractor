@@ -31,3 +31,4 @@ src/Makefile
 src/Makefile.in
 src/autoscan-2.69.log
 stamp-h1
+*.tar.gz
