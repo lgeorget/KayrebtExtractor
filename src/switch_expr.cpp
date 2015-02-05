@@ -3,20 +3,22 @@
 #include <cstdlib>
 #include <list>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "switch_expr.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 #include "dumper.h"
 #include "value_factory.h"
 #include "expr_factory.h"
 
-SwitchExpr::SwitchExpr(tree t) : Expression(t)
+SwitchExpr::SwitchExpr(gimple t) : Expression(t)
 {
-	if (TREE_CODE(t) != SWITCH_EXPR)
-		throw BadTreeException(t, "switch_expr");
+	if (gimple_code(t) != GIMPLE_SWITCH)
+		throw BadGimpleException(t, "gimple_switch");
 
-	_cond = ExprFactory::INSTANCE.build(TREE_OPERAND(t,0));
-	_body = ExprFactory::INSTANCE.build(TREE_OPERAND(t,1));
+	_var = ValueFactory::INSTANCE.build(gimple_switch_index(t));
+	unsigned int nbLabs = gimple_switch_num_labels(t);
+	for (unsigned int i = 0 ; i < nbLabs ; i++)
+		_labels.push_back(ExprFactory::INSTANCE.build(gimple_switch_label(t,i)));
 }
 
 void SwitchExpr::accept(Dumper& d)

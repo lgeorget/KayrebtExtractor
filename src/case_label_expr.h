@@ -4,14 +4,14 @@
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "expression.h"
 #include "value.h"
 
 class CaseLabelExpr : public Expression
 {
 	public:
-		explicit CaseLabelExpr(tree t);
+		explicit CaseLabelExpr(gimple t);
 		virtual void accept(Dumper& d);
 
 	private:

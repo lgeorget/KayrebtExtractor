@@ -5,28 +5,20 @@
 #include <memory>
 #include <tuple>
 #include <gcc-plugin.h>
+#include <activity_graph.h>
 #include "activity_graph_dumper.h"
-#include "bind_expr.h"
+#include "assign_expr.h"
+#include "bb_list.h"
 #include "call_expr.h"
 #include "case_label_expr.h"
 #include "cond_expr.h"
-#include "compound_expr.h"
-#include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
 #include "label_expr.h"
-#include "leaf.h"
-#include "modify_expr.h"
 #include "nop_expr.h"
-#include "preincrement_expr.h"
-#include "predecrement_expr.h"
-#include "postincrement_expr.h"
-#include "postdecrement_expr.h"
 #include "return_expr.h"
-#include "stmt_list.h"
 #include "switch_expr.h"
 #include "dumper.h"
-#include <activity_graph.h>
 #include "label.h"
 
 using namespace kayrebt;
@@ -45,10 +37,41 @@ void ActivityGraphDumper::dumpExpression(Expression* const e)
 	_skip = true;
 }
 
-void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
+void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
 {
-	_skip = true;
-	e->_body->accept(*this);
+	ActionIdentifier a(_g.addAction(e->_whatToSet->print() + " = " + e->_newValue->print()));
+	_branches.emplace(1,a);
+	_end = false;
+	_skip = false;
+}
+
+void ActivityGraphDumper::dumpBbList(BbList* const e)
+{
+	std::vector<Identifier> stmtBranch;
+	if (!_skip) {
+		stmtBranch = std::move(_branches.top());
+		_branches.pop();
+	} else {
+		stmtBranch.push_back(_g.addDecision());
+	}
+	_skip = false;
+
+	bool end = _end;
+	for (auto expr : e->_exprs) {
+		expr->accept(*this);
+		if (!_skip)
+		{
+			auto after = _branches.top();
+			_branches.pop();
+			if (!end && !stmtBranch.empty())
+				_g.addEdge(stmtBranch.back(), after.front());
+			std::move(after.begin(), after.end(), std::back_inserter(stmtBranch));
+		}
+		end = _end;
+	}
+	_branches.push(std::move(stmtBranch));
+	//_end is untouched
+	_skip = false;
 }
 
 void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
@@ -114,37 +137,6 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	_skip = false;
 }
 
-void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
-{
-	std::vector<Identifier> compoundBranch;
-
-	e->_first->accept(*this);
-	std::move(_branches.top().begin(), _branches.top().end(), std::back_inserter(compoundBranch));
-	_branches.pop();
-
-	e->_second->accept(*this);
-	std::vector<Identifier> second(std::move(_branches.top()));
-	_g.addEdge(compoundBranch.back(),second.front());
-	std::move(second.begin(), second.end(), std::back_inserter(compoundBranch));
-	_branches.pop();
-
-	_branches.push(compoundBranch);
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
-{
-	if (e->_init) {
-		ObjectIdentifier o(_g.addObject(e->_name->print() + " = " + e->_init->print()));
-		_branches.emplace(1,o);
-	} else {
-		ObjectIdentifier o(_g.addObject(e->_name->print()));
-		_branches.emplace(1,o);
-	}
-	_end = false;
-	_skip = false;
-}
-
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
 	std::cerr << "Looking for label " << e->_label->print() << std::endl;
@@ -178,61 +170,9 @@ void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 	_skip = false;
 }
 
-void ActivityGraphDumper::dumpLeaf(Leaf* const e)
-{
-	if (_buildLeaf) {
-		ObjectIdentifier o(_g.addObject(e->_val->print()));
-		_branches.emplace(1,o);
-		_end = false;
-	} else {
-		_values.push(e->_val->print());
-	}
-	_skip = !_buildLeaf;
-}
-
-void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_whatToSet->print() + " = " + e->_newValue->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
 void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 {
 	_skip = true;
-}
-
-void ActivityGraphDumper::dumpPreincrementExpr(PreincrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction("++" + e->_variable->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPredecrementExpr(PredecrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction("--" + e->_variable->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_variable->print() + "--"));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPostincrementExpr(PostincrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_variable->print() + "++"));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
 }
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
@@ -251,34 +191,6 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	_skip = false;
 }
 
-void ActivityGraphDumper::dumpStmtList(StmtList* const e)
-{
-	std::vector<Identifier> stmtBranch;
-	if (!_skip) {
-		stmtBranch = std::move(_branches.top());
-		_branches.pop();
-	} else {
-		stmtBranch.push_back(_g.addDecision());
-	}
-	_skip = false;
-
-	bool end = _end;
-	for (auto expr : e->_exprs) {
-		expr->accept(*this);
-		if (!_skip)
-		{
-			auto after = _branches.top();
-			_branches.pop();
-			if (!end && !stmtBranch.empty())
-				_g.addEdge(stmtBranch.back(), after.front());
-			std::move(after.begin(), after.end(), std::back_inserter(stmtBranch));
-		}
-		end = _end;
-	}
-	_branches.push(std::move(stmtBranch));
-	//_end is untouched
-	_skip = false;
-}
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {

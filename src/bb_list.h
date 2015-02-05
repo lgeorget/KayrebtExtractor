@@ -1,19 +1,20 @@
-#ifndef STMT_LIST_H
-#define STMT_LIST_H
+#ifndef BB_LIST_H
+#define BB_LIST_H
 
 #include <iostream>
 #include <list>
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include <gimple.h>
 #include "expression.h"
 
 class Dumper;
 
-class StmtList : public Expression
+class BbList : public Expression
 {
 	public:
-		explicit StmtList(tree t);
+		explicit BbList(basic_block t);
 		void accept(Dumper& d);
 
 	private:

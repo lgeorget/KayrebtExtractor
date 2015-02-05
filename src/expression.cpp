@@ -2,11 +2,11 @@
 #include <memory>
 #include <cstdlib>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "expression.h"
 #include "dumper.h"
 
-Expression::Expression(tree t) : _expr(t)
+Expression::Expression(gimple t) : _expr(t)
 {}
 
 void Expression::accept(Dumper& d)
@@ -16,6 +16,6 @@ void Expression::accept(Dumper& d)
 
 std::ostream& operator<<(std::ostream& out, const Expression& e)
 {
-	out << "Unknown expression : " << tree_code_name[TREE_CODE(e._expr)];
+	out << "Unknown expression : " << gimple_code_name[GIMPLE_CODE(e._expr)];
 	return out;
 }

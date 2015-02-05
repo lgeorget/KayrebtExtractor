@@ -2,15 +2,16 @@
 #include <cstdlib>
 #include <gcc-plugin.h>
 #include <tree.h>
-#include "bad_tree_exception.h"
+#include <gimple.h>
+#include "bad_gimple_exception.h"
 #include "case_label_expr.h"
 #include "dumper.h"
 #include "value_factory.h"
 
-CaseLabelExpr::CaseLabelExpr(tree t) : Expression(t)
+CaseLabelExpr::CaseLabelExpr(gimple t) : Expression(t)
 {
 	if (TREE_CODE(t) != CASE_LABEL_EXPR)
-		throw BadTreeException(t,"case_label_tree");
+		throw BadTreeException(t,"case_label_expr");
 
 	if (TREE_OPERAND(t,0))
 		_lowValue = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));

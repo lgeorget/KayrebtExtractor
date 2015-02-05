@@ -10,7 +10,6 @@ class BadTreeException : public std::domain_error
 {
 	public:
 		BadTreeException(tree got, const char* expected);
-		BadTreeException(tree got, tree expected);
 };
 
 #endif

@@ -1,25 +1,20 @@
 #include <cstdlib>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "return_expr.h"
 #include "expression.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 #include "dumper.h"
-#include "expr_factory.h"
+#include "value_factory.h"
 
-ReturnExpr::ReturnExpr(tree t) : Expression(t)
+ReturnExpr::ReturnExpr(gimple t) : Expression(t)
 {
-	if (TREE_CODE(t) != RETURN_EXPR)
-		throw BadTreeException(t,"RETURN_EXPR");
+	if (gimple_code(t) != GIMPLE_RETURN)
+		throw BadGimpleException(t,"gimple_return");
 
-	//Flatten the tree, don't care about the location of the return value
-	tree ret = TREE_OPERAND(t,0);
-	if (ret) {
-		if (TREE_CODE(ret) == MODIFY_EXPR)
-			_value = ExprFactory::INSTANCE.build(TREE_OPERAND(ret,1));
-		else
-			_value = ExprFactory::INSTANCE.build(ret);
-	}
+	tree val = gimple_return_retval(t);
+	if (val != NULL && val != NULL_TREE)
+		_value = ValueFactory::INSTANCE.build(val);
 }
 
 void ReturnExpr::accept(Dumper& d)

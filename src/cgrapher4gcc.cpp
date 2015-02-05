@@ -16,7 +16,9 @@
 #include <tm.h>
 #include <diagnostic.h>
 
+#include <function.h>
 #include <tree-iterator.h>
+#include <gimple.h>
 
 #include "cgrapher4gcc.h"
 #include "expr_factory.h"
@@ -24,7 +26,7 @@
 #include "dumper.h"
 #include "text_dumper.h"
 #include "activity_graph_dumper.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 
 int plugin_is_GPL_compatible;
 
@@ -45,6 +47,23 @@ static struct plugin_gcc_version myplugin_version =
 	"", // configuration arguments
 };
 
+struct gimple_opt_pass actdiag_extractor = {
+	{
+		.type			= GIMPLE_PASS,
+		.name			= "activity diagram extractor",
+		.gate			= NULL,
+		.execute		= actdiag_extractor,
+		.sub			= NULL,
+		.next			= NULL,
+		.static_pass_number	= 0,
+		.tv_id			= TV_NONE,
+		.properties_required	= 0,
+		.properties_provided	= 0,
+		.properties_destroyed	= 0,
+		.todo_flags_start	= 0,
+		.todo_flags_finish	= 0
+};
+
 }
 
 
@@ -55,14 +74,15 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 		return -1; // incompatible
 	}
 
-	// Disable assembly output.
-	//
-//	asm_file_name = HOST_BIT_BUCKET;
+	struct register_pass_info local_variable_pass_info = {
+		.pass				= &actdiag_extractor.pass,
+		.reference_pass_name		= "pass_build_cfg",
+		.ref_pass_instance_number	= 0,
+		.pos_op				= PASS_POS_INSERT_AFTER
+	};
 
-	// Register callbacks.
-	//
 	register_callback(plugin_info->base_name,
-			PLUGIN_PRE_GENERICIZE,
+			PLUGIN_PASS_MANAGER_SETUP,
 			&gate_callback,
 			(void*) plugin_info);
 	register_callback(plugin_info->base_name,
@@ -73,13 +93,20 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_info,
 	return 0;
 }
 
-extern "C" void walk_through(tree decl, Dumper& dumper)
+static void walk_through_current_fn(Dumper& dumper)
 {
-	tree subdecl = BIND_EXPR_BODY(DECL_SAVED_TREE(decl));
 
-	std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(subdecl);
+	unsigned i;
+	const_tree str, op;
+	basic_block bb;
+	gimple stmt;
+	gimple_stmt_iterator gsi;
+
 	try {
-		e->accept(dumper);
+		FOR_EACH_BB(bb) {
+			std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(bb);
+			e->accept(dumper);
+		}
 	} catch(BadTreeException& e) {
 		std::cerr << "***Error detected***\n" <<
 			e.what() << std::endl;
@@ -87,7 +114,7 @@ extern "C" void walk_through(tree decl, Dumper& dumper)
 	}
 }
 
-extern "C" void gate_callback (void* arg, void* plugin_args)
+extern "C" void actdiag_extractor (void, void* plugin_args)
 {
   // If there were errors during compilation,
   // let GCC handle the exit.
@@ -95,17 +122,8 @@ extern "C" void gate_callback (void* arg, void* plugin_args)
   if (errorcount || sorrycount)
     return;
 
-  tree decl = (tree) arg;
-  struct plugin_name_args* functions = (struct plugin_name_args*) plugin_args;
-
-  int tc = TREE_CODE(decl);
-  tree id = DECL_NAME(decl);
-  const char* name (id ? IDENTIFIER_POINTER (id) : "<unnamed>");
-
-  std::cerr << tree_code_name[tc] << " " << name
-       << " at " << DECL_SOURCE_FILE (decl) << ":"
-       << DECL_SOURCE_LINE (decl) << std::endl;
-
+  // Name of the function currently being parsed
+  const char* name = function_name(cfun);
   bool found = false;
   for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
 	found = strcmp(name,functions->argv[i].key) == 0;
@@ -121,7 +139,7 @@ extern "C" void gate_callback (void* arg, void* plugin_args)
 
 	  out << "Function " << name << std::endl;
 	  auto dumper = ActivityGraphDumper();
-	  walk_through(decl,dumper);
+	  walk_through_current_fn(dumper);
 	  out << dumper.graph();
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();

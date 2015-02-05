@@ -1,27 +1,21 @@
 #include <iostream>
 #include <cstdlib>
 #include <gcc-plugin.h>
-#include <tree.h>
-#include "bad_tree_exception.h"
+#include <gimple.h>
+#include "bad_gimple_exception.h"
 #include "label_expr.h"
 #include "dumper.h"
 #include "value_factory.h"
 
-LabelExpr::LabelExpr(tree t) : Expression(t)
+LabelExpr::LabelExpr(gimple t) : Expression(t)
 {
-	if (TREE_CODE(t) != LABEL_EXPR)
-		throw BadTreeException(t,"label_tree");
+	if (gimple_code(t) != GIMPLE_LABEL)
+		throw BadTreeException(t,"gimple_label");
 
-	_label = ValueFactory::INSTANCE.build(TREE_OPERAND(t, 0));
+	_label = ValueFactory::INSTANCE.build(gimple_label_label(t));
 }
 
 void LabelExpr::accept(Dumper& d)
 {
 	d.dumpLabelExpr(this);
-}
-
-std::ostream& operator<<(std::ostream& out, const LabelExpr& e)
-{
-	out << e._label->print();
-	return out;
 }

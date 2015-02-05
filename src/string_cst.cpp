@@ -5,7 +5,7 @@
 #include <tree.h>
 #include "string_cst.h"
 #include "value.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 
 StringCst::StringCst(tree t) : Value(t)
 {

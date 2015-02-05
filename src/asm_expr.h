@@ -5,13 +5,13 @@
 #include <memory>
 #include <string>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "value.h"
 
 class AsmExpr : public Value
 {
 	public:
-		explicit AsmExpr(tree t);
+		explicit AsmExpr(gimple t);
 		std::string print() const override;
 
 	private:

@@ -4,22 +4,14 @@
 #include <iostream>
 #include "dumper.h"
 
-class BindExpr;
+class AssignExpr;
+class BbList;
 class CaseLabelExpr;
 class CondExpr;
-class CompoundExpr;
-class DeclExpr;
 class GotoExpr;
 class LabelExpr;
-class ModifyExpr;
 class NopExpr;
-class PreincrementExpr;
-class PredecrementExpr;
-class PostdecrementExpr;
-class PostincrementExpr;
 class ReturnExpr;
-class Leaf;
-class StmtList;
 class SwitchExpr;
 class Expression;
 
@@ -27,22 +19,14 @@ class TextDumper : public Dumper
 {
 	public:
 		TextDumper(std::ostream* const out = &std::cout, bool withHeader = true);
-		void dumpBindExpr(BindExpr* const e) override;
+		void dumpAssignExpr(AssignExpr* const e) override;
+		void dumpBbList(BbList* const e) override;
 		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
-		void dumpCompoundExpr(CompoundExpr* const e) override;
-		void dumpDeclExpr(DeclExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
 		void dumpLabelExpr(LabelExpr* const e) override;
-		void dumpLeaf(Leaf* const e) override;
-		void dumpModifyExpr(ModifyExpr* const e) override;
 		void dumpNopExpr(NopExpr* const e) override;
-		void dumpPreincrementExpr(PreincrementExpr* const e) override;
-		void dumpPredecrementExpr(PredecrementExpr* const e)  override;
-		void dumpPostdecrementExpr(PostdecrementExpr* const e) override;
-		void dumpPostincrementExpr(PostincrementExpr* const e) override;
 		void dumpReturnExpr(ReturnExpr* const e) override;
-		void dumpStmtList(StmtList* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
 

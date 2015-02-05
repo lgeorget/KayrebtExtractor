@@ -1,21 +1,25 @@
-#ifndef RETURN_EXPR_H
-#define RETURN_EXPR_H
+#ifndef ASSIGN_EXPR_H
+#define ASSIGN_EXPR_H
 
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>
+#include <tree.h>
 #include <gimple.h>
 #include "expression.h"
 #include "value.h"
 
-class ReturnExpr : public Expression
+class AssignExpr : public Expression
 {
 	public:
-		explicit ReturnExpr(gimple t);
+		explicit AssignExpr(gimple t);
 		virtual void accept(Dumper& d); // Visitor design pattern
 
-	private:
-		std::shared_ptr<Value> _value;
+	protected:
+		std::shared_ptr<Value> 	_whatToSet;
+		tree_code		_op;
+		std::shared_ptr<Value>	_rhs1;
+		std::shared_ptr<Value>	_rhs2;
 
 	friend class TextDumper;
 	friend class ActivityGraphDumper;

@@ -5,24 +5,16 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include "text_dumper.h"
-#include "bind_expr.h"
+#include "assign_expr.h"
+#include "bb_list.h"
 #include "call_expr.h"
 #include "case_label_expr.h"
 #include "cond_expr.h"
-#include "compound_expr.h"
-#include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
 #include "label_expr.h"
-#include "leaf.h"
-#include "modify_expr.h"
 #include "nop_expr.h"
-#include "preincrement_expr.h"
-#include "predecrement_expr.h"
-#include "postincrement_expr.h"
-#include "postdecrement_expr.h"
 #include "return_expr.h"
-#include "stmt_list.h"
 #include "switch_expr.h"
 #include "dumper.h"
 
@@ -36,14 +28,10 @@ void TextDumper::dumpExpression(Expression* const e)
 		<< *e;
 }
 
-void TextDumper::dumpBindExpr(BindExpr* const e)
+void TextDumper::dumpAssignExpr(AssignExpr* const e)
 {
 	header();
-	*_out << "*** start of inner scope ***" << std::endl;
-// Vars are declared in body too
-//	e->_vars->accept(*this);
-	e->_body->accept(*this);
-	*_out << "*** end of inner scope ***";
+	*_out << "Affectation : " << *e;
 }
 
 void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
@@ -75,22 +63,6 @@ void TextDumper::dumpCondExpr(CondExpr* const e)
 	}
 }
 
-void TextDumper::dumpCompoundExpr(CompoundExpr* const e)
-{
-	header();
-	e->_first->accept(*this);
-	*_out << ", ";
-	e->_second->accept(*this);
-}
-
-void TextDumper::dumpDeclExpr(DeclExpr* const e)
-{
-	header();
-	*_out << "Declaration : " << e->_name->print();
-	if (e->_init)
-		*_out << " = " << e->_init->print();
-}
-
 void TextDumper::dumpGotoExpr(GotoExpr* const e)
 {
 	header();
@@ -103,45 +75,9 @@ void TextDumper::dumpLabelExpr(LabelExpr* const e)
 	*_out << "Label : " << *e;
 }
 
-void TextDumper::dumpLeaf(Leaf* const e)
-{
-	header();
-	*_out << e->_val->print();
-}
-
-void TextDumper::dumpModifyExpr(ModifyExpr* const e)
-{
-	header();
-	*_out << "Affectation : " << *e;
-}
-
 void TextDumper::dumpNopExpr(NopExpr* const e)
 {
 	*_out << "No-op";
-}
-
-void TextDumper::dumpPreincrementExpr(PreincrementExpr* const e)
-{
-	header();
-	*_out << "Preincrementation : " << *e;
-}
-
-void TextDumper::dumpPredecrementExpr(PredecrementExpr* const e)
-{
-	header();
-	*_out << "Predecrementation : " << *e;
-}
-
-void TextDumper::dumpPostincrementExpr(PostincrementExpr* const e)
-{
-	header();
-	*_out << "Postincrementation : " << *e;
-}
-
-void TextDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
-{
-	header();
-	*_out << "Postdecrementation : " << *e;
 }
 
 void TextDumper::dumpReturnExpr(ReturnExpr* const e)
@@ -154,7 +90,7 @@ void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 	}
 }
 
-void TextDumper::dumpStmtList(StmtList* const e)
+void TextDumper::dumpBbList(BbList* const e)
 {
 	*_out << "***Statements***" << std::endl;
 	for (auto expr : e->_exprs) {
