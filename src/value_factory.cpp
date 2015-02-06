@@ -5,6 +5,8 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "array_ref.h"
+#include "component_ref.h"
+#include "mem_ref.h"
 #include "value.h"
 #include "value_factory.h"
 #include "integer_cst.h"
@@ -57,16 +59,31 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			return it->second;
 
 		case LABEL_DECL:
-			std::cerr << "Building label" << std::endl;
 			return std::make_shared<Label>(Label(t));
 
 		case CASE_LABEL_EXPR:
 			return std::make_shared<CaseLabel>(CaseLabel(t));
+
 		case ADDR_EXPR:
 			return std::make_shared<Unary>(Unary(t,"&"));
 
+		case INDIRECT_REF:
+			return std::make_shared<Unary>(Unary(t,"*"));
+
 		case ARRAY_REF:
 			return std::make_shared<ArrayRef>(ArrayRef(t));
+
+		case BIT_NOT_EXPR:
+			return std::make_shared<Unary>(Unary(t,"~"));
+
+		case NEGATE_EXPR:
+			return std::make_shared<Unary>(Unary(t,"-"));
+
+		case COMPONENT_REF:
+			return std::make_shared<ComponentRef>(ComponentRef(t, "."));
+
+		case MEM_REF:
+			return std::make_shared<MemRef>(MemRef(t));
 
 		default:
 			std::cerr << "Building " << tree_code_name[TREE_CODE(t)] << std::endl;

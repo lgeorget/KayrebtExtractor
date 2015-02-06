@@ -141,7 +141,7 @@ extern "C" unsigned int actdiag_extractor ()
 
 	  out << "Function " << name << std::endl;
 	  //auto dumper = ActivityGraphDumper();
-	  auto dumper = TextDumper();
+	  auto dumper = TextDumper(&out);
 	  walk_through_current_fn(dumper);
 	  //out << dumper.graph();
 	  out << std::endl << "-------------------------" << std::endl << std::endl;

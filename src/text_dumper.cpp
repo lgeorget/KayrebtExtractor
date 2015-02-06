@@ -43,10 +43,10 @@ void TextDumper::dumpAssignExpr(AssignExpr* const e)
 		if (e->_rhs2)
 		{
 			*_out << e->_rhs1->print() << " " <<
-			Operator::print(e->_op) << tree_code_name[e->_op] << " " <<
+			Operator::print(e->_op) << " " <<
 			e->_rhs2->print();
 		} else {
-			*_out << Operator::print(e->_op) << tree_code_name[e->_op] << " " <<
+			*_out << Operator::print(e->_op) << " " <<
 			e->_rhs1->print();
 		}
 }
@@ -62,7 +62,7 @@ void TextDumper::dumpCondExpr(CondExpr* const e)
 	header();
 	*_out << "Conditional : " << std::endl;
 	*_out << "\tif (";
-	*_out << e->_lhs->print() << Operator::print(e->_op)
+	*_out << e->_lhs->print() << " " << Operator::print(e->_op) << " "
 	      << e->_rhs->print() << ")" << std::endl;
 	*_out << "\tthen ";
 	if (e->_then)

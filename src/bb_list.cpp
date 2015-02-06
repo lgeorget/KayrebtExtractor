@@ -17,7 +17,6 @@ BbList::BbList(function* fn) : _fn(fn)
 			!gsi_end_p(it) ;
 			gsi_next(&it)) {
 		gimple inner = gsi_stmt(it);
-		std::cerr << "new stmt" << std::endl;
 		_exprs.push_back(ExprFactory::INSTANCE.build(inner));
 	}
 }

@@ -48,12 +48,8 @@ const std::map<tree_code,std::string> Operator::symbols =
 	{ GE_EXPR,		">=" },
 	{ EQ_EXPR,		"==" },
 	{ NE_EXPR,		"!=" },
-	{ INDIRECT_REF,		"*" },
-	{ ADDR_EXPR,		"&" },
 	{ COMPONENT_REF,	"." },
 	{ BIT_FIELD_REF,	"." },
-	{ ARRAY_REF,		"[]" },
-	{ VAR_DECL,		"$" },
-	{ LAST_AND_UNUSED_TREE_CODE,	"???"}
+	{ LAST_AND_UNUSED_TREE_CODE,	""}
 };
 
