@@ -16,6 +16,6 @@ void Expression::accept(Dumper& d)
 
 std::ostream& operator<<(std::ostream& out, const Expression& e)
 {
-	out << "Unknown expression : " << gimple_code_name[GIMPLE_CODE(e._expr)];
+	out << "Unknown expression : " << gimple_code_name[gimple_code(e._expr)];
 	return out;
 }

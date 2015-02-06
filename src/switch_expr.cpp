@@ -8,7 +8,6 @@
 #include "bad_gimple_exception.h"
 #include "dumper.h"
 #include "value_factory.h"
-#include "expr_factory.h"
 
 SwitchExpr::SwitchExpr(gimple t) : Expression(t)
 {
@@ -18,7 +17,7 @@ SwitchExpr::SwitchExpr(gimple t) : Expression(t)
 	_var = ValueFactory::INSTANCE.build(gimple_switch_index(t));
 	unsigned int nbLabs = gimple_switch_num_labels(t);
 	for (unsigned int i = 0 ; i < nbLabs ; i++)
-		_labels.push_back(ExprFactory::INSTANCE.build(gimple_switch_label(t,i)));
+		_labels.push_back(ValueFactory::INSTANCE.build(gimple_switch_label(t,i)));
 }
 
 void SwitchExpr::accept(Dumper& d)

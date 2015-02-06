@@ -6,16 +6,17 @@
 #include "value.h"
 #include "bad_gimple_exception.h"
 #include "value_factory.h"
+#include "dumper.h"
 
-AsmExpr::AsmExpr(gimple t) : Value(t)
+AsmExpr::AsmExpr(gimple t) : Expression(t)
 {
 	if (gimple_code(t) != GIMPLE_ASM)
-		throw BadTreeException(t, "gimple_asm");
+		throw BadGimpleException(t, "gimple_asm");
 
-	_stmt = ValueFactory::INSTANCE.build(gimple_asm_string(t));
+	_stmt = gimple_asm_string(t);
 }
 
-std::string AsmExpr::print() const
+void AsmExpr::accept(Dumper& d)
 {
-	return _stmt->print();
+	d.dumpAsmExpr(this);
 }

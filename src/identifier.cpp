@@ -3,7 +3,7 @@
 #include <tree.h>
 #include "value.h"
 #include "identifier.h"
-#include "bad_gimple_exception.h"
+#include "bad_tree_exception.h"
 
 Identifier::Identifier(tree t) : Value(t)
 {

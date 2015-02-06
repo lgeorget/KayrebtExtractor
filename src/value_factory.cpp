@@ -10,6 +10,8 @@
 #include "string_cst.h"
 #include "identifier.h"
 #include "label.h"
+#include "case_label.h"
+#include "unary.h"
 
 //the instance itself is not const, because of the maps
 ValueFactory ValueFactory::INSTANCE;
@@ -17,6 +19,9 @@ ValueFactory ValueFactory::INSTANCE;
 std::shared_ptr<Value> ValueFactory::build(tree t)
 {
 	std::map<tree,std::shared_ptr<Value>>::iterator it;
+	if (!t || t == NULL_TREE)
+		return std::shared_ptr<Value>();
+
 	switch (TREE_CODE(t)) {
 		case STRING_CST:
 			it = strings.find(t);
@@ -44,10 +49,26 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(DECL_NAME(t))))).first;
 			return it->second;
 
+		case IDENTIFIER_NODE:
+			it = idents.find(t);
+			if (it == idents.end())
+				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(t)))).first;
+			return it->second;
+
 		case LABEL_DECL:
+			std::cerr << "Building label" << std::endl;
 			return std::make_shared<Label>(Label(t));
 
+		case CASE_LABEL_EXPR:
+			return std::make_shared<CaseLabel>(CaseLabel(t));
+		case ADDR_EXPR:
+			return std::make_shared<Unary>(Unary(t,"&"));
+
+		case ARRAY_REF:
+			return std::make_shared<Unary>(Unary(t,"[]"));
+
 		default:
+			std::cerr << "Building " << tree_code_name[TREE_CODE(t)] << std::endl;
 			return std::make_shared<Value>(Value(t));
 	}
 }

@@ -6,7 +6,7 @@
 
 class AssignExpr;
 class BbList;
-class CaseLabelExpr;
+class CallExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -19,9 +19,10 @@ class TextDumper : public Dumper
 {
 	public:
 		TextDumper(std::ostream* const out = &std::cout, bool withHeader = true);
+		void dumpAsmExpr(AsmExpr* const e) override;
 		void dumpAssignExpr(AssignExpr* const e) override;
 		void dumpBbList(BbList* const e) override;
-		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
+		void dumpCallExpr(CallExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
 		void dumpLabelExpr(LabelExpr* const e) override;

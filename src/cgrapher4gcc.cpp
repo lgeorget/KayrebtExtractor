@@ -8,11 +8,9 @@
 #include <system.h>
 #include <coretypes.h>
 #include <tree.h>
+#include <tree-pass.h>
 #include <intl.h>
 
-#include <c-tree.h>
-#include <c-family/c-common.h>
-#include <c-family/c-pragma.h>
 #include <tm.h>
 #include <diagnostic.h>
 
@@ -26,6 +24,7 @@
 #include "dumper.h"
 #include "text_dumper.h"
 #include "activity_graph_dumper.h"
+#include "bad_tree_exception.h"
 #include "bad_gimple_exception.h"
 
 int plugin_is_GPL_compatible;
@@ -47,45 +46,51 @@ static struct plugin_gcc_version myplugin_version =
 	"", // configuration arguments
 };
 
-struct gimple_opt_pass actdiag_extractor = {
+struct gimple_opt_pass actdiag_extractor_pass =
+{
 	{
-		.type			= GIMPLE_PASS,
-		.name			= "activity diagram extractor",
-		.gate			= NULL,
-		.execute		= actdiag_extractor,
-		.sub			= NULL,
-		.next			= NULL,
-		.static_pass_number	= 0,
-		.tv_id			= TV_NONE,
-		.properties_required	= 0,
-		.properties_provided	= 0,
-		.properties_destroyed	= 0,
-		.todo_flags_start	= 0,
-		.todo_flags_finish	= 0
+		GIMPLE_PASS, /* type */
+		"activity diagram extractor", /* name */
+		OPTGROUP_NONE, /* optinfo_flags */
+		NULL, /* gate */
+		actdiag_extractor, /* execute */
+		NULL, /* sub */
+		NULL, /* next */
+		0, /* static_pass_number */
+		TV_NONE, /* tv_id */
+		PROP_gimple_any, /* properties_required */
+		0, /* properties_provided */
+		0, /* properties_destroyed */
+		0, /* todo_flags_start */
+		0, /* todo_flags_finish */
+	}
 };
 
 }
 
+static struct plugin_name_args* functions;
 
-extern "C" int plugin_init (struct plugin_name_args *plugin_info,
+extern "C" int plugin_init (struct plugin_name_args *plugin_args,
                         struct plugin_gcc_version *version)
 {
 	if (strcmp(version->basever,myplugin_version.basever) != 0) {
 		return -1; // incompatible
 	}
 
-	struct register_pass_info local_variable_pass_info = {
-		.pass				= &actdiag_extractor.pass,
-		.reference_pass_name		= "pass_build_cfg",
-		.ref_pass_instance_number	= 0,
-		.pos_op				= PASS_POS_INSERT_AFTER
+	struct register_pass_info actdiag_extractor_pass_info = {
+		.pass				= &actdiag_extractor_pass.pass,
+		.reference_pass_name		= "cfg",
+		.ref_pass_instance_number	= 1,
+		.pos_op				= PASS_POS_INSERT_BEFORE
 	};
 
-	register_callback(plugin_info->base_name,
+	functions = plugin_args;
+
+	register_callback("actdiag_extraction",
 			PLUGIN_PASS_MANAGER_SETUP,
-			&gate_callback,
-			(void*) plugin_info);
-	register_callback(plugin_info->base_name,
+			NULL,
+			&actdiag_extractor_pass_info);
+	register_callback("prepare_dump_file",
 			PLUGIN_START_UNIT,
 			&prepare_dump_file,
 			0);
@@ -98,15 +103,12 @@ static void walk_through_current_fn(Dumper& dumper)
 
 	unsigned i;
 	const_tree str, op;
-	basic_block bb;
 	gimple stmt;
 	gimple_stmt_iterator gsi;
 
 	try {
-		FOR_EACH_BB(bb) {
-			std::shared_ptr<Expression> e = ExprFactory::INSTANCE.build(bb);
-			e->accept(dumper);
-		}
+		std::shared_ptr<BbList> e = ExprFactory::INSTANCE.build(cfun);
+		e->accept(dumper);
 	} catch(BadTreeException& e) {
 		std::cerr << "***Error detected***\n" <<
 			e.what() << std::endl;
@@ -114,13 +116,13 @@ static void walk_through_current_fn(Dumper& dumper)
 	}
 }
 
-extern "C" void actdiag_extractor (void, void* plugin_args)
+extern "C" unsigned int actdiag_extractor ()
 {
   // If there were errors during compilation,
   // let GCC handle the exit.
   //
   if (errorcount || sorrycount)
-    return;
+    return 0;
 
   // Name of the function currently being parsed
   const char* name = function_name(cfun);
@@ -134,16 +136,19 @@ extern "C" void actdiag_extractor (void, void* plugin_args)
 	  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
 	  if (!out) {
 		  std::cerr << "Couldn't open dump file, skipping." << std::endl;
-		  return;
+		  return 0;
 	  }
 
 	  out << "Function " << name << std::endl;
-	  auto dumper = ActivityGraphDumper();
+	  //auto dumper = ActivityGraphDumper();
+	  auto dumper = TextDumper();
 	  walk_through_current_fn(dumper);
-	  out << dumper.graph();
+	  //out << dumper.graph();
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();
   }
+
+  return 0;
 }
 
 extern "C" void prepare_dump_file (void*, void*)

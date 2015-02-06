@@ -1,9 +1,10 @@
 #ifndef DUMPER_H
 #define DUMPER_H
 
+class AsmExpr;
 class AssignExpr;
 class BbList;
-class CaseLabelExpr;
+class CallExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -16,9 +17,10 @@ class Dumper
 {
 	public:
 		Dumper() = default;
+		virtual void dumpAsmExpr(AsmExpr* const e) = 0;
 		virtual void dumpAssignExpr(AssignExpr* const e) = 0;
 		virtual void dumpBbList(BbList* const e) = 0;
-		virtual void dumpCaseLabelExpr(CaseLabelExpr* const e) = 0;
+		virtual void dumpCallExpr(CallExpr* const e) = 0;
 		virtual void dumpCondExpr(CondExpr* const e) = 0;
 		virtual void dumpGotoExpr(GotoExpr* const e) = 0;
 		virtual void dumpLabelExpr(LabelExpr* const e) = 0;

@@ -10,7 +10,7 @@
 LabelExpr::LabelExpr(gimple t) : Expression(t)
 {
 	if (gimple_code(t) != GIMPLE_LABEL)
-		throw BadTreeException(t,"gimple_label");
+		throw BadGimpleException(t,"gimple_label");
 
 	_label = ValueFactory::INSTANCE.build(gimple_label_label(t));
 }

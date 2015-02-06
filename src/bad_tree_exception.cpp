@@ -1,5 +1,6 @@
 #include <exception>
 #include <stdexcept>
+#include <gcc-plugin.h>
 #include <tree.h>
 #include "bad_tree_exception.h"
 

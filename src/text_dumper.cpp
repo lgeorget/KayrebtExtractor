@@ -6,10 +6,10 @@
 #include <gcc-plugin.h>
 #include "text_dumper.h"
 #include "operator.h"
+#include "asm_expr.h"
 #include "assign_expr.h"
 #include "bb_list.h"
 #include "call_expr.h"
-#include "case_label_expr.h"
 #include "cond_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
@@ -29,29 +29,32 @@ void TextDumper::dumpExpression(Expression* const e)
 		<< *e;
 }
 
+void TextDumper::dumpAsmExpr(AsmExpr* const e)
+{
+	header();
+	*_out << "Asm statement(s) : \n\t" << e->_stmt;
+}
+
 void TextDumper::dumpAssignExpr(AssignExpr* const e)
 {
 	header();
 	*_out << "Affectation : " <<
-		e->_whatToSet->print() << " = " <<
-		e->_rhs1->print() <<
-		Operator::print(e->_op) <<
-		e->_rhs2->print();
+		e->_whatToSet->print() << " = ";
+		if (e->_rhs2)
+		{
+			*_out << e->_rhs1->print() << " " <<
+			Operator::print(e->_op) << tree_code_name[e->_op] << " " <<
+			e->_rhs2->print();
+		} else {
+			*_out << Operator::print(e->_op) << tree_code_name[e->_op] << " " <<
+			e->_rhs1->print();
+		}
 }
 
-void TextDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
+void TextDumper::dumpCallExpr(CallExpr* const e)
 {
 	header();
-	*_out << "Case label : ";
-	if (e->_lowValue) {
-		*_out << e->_lowValue->print();
-		if (e->_highValue) {
-			*_out <<  " ... " << e->_highValue->print();
-		}
-	}
-	else
-		*_out << "default";
-	*_out << e->_label->print();
+	*_out << "Function call : " << e->_built_str;
 }
 
 void TextDumper::dumpCondExpr(CondExpr* const e)
@@ -62,11 +65,11 @@ void TextDumper::dumpCondExpr(CondExpr* const e)
 	*_out << e->_lhs->print() << Operator::print(e->_op)
 	      << e->_rhs->print() << ")" << std::endl;
 	*_out << "\tthen ";
-	*_out << "goto " << e->_then->print();
-	if (e->_else) {
-		*_out << "\n\telse ";
+	if (e->_then)
+		*_out << "goto " << e->_then->print();
+	*_out << "\n\telse ";
+	if (e->_else)
 		*_out << "goto " << e->_else->print();
-	}
 }
 
 void TextDumper::dumpGotoExpr(GotoExpr* const e)
@@ -110,8 +113,8 @@ void TextDumper::dumpSwitchExpr(SwitchExpr* const e)
 	header();
 	*_out << "Switch ("  << e->_var->print() << ") : ";
 	*_out << std::endl;
-	for (std::shared_ptr<Expression> e : _labels)
-		e->accept();
+	for (std::shared_ptr<Value> l : e->_labels)
+		*_out << l->print() << std::endl;
 	*_out << "*** end of switch ***";
 }
 

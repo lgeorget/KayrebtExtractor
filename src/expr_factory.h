@@ -4,7 +4,9 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include <gimple.h>
+#include <function.h>
 #include "expression.h"
+#include "bb_list.h"
 
 class ExprFactory
 {
@@ -15,7 +17,7 @@ class ExprFactory
 	public:
 		static ExprFactory INSTANCE;
 		std::shared_ptr<Expression> build(gimple t);
-		std::shared_ptr<Expression> build(basic_block t);
+		std::shared_ptr<BbList> build(function* t);
 };
 
 #endif

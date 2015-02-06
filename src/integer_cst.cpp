@@ -4,7 +4,7 @@
 #include <tree.h>
 #include "integer_cst.h"
 #include "value.h"
-#include "bad_gimple_exception.h"
+#include "bad_tree_exception.h"
 
 IntegerCst::IntegerCst(tree t) : Value(t)
 {

@@ -6,16 +6,18 @@
 #include <string>
 #include <gcc-plugin.h>
 #include <gimple.h>
+#include "expression.h"
 #include "value.h"
+#include "dumper.h"
 
-class AsmExpr : public Value
+class AsmExpr : public Expression
 {
 	public:
 		explicit AsmExpr(gimple t);
-		std::string print() const override;
+		void accept(Dumper& h) override;
 
 	private:
-		std::shared_ptr<Value> _stmt;
+		const char* _stmt;
 
 	friend class TextDumper;
 	friend class ActivityGraphDumper;

@@ -1,5 +1,6 @@
 #include <exception>
 #include <stdexcept>
+#include <gcc-plugin.h>
 #include <gimple.h>
 #include "bad_gimple_exception.h"
 

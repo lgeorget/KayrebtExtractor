@@ -11,7 +11,7 @@
 #include "value_factory.h"
 #include "expression.h"
 #include "debug.h"
-#include "text_dumper.h"
+#include "dumper.h"
 
 CallExpr::CallExpr(gimple t) : Expression(t)
 {
@@ -42,7 +42,7 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 	_built_str += ")";
 }
 
-std::string CallExpr::print() const
+void CallExpr::accept(Dumper& d)
 {
-	return _built_str;
+	d.dumpCallExpr(this);
 }

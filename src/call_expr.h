@@ -9,12 +9,13 @@
 #include <gimple.h>
 #include "expression.h"
 #include "value.h"
+#include "dumper.h"
 
 class CallExpr : public Expression
 {
 	public:
 		explicit CallExpr(gimple t);
-		std::string print() const override; // Visitor design pattern
+		void accept(Dumper& d) override;
 
 	private:
 		unsigned int _nbArgs;
@@ -22,6 +23,9 @@ class CallExpr : public Expression
 		std::shared_ptr<Value> _name;
 		std::list<std::shared_ptr<Value>> _args;
 		std::string _built_str;
+
+	friend class TextDumper;
+	friend class ActivityGraphDumper;
 };
 
 #endif

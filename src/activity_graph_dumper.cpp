@@ -7,10 +7,10 @@
 #include <gcc-plugin.h>
 #include <activity_graph.h>
 #include "activity_graph_dumper.h"
+#include "asm_expr.h"
 #include "assign_expr.h"
 #include "bb_list.h"
 #include "call_expr.h"
-#include "case_label_expr.h"
 #include "cond_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
@@ -25,28 +25,44 @@ using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 {
+#if 0
+
 	_branches.emplace(1,_g.initialNode());
 	_end = false;
 	_skip = false;
 	_buildLeaf = true;
+#endif
 }
+
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
+#if 0
+
 	std::cerr << "Discarded: " << *e  << std::endl;
 	_skip = true;
+#endif
 }
 
-void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
+void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 {
+}
+
+void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
+{
+#if 0
+
 	ActionIdentifier a(_g.addAction(e->_whatToSet->print() + " = " + e->_newValue->print()));
 	_branches.emplace(1,a);
 	_end = false;
 	_skip = false;
+#endif
 }
 
 void ActivityGraphDumper::dumpBbList(BbList* const e)
 {
+#if 0
+
 	std::vector<Identifier> stmtBranch;
 	if (!_skip) {
 		stmtBranch = std::move(_branches.top());
@@ -72,28 +88,18 @@ void ActivityGraphDumper::dumpBbList(BbList* const e)
 	_branches.push(std::move(stmtBranch));
 	//_end is untouched
 	_skip = false;
+#endif
 }
 
-void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
-{
-	MergeIdentifier node = _g.addDecision();
-	std::string condition;
-	if (e->_lowValue)
-		if (e->_highValue)
-			condition = "[" + _switchs.top().second + " between " + e->_lowValue->print() + " and " + e->_highValue->print() + "]";
-		else
-			condition = "[" + _switchs.top().second + " == " + e->_lowValue->print() + "]";
-	else
-		condition = "[otherwise]";
 
-	_g.addGuard(_switchs.top().first, node, condition);
-	_branches.emplace(1,node);
-	_end = false;
-	_skip = false;
+void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
+{
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
+#if 0
+
 	bool end;
 	std::vector<Identifier> condBranch;
 	auto decision = _g.addDecision();
@@ -135,10 +141,14 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	condBranch.push_back(fusion);
 	_branches.push(std::move(condBranch));
 	_skip = false;
+#endif
 }
+
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
+#if 0
+
 	std::cerr << "Looking for label " << e->_label->print() << std::endl;
 	auto label = _labels.find(*(e->_label));
 	if (label == _labels.end()) {
@@ -151,10 +161,14 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 	_branches.emplace(1,gotoNode);
 	_end = true;
 	_skip = false;
+#endif
 }
+
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
+#if 0
+
 	std::cerr << "Check for already existing label " << e->_label->print() << std::endl;
 	auto label = _labels.find(*(e->_label));
 	if (label == _labels.end()) {
@@ -168,15 +182,23 @@ void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 	}
 	_end = false;
 	_skip = false;
+#endif
 }
+
 
 void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 {
+#if 0
+
 	_skip = true;
+#endif
 }
+
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
+#if 0
+
 	std::vector<Identifier> returnBranch;
 	auto endingNode = _g.terminateActivity();
 	if (e->_value) {
@@ -189,11 +211,15 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	_branches.push(std::move(returnBranch));
 	_end = true;
 	_skip = false;
+#endif
 }
+
 
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
+#if 0
+
 	_buildLeaf = false;
 	e->_cond->accept(*this);
 	auto cond = _g.addDecision();
@@ -211,10 +237,14 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	_branches.push(std::move(switchBranch));
 	//_end is untouched
 	_skip = false;
+#endif
 }
 
-ActivityGraph& ActivityGraphDumper::graph()
+
+const ActivityGraph& ActivityGraphDumper::graph()
 {
+
 	_g.simplifyMergeNodes();
 	return _g;
 }
+

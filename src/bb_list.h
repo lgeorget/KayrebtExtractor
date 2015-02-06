@@ -7,20 +7,23 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include <gimple.h>
+#include <function.h>
 #include "expression.h"
 
 class Dumper;
 
-class BbList : public Expression
+class BbList
 {
 	public:
-		explicit BbList(basic_block t);
+		explicit BbList(function* t);
 		void accept(Dumper& d);
 
 	private:
 		std::list<std::shared_ptr<Expression>> _exprs;
+		function* _fn;
 
-	friend class TextDumper;	friend class ActivityGraphDumper;
+	friend class TextDumper;
+	friend class ActivityGraphDumper;
 };
 
 #endif

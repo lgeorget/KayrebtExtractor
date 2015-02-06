@@ -13,7 +13,7 @@
 
 class AssignExpr;
 class BbList;
-class CaseLabelExpr;
+class CallExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -26,9 +26,10 @@ class ActivityGraphDumper : public Dumper
 {
 	public:
 		ActivityGraphDumper();
+		void dumpAsmExpr(AsmExpr* const e) override;
 		void dumpAssignExpr(AssignExpr* const e) override;
 		void dumpBbList(BbList* const e) override;
-		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
+		void dumpCallExpr(CallExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
 		void dumpLabelExpr(LabelExpr* const e) override;
@@ -36,6 +37,7 @@ class ActivityGraphDumper : public Dumper
 		void dumpReturnExpr(ReturnExpr* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
+		const kayrebt::ActivityGraph& graph();
 
 	private:
 		kayrebt::ActivityGraph _g;
