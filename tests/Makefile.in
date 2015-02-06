@@ -1,0 +1,10 @@
+CC=gcc
+CFLAGS= -xc -fplugin=cgrapher4gcc \
+	-fplugin-arg-cgrapher4gcc-other_function
+
+all: run
+
+.PHONY: run
+
+run: test.c
+	$(CC) $(CFLAGS) -c -o $@ $<
