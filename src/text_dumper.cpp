@@ -8,7 +8,7 @@
 #include "operator.h"
 #include "asm_expr.h"
 #include "assign_expr.h"
-#include "bb_list.h"
+#include "function_body.h"
 #include "call_expr.h"
 #include "cond_expr.h"
 #include "expression.h"
@@ -98,7 +98,7 @@ void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 	}
 }
 
-void TextDumper::dumpBbList(BbList* const e)
+void TextDumper::dumpFunctionBody(FunctionBody* const e)
 {
 	*_out << "***Statements***" << std::endl;
 	for (auto expr : e->_exprs) {

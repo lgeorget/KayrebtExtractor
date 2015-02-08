@@ -9,9 +9,9 @@
 #include "bad_gimple_exception.h"
 #include "expr_factory.h"
 #include "dumper.h"
-#include "bb_list.h"
+#include "function_body.h"
 
-BbList::BbList(function* fn) : _fn(fn)
+FunctionBody::FunctionBody(function* fn) : _fn(fn)
 {
 	for (gimple_stmt_iterator it = gsi_start(_fn->gimple_body) ;
 			!gsi_end_p(it) ;
@@ -21,7 +21,7 @@ BbList::BbList(function* fn) : _fn(fn)
 	}
 }
 
-void BbList::accept(Dumper& d)
+void FunctionBody::accept(Dumper& d)
 {
-	d.dumpBbList(this);
+	d.dumpFunctionBody(this);
 }

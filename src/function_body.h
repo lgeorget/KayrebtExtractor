@@ -1,5 +1,5 @@
-#ifndef BB_LIST_H
-#define BB_LIST_H
+#ifndef FUNCTION_BODY_H
+#define FUNCTION_BODY_H
 
 #include <iostream>
 #include <list>
@@ -12,10 +12,10 @@
 
 class Dumper;
 
-class BbList
+class FunctionBody
 {
 	public:
-		explicit BbList(function* t);
+		explicit FunctionBody(function* t);
 		void accept(Dumper& d);
 
 	private:

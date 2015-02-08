@@ -16,7 +16,7 @@
 #include "label_expr.h"
 #include "return_expr.h"
 #include "switch_expr.h"
-#include "bb_list.h"
+#include "function_body.h"
 
 ExprFactory ExprFactory::INSTANCE;
 
@@ -55,9 +55,9 @@ std::shared_ptr<Expression> ExprFactory::build(gimple t)
 	}
 }
 
-std::shared_ptr<BbList> ExprFactory::build(function* fn)
+std::shared_ptr<FunctionBody> ExprFactory::build(function* fn)
 {
-	return std::make_shared<BbList>(BbList(fn));
+	return std::make_shared<FunctionBody>(FunctionBody(fn));
 }
 
 

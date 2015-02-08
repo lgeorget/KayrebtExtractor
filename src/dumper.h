@@ -3,7 +3,7 @@
 
 class AsmExpr;
 class AssignExpr;
-class BbList;
+class FunctionBody;
 class CallExpr;
 class CondExpr;
 class GotoExpr;
@@ -19,7 +19,7 @@ class Dumper
 		Dumper() = default;
 		virtual void dumpAsmExpr(AsmExpr* const e) = 0;
 		virtual void dumpAssignExpr(AssignExpr* const e) = 0;
-		virtual void dumpBbList(BbList* const e) = 0;
+		virtual void dumpFunctionBody(FunctionBody* const e) = 0;
 		virtual void dumpCallExpr(CallExpr* const e) = 0;
 		virtual void dumpCondExpr(CondExpr* const e) = 0;
 		virtual void dumpGotoExpr(GotoExpr* const e) = 0;

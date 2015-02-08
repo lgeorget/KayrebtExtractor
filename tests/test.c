@@ -61,14 +61,16 @@ char other_function()
 	while(1)
 		for (;;)
 			continue;
-	function_with_numerous_args(a,a,&r,&a,a,a,&a,a);
+
+	char other_a = 'a';
+	function_with_numerous_args(a,a,&r,&a,a,a,&other_a,a);
 
 	return main(0,(char**)0);
 }
 
 void say_hello_and_check_if_equal(int s)
 {
-	exit(1);
+	//exit(1);
 	printf("hello %i %i\n",s,a);
 	struct greetings* ptr = &r;
 	if (ptr->goodbye)

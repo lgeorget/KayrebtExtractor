@@ -12,7 +12,7 @@
 #include "label.h"
 
 class AssignExpr;
-class BbList;
+class FunctionBody;
 class CallExpr;
 class CondExpr;
 class GotoExpr;
@@ -28,7 +28,7 @@ class ActivityGraphDumper : public Dumper
 		ActivityGraphDumper();
 		void dumpAsmExpr(AsmExpr* const e) override;
 		void dumpAssignExpr(AssignExpr* const e) override;
-		void dumpBbList(BbList* const e) override;
+		void dumpFunctionBody(FunctionBody* const e) override;
 		void dumpCallExpr(CallExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
@@ -41,13 +41,10 @@ class ActivityGraphDumper : public Dumper
 
 	private:
 		kayrebt::ActivityGraph _g;
-		std::stack<std::pair<kayrebt::MergeIdentifier,std::string>> _switchs;
-		std::stack<std::vector<kayrebt::Identifier>> _branches;
+		std::stack<kayrebt::Identifier> _branches;
 		std::stack<std::string> _values;
 		std::map<Value,kayrebt::MergeIdentifier> _labels;
-		bool _end;
-		bool _skip;
-		bool _buildLeaf;
+		bool _end, _skip;
 };
 
 

@@ -6,7 +6,7 @@
 #include <gimple.h>
 #include <function.h>
 #include "expression.h"
-#include "bb_list.h"
+#include "function_body.h"
 
 class ExprFactory
 {
@@ -17,7 +17,7 @@ class ExprFactory
 	public:
 		static ExprFactory INSTANCE;
 		std::shared_ptr<Expression> build(gimple t);
-		std::shared_ptr<BbList> build(function* t);
+		std::shared_ptr<FunctionBody> build(function* t);
 };
 
 #endif

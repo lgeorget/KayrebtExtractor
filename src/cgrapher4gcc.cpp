@@ -107,7 +107,7 @@ static void walk_through_current_fn(Dumper& dumper)
 	gimple_stmt_iterator gsi;
 
 	try {
-		std::shared_ptr<BbList> e = ExprFactory::INSTANCE.build(cfun);
+		std::shared_ptr<FunctionBody> e = ExprFactory::INSTANCE.build(cfun);
 		e->accept(dumper);
 	} catch(BadTreeException& e) {
 		std::cerr << "***Error detected***\n" <<
@@ -140,10 +140,10 @@ extern "C" unsigned int actdiag_extractor ()
 	  }
 
 	  out << "Function " << name << std::endl;
-	  //auto dumper = ActivityGraphDumper();
-	  auto dumper = TextDumper(&out);
+	  auto dumper = ActivityGraphDumper();
+	  //auto dumper = TextDumper(&out);
 	  walk_through_current_fn(dumper);
-	  //out << dumper.graph();
+	  out << dumper.graph();
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();
   }

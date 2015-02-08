@@ -12,8 +12,8 @@ libcgrapher4gcc_la_SOURCES=\
 	bad_gimple_exception.h\
 	bad_tree_exception.cpp\
 	bad_tree_exception.h\
-	bb_list.cpp\
-	bb_list.h\
+	function_body.cpp\
+	function_body.h\
 	call_expr.cpp\
 	call_expr.h\
 	case_label.cpp\
