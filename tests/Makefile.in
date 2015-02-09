@@ -8,3 +8,4 @@ all: run
 
 run: test.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+	./compile.sh
