@@ -5,6 +5,8 @@
 #include "identifier.h"
 #include "bad_tree_exception.h"
 
+unsigned int Identifier::counter = 1;
+
 Identifier::Identifier(tree t) : Value(t)
 {
 	if (t && TREE_CODE(t) != IDENTIFIER_NODE)
@@ -13,7 +15,7 @@ Identifier::Identifier(tree t) : Value(t)
 	if (t && t != NULL_TREE)
 		_name = IDENTIFIER_POINTER(t);
 	else
-		_name = "<anonymous>";
+		_name = "<" + std::to_string(counter++) + ">";
 }
 
 std::string Identifier::print() const

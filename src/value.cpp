@@ -3,8 +3,9 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include "value.h"
+#include "label.h"
 
-Value::Value(tree t) : _inner(t)
+Value::Value(tree t) : _inner(t), _uid(reinterpret_cast<uintptr_t>(t))
 {}
 
 std::string Value::print() const
@@ -20,5 +21,10 @@ std::ostream& operator<<(std::ostream& out, const Value* v)
 
 bool Value::operator<(const Value& other) const
 {
-	return reinterpret_cast<uintptr_t>(_inner) < reinterpret_cast<uintptr_t>(other._inner);
+	return _uid < other._uid;
+}
+
+uintptr_t Value::getUid() const
+{
+	return _uid;
 }

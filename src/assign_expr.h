@@ -20,6 +20,7 @@ class AssignExpr : public Expression
 		tree_code		_op;
 		std::shared_ptr<Value>	_rhs1;
 		std::shared_ptr<Value>	_rhs2;
+		bool _anonymous;
 
 	friend class TextDumper;
 	friend class ActivityGraphDumper;

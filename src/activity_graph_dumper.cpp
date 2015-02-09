@@ -21,6 +21,7 @@
 #include "dumper.h"
 #include "label.h"
 #include "operator.h"
+#include "case_label.h"
 
 using namespace kayrebt;
 
@@ -48,14 +49,19 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 {
 	std::cerr << "building assign" << std::endl;
-	if (e->_rhs2) {
-		auto assig = _g.addAction(e->_whatToSet->print() + " = " +
-				e->_rhs1->print() + Operator::print(e->_op) +
-				e->_rhs2->print());
+	std::string label = e->_rhs2 ?
+		e->_whatToSet->print() + " = " +
+		e->_rhs1->print() + Operator::print(e->_op) +
+		e->_rhs2->print()
+		:
+		e->_whatToSet->print() + " = " +
+		e->_rhs1->print();
+
+	if (e->_anonymous) {
+		auto assig = _g.addAction(label);
 		_branches.push(assig);
 	} else {
-		auto assig = _g.addAction(e->_whatToSet->print() + " = " +
-					  e->_rhs1->print());
+		auto assig = _g.addObject(label);
 		_branches.push(assig);
 	}
 	_end = false;
@@ -99,10 +105,21 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
 
-	auto bthen = _g.addDecision();
-	_g.addGuard(decision, bthen, "[" + condition + "]");
-	auto belse = _g.addDecision();
-	_g.addGuard(decision, belse, "[!" + condition + "]");
+	auto bthen = _labels.find(*(e->_then));
+	if (bthen == _labels.end()) {
+		std::cerr << "Then-branch not found!" << std::endl;
+		MergeIdentifier labelNode(_g.addDecision());
+		bthen = _labels.insert(std::make_pair(*(e->_then),labelNode)).first;
+	}
+	_g.addGuard(decision, bthen->second, "[" + condition + "]");
+
+	auto belse = _labels.find(*(e->_else));
+	if (belse == _labels.end()) {
+		std::cerr << "Else-branch not found!" << std::endl;
+		MergeIdentifier labelNode(_g.addDecision());
+		belse = _labels.insert(std::make_pair(*(e->_else),labelNode)).first;
+	}
+	_g.addGuard(decision, belse->second, "[!" + condition + "]");
 	_branches.push(decision);
 	_end = true;
 }
@@ -169,9 +186,13 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	auto cond = _g.addDecision();
 
 	for (auto label_ptr : e->_labels) {
-		auto lab = _g.addDecision();
-		_g.addGuard(cond, lab, e->_var->print() + " == " + label_ptr->print());
-		_labels.insert(std::make_pair(*label_ptr,lab));
+		auto label = _labels.find(*label_ptr);
+		if (label == _labels.end()) {
+			std::cerr << "Label not found" << std::endl;
+			MergeIdentifier labelNode(_g.addDecision());
+			label = _labels.insert(std::make_pair(*label_ptr,labelNode)).first;
+		}
+		_g.addGuard(cond, label->second, e->_var->print() + " == " + label_ptr->print());
 	}
 	_branches.push(cond);
 	_end = true;

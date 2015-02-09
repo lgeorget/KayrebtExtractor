@@ -24,9 +24,11 @@ CaseLabel::CaseLabel(tree t) : Value(t)
 			_built_str +=  " ... " + _highValue->print();
 		}
 	}
-	else
+	else {
 		_built_str += "default";
-	_built_str += _label->print();
+	}
+	//_built_str += _label->print();
+	_uid = _label->getUid();
 }
 
 std::string CaseLabel::print() const

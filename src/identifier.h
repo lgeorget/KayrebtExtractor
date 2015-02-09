@@ -13,6 +13,7 @@ class Identifier : public Value
 
 	private:
 		std::string _name;
+		static unsigned int counter;
 };
 
 #endif
