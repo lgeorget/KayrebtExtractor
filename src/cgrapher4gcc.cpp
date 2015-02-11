@@ -93,7 +93,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 	register_callback("prepare_dump_file",
 			PLUGIN_START_UNIT,
 			&prepare_dump_file,
-			0);
+			NULL);
 
 	return 0;
 }
