@@ -29,6 +29,7 @@ ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 {
 	_branches.push(_g.initialNode());
 	_end = false;
+	_skip = false;
 }
 
 
