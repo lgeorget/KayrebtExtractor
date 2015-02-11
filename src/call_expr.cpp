@@ -18,6 +18,11 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 	if (gimple_code(t) != GIMPLE_CALL)
 		throw BadGimpleException(t, "gimple_call");
 
+
+	tree var = gimple_call_lhs(t);
+	if (var != NULL && var != NULL_TREE)
+		_var = ValueFactory::INSTANCE.build(var);
+
 	tree fn = gimple_call_fndecl(t);
 	if (fn != NULL && fn != NULL_TREE)
 		_name = ValueFactory::INSTANCE.build(DECL_NAME(fn));
@@ -27,6 +32,8 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 		_args.push_back(ValueFactory::INSTANCE.build(gimple_call_arg(t,i)));
 	}
 
+	if (_var)
+		_built_str += _var->print() + " = ";
 	if (_name)
 		_built_str += _name->print();
 	else
