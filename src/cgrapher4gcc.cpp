@@ -107,8 +107,12 @@ extern "C" void gate_callback (void* arg, void* plugin_args)
        << DECL_SOURCE_LINE (decl) << std::endl;
 
   bool found = false;
-  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
-	found = strcmp(name,functions->argv[i].key) == 0;
+  bool graph = true;
+  for (unsigned int i=0 ; i<functions->argc && (!found || graph) ; i++) {
+	if (strcmp(functions->argv[i].key, "fn") == 0)
+		found = strcmp(name,functions->argv[i].value) == 0;
+	else if (strcmp(functions->argv[i].key, "text") == 0)
+		graph = false;
   }
 
   if (found)
@@ -120,9 +124,14 @@ extern "C" void gate_callback (void* arg, void* plugin_args)
 	  }
 
 	  out << "Function " << name << std::endl;
-	  auto dumper = ActivityGraphDumper();
-	  walk_through(decl,dumper);
-	  out << dumper.graph();
+	  if (graph) {
+		  auto dumper = ActivityGraphDumper();
+		  walk_through(decl,dumper);
+		  out << dumper.graph();
+	  } else {
+		  auto dumper = TextDumper(&out);
+		  walk_through(decl,dumper);
+	  }
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();
   }
