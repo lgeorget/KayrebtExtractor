@@ -58,6 +58,8 @@ libcgrapher4gcc_la_SOURCES=\
 	array_ref.h\
 	component_ref.cpp\
 	component_ref.h\
+	constructor.cpp\
+	constructor.h\
 	mem_ref.cpp\
 	mem_ref.h
 libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/

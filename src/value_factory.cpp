@@ -6,6 +6,7 @@
 #include <tree.h>
 #include "array_ref.h"
 #include "component_ref.h"
+#include "constructor.h"
 #include "mem_ref.h"
 #include "value.h"
 #include "value_factory.h"
@@ -81,6 +82,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 
 		case COMPONENT_REF:
 			return std::make_shared<ComponentRef>(ComponentRef(t, "."));
+
+		case CONSTRUCTOR:
+			return std::make_shared<Constructor>(Constructor(t));
 
 		case MEM_REF:
 			return std::make_shared<MemRef>(MemRef(t));

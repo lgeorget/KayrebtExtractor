@@ -53,7 +53,13 @@ int main(int argc, char** argv)
 void function_with_numerous_args(int a, char b, struct greetings* c, int* d,
 		unsigned long long int e, char f, char* g, int h)
 {
-	exit(3);
+	struct greetings hi = {
+		.hello = b,
+		.goodbye = *g
+	};
+	if (hi.hello + c->hello == *d)
+		(*d)++;
+	g = c->goodbye ? c->goodbye + f : (char)(e++,h+e);
 }
 
 char other_function()

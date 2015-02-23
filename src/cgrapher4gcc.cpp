@@ -116,6 +116,20 @@ static void walk_through_current_fn(Dumper& dumper)
 	}
 }
 
+static bool look_for_target(const char* current_fn, const char* filename)
+{
+	std::ifstream fns(filename);
+	bool found = false;
+	std::string fn;
+	while (fns && !fns.eof() && !found) {
+		fns >> fn;
+		std::cerr << "Comparing " << fn << " against " << current_fn << std::endl;
+		found = strcmp(current_fn, fn.data()) == 0;
+	}
+	fns.close();
+	return found;
+}
+
 extern "C" unsigned int actdiag_extractor ()
 {
   // If there were errors during compilation,
@@ -133,6 +147,8 @@ extern "C" unsigned int actdiag_extractor ()
 		found = strcmp(name,functions->argv[i].value) == 0;
 	else if (strcmp(functions->argv[i].key, "text") == 0)
 		graph = false;
+	else if (strcmp(functions->argv[i].key,"fn_list") == 0)
+		found = look_for_target(name, functions->argv[i].value);
   }
 
   if (found)
