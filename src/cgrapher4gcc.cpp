@@ -79,7 +79,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 
 	struct register_pass_info actdiag_extractor_pass_info = {
 		.pass				= &actdiag_extractor_pass.pass,
-		.reference_pass_name		= "cfg",
+		.reference_pass_name		= "ssa",
 		.ref_pass_instance_number	= 1,
 		.pos_op				= PASS_POS_INSERT_BEFORE
 	};
@@ -100,13 +100,8 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 
 static void walk_through_current_fn(Dumper& dumper)
 {
-
-	unsigned i;
-	const_tree str, op;
-	gimple stmt;
-	gimple_stmt_iterator gsi;
-
 	try {
+		std::cerr << "Walking through the function" << std::endl;
 		std::shared_ptr<FunctionBody> e = ExprFactory::INSTANCE.build(cfun);
 		e->accept(dumper);
 	} catch(BadTreeException& e) {
@@ -127,6 +122,7 @@ static bool look_for_target(const char* current_fn, const char* filename)
 		found = strcmp(current_fn, fn.data()) == 0;
 	}
 	fns.close();
+	std::cerr << "Graphing " << current_fn << ": " << std::boolalpha << found << std::endl;
 	return found;
 }
 
@@ -140,6 +136,7 @@ extern "C" unsigned int actdiag_extractor ()
 
   // Name of the function currently being parsed
   const char* name = function_name(cfun);
+  std::cerr << "Reached: " << name << std::endl;
   bool found = false;
   bool graph = true;
   for (unsigned int i=0 ; i<functions->argc && (!found || graph) ; i++) {
@@ -150,6 +147,7 @@ extern "C" unsigned int actdiag_extractor ()
 	else if (strcmp(functions->argv[i].key,"fn_list") == 0)
 		found = look_for_target(name, functions->argv[i].value);
   }
+  std::cerr << "Found: " << std::boolalpha << found << std::endl;
 
   if (found)
   {
@@ -159,9 +157,12 @@ extern "C" unsigned int actdiag_extractor ()
 		  return 0;
 	  }
 
+	  std::cerr << "Trying to graph function " << name << std::endl;
 	  out << "Function " << name << std::endl;
 	  if (graph) {
+		  std::cerr << "Initializing the dumper" << std::endl;
 		  auto dumper = ActivityGraphDumper();
+		  std::cerr << "Dumper initialized" << std::endl;
 		  walk_through_current_fn(dumper);
 		  out << dumper.graph();
 	  } else {

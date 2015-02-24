@@ -101,11 +101,11 @@ void TextDumper::dumpReturnExpr(ReturnExpr* const e)
 void TextDumper::dumpFunctionBody(FunctionBody* const e)
 {
 	*_out << "***Statements***" << std::endl;
-	for (auto expr : e->_exprs) {
+/*	for (auto expr : e->_exprs) {
 		expr->accept(*this);
 		*_out << std::endl;
 	}
-	*_out << "***end of statements***" << std::endl;
+*/	*_out << "***end of statements***" << std::endl;
 }
 
 void TextDumper::dumpSwitchExpr(SwitchExpr* const e)
