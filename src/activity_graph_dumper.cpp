@@ -46,19 +46,25 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "Discarded: " << *e  << std::endl;
+#endif
 	_skip = true;
 }
 
 void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building asm" << std::endl;
+#endif
 	updateLast(_g.addAction(e->_stmt));
 }
 
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building assign" << std::endl;
+#endif
 	std::string label = e->_rhs2 ?
 		e->_whatToSet->print() + " = " +
 		e->_rhs1->print() + Operator::print(e->_op) +
@@ -76,12 +82,16 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 
 void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "function body" << std::endl;
+#endif
 	for (auto bb : e->_bb) {
 		auto node = _g.addDecision();
 		updateLast(node);
 		_init_bb[bb.first] = std::unique_ptr<kayrebt::MergeIdentifier>(new MergeIdentifier(node));
+#ifndef NDEBUG
 		std::cerr << "dumping basic block " << bb.first << std::endl;
+#endif
 		_current_bb = bb.first;
 		for (auto expr : bb.second) {
 			expr->accept(*this);
@@ -98,7 +108,9 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		_last = nullptr;
 	}
 
+#ifndef NDEBUG
 	std::cerr << "dumping conditionals" << std::endl;
+#endif
 	for (auto& cond : _ifs) {
 		basic_block bb = cond.first;
 		kayrebt::MergeIdentifier& decision = *(cond.second.first);
@@ -107,9 +119,15 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		edge ed;
 		edge_iterator ei;
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
 			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
 			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
 			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
 			if (ed->flags & EDGE_TRUE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
 				_g.addGuard(decision,*(_init_bb[ed->dest]),"["+condition+"]");
 			else if (ed->flags & EDGE_FALSE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
@@ -117,16 +135,24 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		}
 	}
 
+#ifndef NDEBUG
 	std::cerr << "dumping fallthrough" << std::endl;
+#endif
 	for (auto& fallthru : _gotos) {
 		basic_block bb = fallthru.second;
 		kayrebt::Identifier& start = *(fallthru.first);
 		edge ed;
 		edge_iterator ei;
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
 			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
 			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
 			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
 			if (_init_bb.find(ed->dest) != _init_bb.end())
 				_g.addEdge(start,*(_init_bb[ed->dest]));
 		}
@@ -136,13 +162,17 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building call" << std::endl;
+#endif
 	updateLast(_g.addAction(e->_built_str));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building cond" << std::endl;
+#endif
 	auto decision = _g.addDecision();
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
@@ -154,14 +184,18 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building goto" << std::endl;
+#endif
 	updateLast(_g.addDecision());
 }
 
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building label" << std::endl;
+#endif
 	updateLast(_g.addDecision());
 }
 
@@ -174,7 +208,9 @@ void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building return" << std::endl;
+#endif
 	auto endingNode = _g.terminateActivity();
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
@@ -188,7 +224,9 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building switch" << std::endl;
+#endif
 	updateLast(_g.addDecision());
 }
 

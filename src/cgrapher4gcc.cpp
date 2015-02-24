@@ -22,7 +22,6 @@
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"
-#include "text_dumper.h"
 #include "activity_graph_dumper.h"
 #include "bad_tree_exception.h"
 #include "bad_gimple_exception.h"
@@ -101,12 +100,13 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 static void walk_through_current_fn(Dumper& dumper)
 {
 	try {
+#ifndef NDEBUG
 		std::cerr << "Walking through the function" << std::endl;
+#endif
 		std::shared_ptr<FunctionBody> e = ExprFactory::INSTANCE.build(cfun);
 		e->accept(dumper);
 	} catch(BadTreeException& e) {
-		std::cerr << "***Error detected***\n" <<
-			e.what() << std::endl;
+		std::cerr << "***Error detected***\n" << e.what() << std::endl;
 		throw e;
 	}
 }
@@ -118,11 +118,15 @@ static bool look_for_target(const char* current_fn, const char* filename)
 	std::string fn;
 	while (fns && !fns.eof() && !found) {
 		fns >> fn;
+#ifndef NDEBUG
 		std::cerr << "Comparing " << fn << " against " << current_fn << std::endl;
+#endif
 		found = strcmp(current_fn, fn.data()) == 0;
 	}
 	fns.close();
+#ifndef NDEBUG
 	std::cerr << "Graphing " << current_fn << ": " << std::boolalpha << found << std::endl;
+#endif
 	return found;
 }
 
@@ -136,18 +140,19 @@ extern "C" unsigned int actdiag_extractor ()
 
   // Name of the function currently being parsed
   const char* name = function_name(cfun);
+#ifndef NDEBUG
   std::cerr << "Reached: " << name << std::endl;
+#endif
   bool found = false;
-  bool graph = true;
-  for (unsigned int i=0 ; i<functions->argc && (!found || graph) ; i++) {
+  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
 	if (strcmp(functions->argv[i].key, "fn") == 0)
 		found = strcmp(name,functions->argv[i].value) == 0;
-	else if (strcmp(functions->argv[i].key, "text") == 0)
-		graph = false;
 	else if (strcmp(functions->argv[i].key,"fn_list") == 0)
 		found = look_for_target(name, functions->argv[i].value);
   }
+#ifndef NDEBUG
   std::cerr << "Found: " << std::boolalpha << found << std::endl;
+#endif
 
   if (found)
   {
@@ -159,16 +164,16 @@ extern "C" unsigned int actdiag_extractor ()
 
 	  std::cerr << "Trying to graph function " << name << std::endl;
 	  out << "Function " << name << std::endl;
-	  if (graph) {
-		  std::cerr << "Initializing the dumper" << std::endl;
-		  auto dumper = ActivityGraphDumper();
-		  std::cerr << "Dumper initialized" << std::endl;
-		  walk_through_current_fn(dumper);
-		  out << dumper.graph();
-	  } else {
-		  auto dumper = TextDumper(&out);
-		  walk_through_current_fn(dumper);
-	  }
+#ifndef NDEBUG
+	  std::cerr << "Initializing the dumper" << std::endl;
+#endif
+	  auto dumper = ActivityGraphDumper();
+#ifndef NDEBUG
+	  std::cerr << "Dumper initialized" << std::endl;
+#endif
+	  walk_through_current_fn(dumper);
+	  out << dumper.graph();
+
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();
   }
