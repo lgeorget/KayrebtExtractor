@@ -90,7 +90,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			return std::make_shared<MemRef>(MemRef(t));
 
 		default:
+#ifndef NDEBUG
 			std::cerr << "Building " << tree_code_name[TREE_CODE(t)] << std::endl;
+#endif
 			return std::make_shared<Value>(Value(t));
 	}
 }

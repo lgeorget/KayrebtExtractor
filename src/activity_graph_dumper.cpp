@@ -3,8 +3,9 @@
 #include <stdexcept>
 #include <string>
 #include <memory>
-#include <tuple>
+#include <utility>
 #include <gcc-plugin.h>
+#include <basic-block.h>
 #include <activity_graph.h>
 #include "activity_graph_dumper.h"
 #include "asm_expr.h"
@@ -27,29 +28,43 @@ using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 {
-	_branches.push(_g.initialNode());
-	_end = false;
 	_skip = false;
+	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
 }
 
+void ActivityGraphDumper::updateLast(kayrebt::Identifier&& node)
+{
+	_last_but_one = std::move(_last);
+	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
+}
+
+void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
+{
+	_last_but_one = std::move(_last);
+	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
+}
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "Discarded: " << *e  << std::endl;
+#endif
 	_skip = true;
 }
 
 void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building asm" << std::endl;
-	auto assemb = _g.addAction(e->_stmt);
-	_branches.push(assemb);
-	_end = false;
+#endif
+	updateLast(_g.addAction(e->_stmt));
 }
 
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building assign" << std::endl;
+#endif
 	std::string label = e->_rhs2 ?
 		e->_whatToSet->print() + " = " +
 		e->_rhs1->print() + Operator::print(e->_op) +
@@ -59,32 +74,87 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 		e->_rhs1->print();
 
 	if (e->_anonymous) {
-		auto assig = _g.addAction(label);
-		_branches.push(assig);
+		updateLast(_g.addAction(label));
 	} else {
-		auto assig = _g.addObject(label);
-		_branches.push(assig);
+		updateLast(_g.addObject(label));
 	}
-	_end = false;
 }
 
 void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "function body" << std::endl;
-	bool end = false;
-	auto before = _branches.top();
-	for (auto expr : e->_exprs) {
-		std::cerr << "building stmt" << std::endl;
-		expr->accept(*this);
-		std::cerr << "built stmt" << std::endl;
-		if (!_skip) {
-			auto after = _branches.top();
-			if (!end)
-				_g.addEdge(before, after);
-			end = _end;
-			before = after;
-		} else {
-			_skip = false;
+#endif
+	for (auto bb : e->_bb) {
+		auto node = _g.addDecision();
+		updateLast(node);
+		_init_bb[bb.first] = std::unique_ptr<kayrebt::MergeIdentifier>(new MergeIdentifier(node));
+#ifndef NDEBUG
+		std::cerr << "dumping basic block " << bb.first << std::endl;
+#endif
+		_current_bb = bb.first;
+		for (auto expr : bb.second) {
+			expr->accept(*this);
+			if (!_skip) {
+				if (_last_but_one && _last)
+					_g.addEdge(*_last_but_one, *_last);
+			} else {
+				_skip = false;
+			}
+		}
+		if (_ifs.find(_current_bb) == _ifs.end()) {
+			_gotos.emplace_back(std::move(_last), _current_bb);
+		}
+		_last = nullptr;
+	}
+
+#ifndef NDEBUG
+	std::cerr << "dumping conditionals" << std::endl;
+#endif
+	for (auto& cond : _ifs) {
+		basic_block bb = cond.first;
+		kayrebt::MergeIdentifier& decision = *(cond.second.first);
+		std::string& condition = cond.second.second;
+
+		edge ed;
+		edge_iterator ei;
+		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
+			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
+			if (ed->flags & EDGE_TRUE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
+				_g.addGuard(decision,*(_init_bb[ed->dest]),"["+condition+"]");
+			else if (ed->flags & EDGE_FALSE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
+				_g.addGuard(decision,*(_init_bb[ed->dest]),"[!"+condition+"]");
+		}
+	}
+
+#ifndef NDEBUG
+	std::cerr << "dumping fallthrough" << std::endl;
+#endif
+	for (auto& fallthru : _gotos) {
+		basic_block bb = fallthru.second;
+		kayrebt::Identifier& start = *(fallthru.first);
+		edge ed;
+		edge_iterator ei;
+		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
+			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
+			if (_init_bb.find(ed->dest) != _init_bb.end())
+				_g.addEdge(start,*(_init_bb[ed->dest]));
 		}
 	}
 }
@@ -92,71 +162,41 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building call" << std::endl;
-	auto call = _g.addAction(e->_built_str);
-	_branches.push(call);
-	_end = false;
+#endif
+	updateLast(_g.addAction(e->_built_str));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building cond" << std::endl;
+#endif
 	auto decision = _g.addDecision();
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
-
-	auto bthen = _labels.find(*(e->_then));
-	if (bthen == _labels.end()) {
-		std::cerr << "Then-branch not found!" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		bthen = _labels.insert(std::make_pair(*(e->_then),labelNode)).first;
-	}
-	_g.addGuard(decision, bthen->second, "[" + condition + "]");
-
-	auto belse = _labels.find(*(e->_else));
-	if (belse == _labels.end()) {
-		std::cerr << "Else-branch not found!" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		belse = _labels.insert(std::make_pair(*(e->_else),labelNode)).first;
-	}
-	_g.addGuard(decision, belse->second, "[!" + condition + "]");
-	_branches.push(decision);
-	_end = true;
+	_ifs[_current_bb] = std::make_pair(std::unique_ptr<kayrebt::MergeIdentifier>(new kayrebt::MergeIdentifier(decision)),condition);
+	updateLast(decision);
 }
 
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building goto" << std::endl;
-	auto label = _labels.find(*(e->_label));
-	if (label == _labels.end()) {
-		std::cerr << "Not found!" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
-	}
-	MergeIdentifier gotoNode(_g.addDecision());
-	_g.addEdge(gotoNode, label->second);
-	_branches.push(gotoNode);
-	_end = true;
+#endif
+	updateLast(_g.addDecision());
 }
 
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building label" << std::endl;
-	std::cerr << "Check for already existing label " << e->_label->print() << std::endl;
-	auto label = _labels.find(*(e->_label));
-	if (label == _labels.end()) {
-		std::cerr << "Label not found" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
-		_branches.push(labelNode);
-	} else {
-		MergeIdentifier& labelNode = label->second;
-		_branches.push(labelNode);
-	}
-	_end = false;
+#endif
+	updateLast(_g.addDecision());
 }
 
 
@@ -168,35 +208,26 @@ void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building return" << std::endl;
+#endif
 	auto endingNode = _g.terminateActivity();
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
 		_g.addEdge(ret,endingNode);
-		_branches.push(ret);
+		updateLast(ret);
 	} else {
-		_branches.push(endingNode);
+		updateLast(endingNode);
 	}
-	_end = true;
 }
 
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "building switch" << std::endl;
-	auto cond = _g.addDecision();
-
-	for (auto label_ptr : e->_labels) {
-		auto label = _labels.find(*label_ptr);
-		if (label == _labels.end()) {
-			std::cerr << "Label not found" << std::endl;
-			MergeIdentifier labelNode(_g.addDecision());
-			label = _labels.insert(std::make_pair(*label_ptr,labelNode)).first;
-		}
-		_g.addGuard(cond, label->second, e->_var->print() + " == " + label_ptr->print());
-	}
-	_branches.push(cond);
-	_end = true;
+#endif
+	updateLast(_g.addDecision());
 }
 
 

@@ -46,8 +46,6 @@ libcgrapher4gcc_la_SOURCES=\
 	string_cst.h\
 	switch_expr.cpp\
 	switch_expr.h\
-	text_dumper.cpp\
-	text_dumper.h\
 	value.cpp\
 	value.h\
 	value_factory.cpp\

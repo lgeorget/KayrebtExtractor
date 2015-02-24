@@ -2,7 +2,7 @@
 #define FUNCTION_BODY_H
 
 #include <iostream>
-#include <list>
+#include <vector>
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
@@ -19,7 +19,7 @@ class FunctionBody
 		void accept(Dumper& d);
 
 	private:
-		std::list<std::shared_ptr<Expression>> _exprs;
+		std::vector<std::pair<basic_block,std::vector<std::shared_ptr<Expression>>>> _bb;
 		function* _fn;
 
 	friend class TextDumper;

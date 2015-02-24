@@ -21,12 +21,13 @@ CondExpr::CondExpr(gimple t) : Expression(t)
 	_lhs = ValueFactory::INSTANCE.build(gimple_cond_lhs(t));
 	_rhs = ValueFactory::INSTANCE.build(gimple_cond_rhs(t));
 
-	tree a = gimple_cond_true_label(t);
+/*	tree a = gimple_cond_true_label(t);
 	if (a != NULL && a != NULL_TREE)
 		_then = ValueFactory::INSTANCE.build(gimple_cond_true_label(t));
 	a = gimple_cond_false_label(t);
 	if (a != NULL && a != NULL_TREE)
 		_else = ValueFactory::INSTANCE.build(gimple_cond_false_label(t));
+		*/
 }
 
 void CondExpr::accept(Dumper& d)
