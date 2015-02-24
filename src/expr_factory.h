@@ -3,7 +3,10 @@
 
 #include <memory>
 #include <gcc-plugin.h>
+#include <gimple.h>
+#include <function.h>
 #include "expression.h"
+#include "function_body.h"
 
 class ExprFactory
 {
@@ -13,7 +16,8 @@ class ExprFactory
 
 	public:
 		static ExprFactory INSTANCE;
-		std::shared_ptr<Expression> build(tree t);
+		std::shared_ptr<Expression> build(gimple t);
+		std::shared_ptr<FunctionBody> build(function* t);
 };
 
 #endif

@@ -1,21 +1,22 @@
 #include <iostream>
 #include <string>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "asm_expr.h"
 #include "value.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 #include "value_factory.h"
+#include "dumper.h"
 
-AsmExpr::AsmExpr(tree t) : Value(t)
+AsmExpr::AsmExpr(gimple t) : Expression(t)
 {
-	if (TREE_CODE(t) != ASM_EXPR)
-		throw BadTreeException(t, "asm_expr");
+	if (gimple_code(t) != GIMPLE_ASM)
+		throw BadGimpleException(t, "gimple_asm");
 
-	_stmt = ValueFactory::INSTANCE.build(ASM_STRING(t));
+	_stmt = gimple_asm_string(t);
 }
 
-std::string AsmExpr::print() const
+void AsmExpr::accept(Dumper& d)
 {
-	return _stmt->print();
+	d.dumpAsmExpr(this);
 }

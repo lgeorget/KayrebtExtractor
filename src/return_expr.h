@@ -4,20 +4,21 @@
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "expression.h"
 #include "value.h"
 
 class ReturnExpr : public Expression
 {
 	public:
-		explicit ReturnExpr(tree t);
+		explicit ReturnExpr(gimple t);
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		std::shared_ptr<Expression> _value;
+		std::shared_ptr<Value> _value;
 
-	friend class TextDumper;	friend class ActivityGraphDumper;
+	friend class TextDumper;
+	friend class ActivityGraphDumper;
 };
 
 #endif

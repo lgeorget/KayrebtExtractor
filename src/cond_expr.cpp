@@ -3,41 +3,34 @@
 #include <cstdlib>
 #include <list>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
+#include <gimple.h>
 #include "cond_expr.h"
-#include "bad_tree_exception.h"
+#include "bad_gimple_exception.h"
 #include "dumper.h"
 #include "value_factory.h"
 #include "expr_factory.h"
 #include "value.h"
 
-CondExpr::CondExpr(tree t) : Expression(t)
+CondExpr::CondExpr(gimple t) : Expression(t)
 {
-	if (TREE_CODE(t) != COND_EXPR)
-		throw BadTreeException(t, "cond_expr");
+	if (gimple_code(t) != GIMPLE_COND)
+		throw BadGimpleException(t, "cond_expr");
 
-	_cond = ExprFactory::INSTANCE.build(TREE_OPERAND(t,0));
-	_then = ExprFactory::INSTANCE.build(TREE_OPERAND(t,1));
-	if (TREE_OPERAND(t,2))
-		_else = ExprFactory::INSTANCE.build(TREE_OPERAND(t,2));
-	else
-		_else = std::shared_ptr<Expression>();
+	_op = gimple_cond_code(t);
+	_lhs = ValueFactory::INSTANCE.build(gimple_cond_lhs(t));
+	_rhs = ValueFactory::INSTANCE.build(gimple_cond_rhs(t));
+
+/*	tree a = gimple_cond_true_label(t);
+	if (a != NULL && a != NULL_TREE)
+		_then = ValueFactory::INSTANCE.build(gimple_cond_true_label(t));
+	a = gimple_cond_false_label(t);
+	if (a != NULL && a != NULL_TREE)
+		_else = ValueFactory::INSTANCE.build(gimple_cond_false_label(t));
+		*/
 }
 
 void CondExpr::accept(Dumper& d)
 {
 	d.dumpCondExpr(this);
-}
-
-std::ostream& operator<<(std::ostream& out, const CondExpr& e)
-{
-	out << "if " << *e._cond
-	    << " then : "
-	    << *e._then;
-	if (e._else)
-	    out << " else : "
-	        << *e._else;
-
-	out << std::endl;
-	return out;
 }

@@ -3,306 +3,237 @@
 #include <stdexcept>
 #include <string>
 #include <memory>
-#include <tuple>
+#include <utility>
 #include <gcc-plugin.h>
+#include <basic-block.h>
+#include <activity_graph.h>
 #include "activity_graph_dumper.h"
-#include "bind_expr.h"
+#include "asm_expr.h"
+#include "assign_expr.h"
+#include "function_body.h"
 #include "call_expr.h"
-#include "case_label_expr.h"
 #include "cond_expr.h"
-#include "compound_expr.h"
-#include "decl_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
 #include "label_expr.h"
-#include "leaf.h"
-#include "modify_expr.h"
 #include "nop_expr.h"
-#include "preincrement_expr.h"
-#include "predecrement_expr.h"
-#include "postincrement_expr.h"
-#include "postdecrement_expr.h"
 #include "return_expr.h"
-#include "stmt_list.h"
 #include "switch_expr.h"
 #include "dumper.h"
-#include <activity_graph.h>
 #include "label.h"
+#include "operator.h"
+#include "case_label.h"
 
 using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper() : Dumper()
 {
-	_branches.emplace(1,_g.initialNode());
-	_end = false;
 	_skip = false;
-	_buildLeaf = true;
+	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
+}
+
+void ActivityGraphDumper::updateLast(kayrebt::Identifier&& node)
+{
+	_last_but_one = std::move(_last);
+	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
+}
+
+void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
+{
+	_last_but_one = std::move(_last);
+	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
 }
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
+#ifndef NDEBUG
 	std::cerr << "Discarded: " << *e  << std::endl;
+#endif
 	_skip = true;
 }
 
-void ActivityGraphDumper::dumpBindExpr(BindExpr* const e)
+void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 {
-	_skip = true;
-	e->_body->accept(*this);
+#ifndef NDEBUG
+	std::cerr << "building asm" << std::endl;
+#endif
+	updateLast(_g.addAction(e->_stmt));
 }
 
-void ActivityGraphDumper::dumpCaseLabelExpr(CaseLabelExpr* const e)
+void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 {
-	MergeIdentifier node = _g.addDecision();
-	std::string condition;
-	if (e->_lowValue)
-		if (e->_highValue)
-			condition = "[" + _switchs.top().second + " between " + e->_lowValue->print() + " and " + e->_highValue->print() + "]";
-		else
-			condition = "[" + _switchs.top().second + " == " + e->_lowValue->print() + "]";
-	else
-		condition = "[otherwise]";
+#ifndef NDEBUG
+	std::cerr << "building assign" << std::endl;
+#endif
+	std::string label = e->_rhs2 ?
+		e->_whatToSet->print() + " = " +
+		e->_rhs1->print() + Operator::print(e->_op) +
+		e->_rhs2->print()
+		:
+		e->_whatToSet->print() + " = " +
+		e->_rhs1->print();
 
-	_g.addGuard(_switchs.top().first, node, condition);
-	_branches.emplace(1,node);
-	_end = false;
-	_skip = false;
+	if (e->_anonymous) {
+		updateLast(_g.addAction(label));
+	} else {
+		updateLast(_g.addObject(label));
+	}
+}
+
+void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
+{
+#ifndef NDEBUG
+	std::cerr << "function body" << std::endl;
+#endif
+	for (auto bb : e->_bb) {
+		auto node = _g.addDecision();
+		updateLast(node);
+		_init_bb[bb.first] = std::unique_ptr<kayrebt::MergeIdentifier>(new MergeIdentifier(node));
+#ifndef NDEBUG
+		std::cerr << "dumping basic block " << bb.first << std::endl;
+#endif
+		_current_bb = bb.first;
+		for (auto expr : bb.second) {
+			expr->accept(*this);
+			if (!_skip) {
+				if (_last_but_one && _last)
+					_g.addEdge(*_last_but_one, *_last);
+			} else {
+				_skip = false;
+			}
+		}
+		if (_ifs.find(_current_bb) == _ifs.end()) {
+			_gotos.emplace_back(std::move(_last), _current_bb);
+		}
+		_last = nullptr;
+	}
+
+#ifndef NDEBUG
+	std::cerr << "dumping conditionals" << std::endl;
+#endif
+	for (auto& cond : _ifs) {
+		basic_block bb = cond.first;
+		kayrebt::MergeIdentifier& decision = *(cond.second.first);
+		std::string& condition = cond.second.second;
+
+		edge ed;
+		edge_iterator ei;
+		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
+			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
+			if (ed->flags & EDGE_TRUE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
+				_g.addGuard(decision,*(_init_bb[ed->dest]),"["+condition+"]");
+			else if (ed->flags & EDGE_FALSE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
+				_g.addGuard(decision,*(_init_bb[ed->dest]),"[!"+condition+"]");
+		}
+	}
+
+#ifndef NDEBUG
+	std::cerr << "dumping fallthrough" << std::endl;
+#endif
+	for (auto& fallthru : _gotos) {
+		basic_block bb = fallthru.second;
+		kayrebt::Identifier& start = *(fallthru.first);
+		edge ed;
+		edge_iterator ei;
+		FOR_EACH_EDGE(ed, ei, bb->succs) {
+#ifndef NDEBUG
+			std::cerr << "Edge: " << ed << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->flags: " << ed->flags << std::endl;
+#endif
+#ifndef NDEBUG
+			std::cerr << "Edge->dest: " << ed->dest << std::endl;
+#endif
+			if (_init_bb.find(ed->dest) != _init_bb.end())
+				_g.addEdge(start,*(_init_bb[ed->dest]));
+		}
+	}
+}
+
+
+void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
+{
+#ifndef NDEBUG
+	std::cerr << "building call" << std::endl;
+#endif
+	updateLast(_g.addAction(e->_built_str));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
-	bool end;
-	std::vector<Identifier> condBranch;
+#ifndef NDEBUG
+	std::cerr << "building cond" << std::endl;
+#endif
 	auto decision = _g.addDecision();
-	auto fusion = _g.addDecision();
-	condBranch.push_back(decision);
-
-	_buildLeaf = false;
-	e->_cond->accept(*this);
-	std::string condition = std::move(_values.top());
-	_values.pop();
-	_buildLeaf = true;
-
-	_skip = true;
-	e->_then->accept(*this);
-	std::vector<Identifier> bthen;
-	bthen = std::move(_branches.top());
-	_g.addGuard(decision, bthen.front(), "[" + condition + "]");
-	if (!_end)
-		_g.addEdge(bthen.back(), fusion);
-	std::move(bthen.begin(), bthen.end(), std::back_inserter(condBranch));
-	_branches.pop();
-	end = _end;
-
-	if (e->_else) {
-		_skip = true;
-		e->_else->accept(*this);
-		std::vector<Identifier> belse(std::move(_branches.top()));
-		_g.addGuard(decision, belse.front(), "[!" + condition + "]");
-		end &= _end;
-		if (!_end)
-			_g.addEdge(belse.back(), fusion);
-		std::move(belse.begin(), belse.end(), std::back_inserter(condBranch));
-		_branches.pop();
-	} else {
-		end = false;
-		_g.addGuard(decision, fusion, "[!" + condition + "]");
-	}
-	_end = end;
-	condBranch.push_back(fusion);
-	_branches.push(std::move(condBranch));
-	_skip = false;
+	std::string condition = e->_lhs->print() + " " +
+				Operator::print(e->_op) + " " +
+				e->_rhs->print();
+	_ifs[_current_bb] = std::make_pair(std::unique_ptr<kayrebt::MergeIdentifier>(new kayrebt::MergeIdentifier(decision)),condition);
+	updateLast(decision);
 }
 
-void ActivityGraphDumper::dumpCompoundExpr(CompoundExpr* const e)
-{
-	std::vector<Identifier> compoundBranch;
-
-	e->_first->accept(*this);
-	std::move(_branches.top().begin(), _branches.top().end(), std::back_inserter(compoundBranch));
-	_branches.pop();
-
-	e->_second->accept(*this);
-	std::vector<Identifier> second(std::move(_branches.top()));
-	_g.addEdge(compoundBranch.back(),second.front());
-	std::move(second.begin(), second.end(), std::back_inserter(compoundBranch));
-	_branches.pop();
-
-	_branches.push(compoundBranch);
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpDeclExpr(DeclExpr* const e)
-{
-	if (e->_init) {
-		ObjectIdentifier o(_g.addObject(e->_name->print() + " = " + e->_init->print()));
-		_branches.emplace(1,o);
-	} else {
-		ObjectIdentifier o(_g.addObject(e->_name->print()));
-		_branches.emplace(1,o);
-	}
-	_end = false;
-	_skip = false;
-}
 
 void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 {
-	std::cerr << "Looking for label " << e->_label->print() << std::endl;
-	auto label = _labels.find(*(e->_label));
-	if (label == _labels.end()) {
-		std::cerr << "Not found!" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
-	}
-	MergeIdentifier gotoNode(_g.addDecision());
-	_g.addEdge(gotoNode, label->second);
-	_branches.emplace(1,gotoNode);
-	_end = true;
-	_skip = false;
+#ifndef NDEBUG
+	std::cerr << "building goto" << std::endl;
+#endif
+	updateLast(_g.addDecision());
 }
+
 
 void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 {
-	std::cerr << "Check for already existing label " << e->_label->print() << std::endl;
-	auto label = _labels.find(*(e->_label));
-	if (label == _labels.end()) {
-		std::cerr << "Label not found" << std::endl;
-		MergeIdentifier labelNode(_g.addDecision());
-		label = _labels.insert(std::make_pair(*(e->_label),labelNode)).first;
-		_branches.emplace(1,labelNode);
-	} else {
-		MergeIdentifier& labelNode = label->second;
-		_branches.emplace(1,labelNode);
-	}
-	_end = false;
-	_skip = false;
+#ifndef NDEBUG
+	std::cerr << "building label" << std::endl;
+#endif
+	updateLast(_g.addDecision());
 }
 
-void ActivityGraphDumper::dumpLeaf(Leaf* const e)
-{
-	if (_buildLeaf) {
-		ObjectIdentifier o(_g.addObject(e->_val->print()));
-		_branches.emplace(1,o);
-		_end = false;
-	} else {
-		_values.push(e->_val->print());
-	}
-	_skip = !_buildLeaf;
-}
-
-void ActivityGraphDumper::dumpModifyExpr(ModifyExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_whatToSet->print() + " = " + e->_newValue->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
 
 void ActivityGraphDumper::dumpNopExpr(NopExpr* const e)
 {
 	_skip = true;
 }
 
-void ActivityGraphDumper::dumpPreincrementExpr(PreincrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction("++" + e->_variable->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPredecrementExpr(PredecrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction("--" + e->_variable->print()));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPostdecrementExpr(PostdecrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_variable->print() + "--"));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpPostincrementExpr(PostincrementExpr* const e)
-{
-	ActionIdentifier a(_g.addAction(e->_variable->print() + "++"));
-	_branches.emplace(1,a);
-	_end = false;
-	_skip = false;
-}
 
 void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 {
-	std::vector<Identifier> returnBranch;
+#ifndef NDEBUG
+	std::cerr << "building return" << std::endl;
+#endif
 	auto endingNode = _g.terminateActivity();
 	if (e->_value) {
-		e->_value->accept(*this);
-		returnBranch = std::move(_branches.top());
-		_branches.pop();
-		_g.addEdge(returnBranch.back(),endingNode);
-	}
-	returnBranch.push_back(endingNode);
-	_branches.push(std::move(returnBranch));
-	_end = true;
-	_skip = false;
-}
-
-void ActivityGraphDumper::dumpStmtList(StmtList* const e)
-{
-	std::vector<Identifier> stmtBranch;
-	if (!_skip) {
-		stmtBranch = std::move(_branches.top());
-		_branches.pop();
+		auto ret = _g.addObject(e->_value->print());
+		_g.addEdge(ret,endingNode);
+		updateLast(ret);
 	} else {
-		stmtBranch.push_back(_g.addDecision());
+		updateLast(endingNode);
 	}
-	_skip = false;
-
-	bool end = _end;
-	for (auto expr : e->_exprs) {
-		expr->accept(*this);
-		if (!_skip)
-		{
-			auto after = _branches.top();
-			_branches.pop();
-			if (!end && !stmtBranch.empty())
-				_g.addEdge(stmtBranch.back(), after.front());
-			std::move(after.begin(), after.end(), std::back_inserter(stmtBranch));
-		}
-		end = _end;
-	}
-	_branches.push(std::move(stmtBranch));
-	//_end is untouched
-	_skip = false;
 }
+
 
 void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 {
-	_buildLeaf = false;
-	e->_cond->accept(*this);
-	auto cond = _g.addDecision();
-	_switchs.push(std::make_pair(cond,_values.top()));
-	_values.pop();
-	_buildLeaf = true;
-
-	std::vector<Identifier> switchBranch;
-	switchBranch.push_back(cond);
-	e->_body->accept(*this);
-	std::move(_branches.top().begin(), _branches.top().end(), std::back_inserter(switchBranch));
-	_branches.pop();
-	_switchs.pop();
-
-	_branches.push(std::move(switchBranch));
-	//_end is untouched
-	_skip = false;
+#ifndef NDEBUG
+	std::cerr << "building switch" << std::endl;
+#endif
+	updateLast(_g.addDecision());
 }
 
-ActivityGraph& ActivityGraphDumper::graph()
+
+const ActivityGraph& ActivityGraphDumper::graph()
 {
 	_g.simplifyMergeNodes();
 	return _g;
 }
+

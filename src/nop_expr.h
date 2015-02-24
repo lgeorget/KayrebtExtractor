@@ -5,13 +5,13 @@
 #include <memory>
 #include <list>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 #include "expression.h"
 
 class NopExpr : public Expression
 {
 	public:
-		explicit NopExpr(tree t);
+		explicit NopExpr(gimple t);
 		void accept(Dumper& d) override;
 
 	friend class TextDumper;	friend class ActivityGraphDumper;

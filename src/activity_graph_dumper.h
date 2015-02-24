@@ -7,63 +7,52 @@
 #include <vector>
 #include <stack>
 #include <utility>
+#include <memory>
 #include <activity_graph.h>
 #include "dumper.h"
 #include "label.h"
 
-class BindExpr;
-class CaseLabelExpr;
+class AssignExpr;
+class FunctionBody;
+class CallExpr;
 class CondExpr;
-class CompoundExpr;
-class DeclExpr;
 class GotoExpr;
 class LabelExpr;
-class ModifyExpr;
 class NopExpr;
-class PreincrementExpr;
-class PredecrementExpr;
-class PostdecrementExpr;
-class PostincrementExpr;
 class ReturnExpr;
-class Leaf;
-class StmtList;
 class SwitchExpr;
 class Expression;
-class Value;
 
 class ActivityGraphDumper : public Dumper
 {
 	public:
 		ActivityGraphDumper();
-		void dumpBindExpr(BindExpr* const e) override;
-		void dumpCaseLabelExpr(CaseLabelExpr* const e) override;
-		void dumpCompoundExpr(CompoundExpr* const e) override;
+		void dumpAsmExpr(AsmExpr* const e) override;
+		void dumpAssignExpr(AssignExpr* const e) override;
+		void dumpFunctionBody(FunctionBody* const e) override;
+		void dumpCallExpr(CallExpr* const e) override;
 		void dumpCondExpr(CondExpr* const e) override;
-		void dumpDeclExpr(DeclExpr* const e) override;
 		void dumpGotoExpr(GotoExpr* const e) override;
 		void dumpLabelExpr(LabelExpr* const e) override;
-		void dumpLeaf(Leaf* const e) override;
-		void dumpModifyExpr(ModifyExpr* const e) override;
 		void dumpNopExpr(NopExpr* const e) override;
-		void dumpPreincrementExpr(PreincrementExpr* const e) override;
-		void dumpPredecrementExpr(PredecrementExpr* const e)  override;
-		void dumpPostdecrementExpr(PostdecrementExpr* const e) override;
-		void dumpPostincrementExpr(PostincrementExpr* const e) override;
 		void dumpReturnExpr(ReturnExpr* const e) override;
-		void dumpStmtList(StmtList* const e) override;
 		void dumpSwitchExpr(SwitchExpr* const e) override;
 		void dumpExpression(Expression* const e) override;
-		kayrebt::ActivityGraph& graph();
+		const kayrebt::ActivityGraph& graph();
 
 	private:
 		kayrebt::ActivityGraph _g;
-		std::stack<std::pair<kayrebt::MergeIdentifier,std::string>> _switchs;
-		std::stack<std::vector<kayrebt::Identifier>> _branches;
+		std::unique_ptr<kayrebt::Identifier> _last;
+		std::unique_ptr<kayrebt::Identifier> _last_but_one;
 		std::stack<std::string> _values;
-		std::map<Value,kayrebt::MergeIdentifier> _labels;
-		bool _end;
+		std::map<basic_block,std::unique_ptr<kayrebt::MergeIdentifier>> _init_bb;
+		std::map<basic_block,std::pair<std::unique_ptr<kayrebt::MergeIdentifier>,std::string>> _ifs;
+		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,basic_block>> _gotos;
 		bool _skip;
-		bool _buildLeaf;
+		basic_block _current_bb;
+
+		void updateLast(kayrebt::Identifier&& node);
+		void updateLast(kayrebt::Identifier& node);
 };
 
 

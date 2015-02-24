@@ -3,19 +3,19 @@
 
 #include <iostream>
 #include <gcc-plugin.h>
-#include <tree.h>
+#include <gimple.h>
 
 class Dumper;
 
 class Expression
 {
 	public:
-		explicit Expression(tree t);
+		explicit Expression(gimple t);
 		virtual ~Expression() = default;
 		virtual void accept(Dumper& d); // Visitor design pattern
 
 	private:
-		tree _expr;
+		gimple _expr;
 
 	friend std::ostream& operator<<(std::ostream& out, const Expression& e);
 };

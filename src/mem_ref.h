@@ -1,5 +1,5 @@
-#ifndef COMPONENT_REF_H
-#define COMPONENT_REF_H
+#ifndef MEM_REF_H
+#define MEM_REF_H
 
 #include <iostream>
 #include <string>
@@ -8,15 +8,14 @@
 #include <tree.h>
 #include "value.h"
 
-class ComponentRef : public Value
+class MemRef : public Value
 {
 	public:
-		explicit ComponentRef(tree t, const std::string& symbol);
+		explicit MemRef(tree t);
 		std::string print() const override;
 
 	private:
-		std::shared_ptr<Value> _container;
-		std::shared_ptr<Value> _component;
+		std::shared_ptr<Value> _ptr;
 		const std::string _symbol;
 };
 

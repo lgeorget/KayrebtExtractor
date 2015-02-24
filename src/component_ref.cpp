@@ -8,7 +8,7 @@
 #include "bad_tree_exception.h"
 #include "value_factory.h"
 
-ComponentRef::ComponentRef(tree t) : Value(t)
+ComponentRef::ComponentRef(tree t, const std::string& symbol) : Value(t), _symbol(symbol)
 {
 	if (TREE_CODE(t) != COMPONENT_REF)
 		throw BadTreeException(t,"component_ref");
@@ -19,5 +19,5 @@ ComponentRef::ComponentRef(tree t) : Value(t)
 
 std::string ComponentRef::print() const
 {
-	return _container->print() + "." + _component->print();
+	return _container->print() + _symbol + _component->print();
 }
