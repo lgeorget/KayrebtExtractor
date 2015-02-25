@@ -21,7 +21,6 @@ class SwitchExpr : public Expression
 		std::shared_ptr<Value> _var;
 		std::vector<std::shared_ptr<Value>> _labels;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

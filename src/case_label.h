@@ -21,7 +21,6 @@ class CaseLabel : public Value
 		std::shared_ptr<Value> _label;
 		std::string _built_str;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

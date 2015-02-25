@@ -22,7 +22,6 @@ class FunctionBody
 		std::vector<std::pair<basic_block,std::vector<std::shared_ptr<Expression>>>> _bb;
 		function* _fn;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

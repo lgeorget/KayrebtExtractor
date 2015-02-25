@@ -17,7 +17,6 @@ class LabelExpr : public Expression
 	private:
 		std::shared_ptr<Value> _label;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

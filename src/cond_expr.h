@@ -23,7 +23,6 @@ class CondExpr : public Expression
 		std::shared_ptr<Value> _then;
 		std::shared_ptr<Value> _else;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

@@ -19,7 +19,7 @@ class GotoExpr : public Expression
 		// that probably supports computed gotos as well
 		std::shared_ptr<Value> _label;
 
-	friend class TextDumper;	friend class ActivityGraphDumper;
+	friend class ActivityGraphDumper;
 };
 
 #endif

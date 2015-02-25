@@ -24,7 +24,6 @@ class CallExpr : public Expression
 		std::list<std::shared_ptr<Value>> _args;
 		std::string _built_str;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

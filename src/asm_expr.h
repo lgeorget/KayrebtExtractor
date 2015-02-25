@@ -19,7 +19,6 @@ class AsmExpr : public Expression
 	private:
 		const char* _stmt;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 

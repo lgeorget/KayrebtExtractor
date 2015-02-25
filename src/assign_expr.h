@@ -22,7 +22,6 @@ class AssignExpr : public Expression
 		std::shared_ptr<Value>	_rhs2;
 		bool _anonymous;
 
-	friend class TextDumper;
 	friend class ActivityGraphDumper;
 };
 
