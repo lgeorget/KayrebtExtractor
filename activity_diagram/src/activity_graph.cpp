@@ -174,6 +174,10 @@ namespace kayrebt
 		return nodes.size() == 0;
 	}
 
+	/**
+	 * \brief Output the activity diagram in GraphViz format
+	 * \relates kayrebt::ActivityGraph
+	 */
 	std::ostream& operator<<(std::ostream& out, const ActivityGraph& graph)
 	{
 		unsigned int nb = num_vertices(graph._d->inner);
