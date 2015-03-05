@@ -64,6 +64,6 @@ libcgrapher4gcc_la_LDFLAGS  = -version-info 0:0:0
 libcgrapher4gcc_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la
 
 install-exec-local:
-	$(RM) `gcc -print-file-name=plugin`/cgrapher4gcc.so
-	$(LN_S) @libdir@/libcgrapher4gcc.so `gcc -print-file-name=plugin`/cgrapher4gcc.so
+	$(RM) `gcc -print-file-name=plugin`/cgrapher4gcc.so || true
+	$(LN_S) @libdir@/libcgrapher4gcc.so `gcc -print-file-name=plugin`/cgrapher4gcc.so || echo "Couldn't install plugin in `gcc -print-file-name=plugin`"
 
