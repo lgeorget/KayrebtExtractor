@@ -1,3 +1,9 @@
+/**
+ * \file integer_cst.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the IntegerCst
+ */
 #include <iostream>
 #include <string>
 #include <gcc-plugin.h>

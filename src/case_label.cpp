@@ -1,3 +1,9 @@
+/**
+ * \file case_label.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the CaseLabel
+ */
 #include <iostream>
 #include <cstdlib>
 #include <gcc-plugin.h>

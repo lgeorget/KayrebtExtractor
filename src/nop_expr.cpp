@@ -1,3 +1,9 @@
+/**
+ * \file nop_expr.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the NopExpr
+ */
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>

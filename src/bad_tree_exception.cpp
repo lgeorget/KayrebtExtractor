@@ -1,3 +1,9 @@
+/**
+ * \file bad_tree_exception.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the BadTreeException
+ */
 #include <exception>
 #include <stdexcept>
 #include <gcc-plugin.h>

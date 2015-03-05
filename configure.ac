@@ -27,6 +27,18 @@ AM_COND_IF([GXX_4_8_AVAIL], [:],
 	   [AC_MSG_ERROR([g++ version 4.8 exactly is required])]
 	  )
 AM_PROG_AR
+AC_CHECK_PROGS([DOT], [dot])
+if test -z "$DOT";
+then AC_MSG_WARN([[Graphs will not be available in Doxygen documentation]])
+fi
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN";
+   then AC_MSG_WARN([[Doxygen not found - continuing without Doxygen support]])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN],[test -n "$DOXYGEN"])
+AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([Doxyfile])])
+AM_CONDITIONAL([HAVE_DOT],[test -n "$DOT"])
+AM_COND_IF([HAVE_DOT], [AC_SUBST(DOT_IS_AVAILABLE,["YES"])], [AC_SUBST(DOT_IS_AVAILABLE,["NO"])])
 LT_INIT
 
 # Checks for libraries.

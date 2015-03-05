@@ -1,3 +1,9 @@
+/**
+ * \file asm_expr.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the AsmExpr
+ */
 #include <iostream>
 #include <string>
 #include <gcc-plugin.h>

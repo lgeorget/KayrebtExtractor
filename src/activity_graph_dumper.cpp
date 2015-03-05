@@ -1,3 +1,9 @@
+/**
+ * \file activity_graph_dumper.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the ActivityGraphDumper
+ */
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>

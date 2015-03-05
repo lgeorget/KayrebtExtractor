@@ -1,3 +1,9 @@
+/**
+ * \file expr_factory.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the ExprFactory
+ */
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>

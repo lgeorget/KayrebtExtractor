@@ -1,3 +1,9 @@
+/**
+ * \file operator.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the static class Operator
+ */
 #include <cstdlib>
 #include <gcc-plugin.h>
 #include <tree.h>

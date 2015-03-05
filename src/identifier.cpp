@@ -1,3 +1,9 @@
+/**
+ * \file identifier.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the Identifier
+ */
 #include <iostream>
 #include <gcc-plugin.h>
 #include <tree.h>

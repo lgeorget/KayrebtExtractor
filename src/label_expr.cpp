@@ -1,3 +1,9 @@
+/**
+ * \file label_expr.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the LabelExpr
+ */
 #include <iostream>
 #include <cstdlib>
 #include <gcc-plugin.h>

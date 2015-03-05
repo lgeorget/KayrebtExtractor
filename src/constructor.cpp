@@ -1,3 +1,9 @@
+/**
+ * \file constructor.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the Constructor
+ */
 #include <iostream>
 #include <string>
 #include <memory>

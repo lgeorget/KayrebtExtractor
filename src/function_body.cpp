@@ -1,3 +1,9 @@
+/**
+ * \file function_body.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the FunctionBody
+ */
 #include <iostream>
 #include <list>
 #include <memory>

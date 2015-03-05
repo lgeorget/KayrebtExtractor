@@ -1,3 +1,9 @@
+/**
+ * \file string_cst.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the StringCst
+ */
 #include <iostream>
 #include <algorithm>
 #include <string>

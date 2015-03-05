@@ -1,3 +1,9 @@
+/**
+ * \file cgrapher4gcc.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Entry point of the plugin
+ */
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,7 +24,6 @@
 #include <tree-iterator.h>
 #include <gimple.h>
 
-#include "cgrapher4gcc.h"
 #include "expr_factory.h"
 #include "expression.h"
 #include "dumper.h"
@@ -26,25 +31,38 @@
 #include "bad_tree_exception.h"
 #include "bad_gimple_exception.h"
 
+/**
+ * \brief Must-be-defined value for license compatibility
+ */
 int plugin_is_GPL_compatible;
 
 extern "C" {
+static unsigned int actdiag_extractor();
 
+/**
+ * \brief Basic information about the plugin
+ */
 static struct plugin_info myplugin_info =
 {
-	"0.0.1", // version
+	"0.2", // version
 	"Later...", //help
 };
 
+/**
+ * \brief Plugin version information
+ */
 static struct plugin_gcc_version myplugin_version =
 {
 	"4.8.3", //basever
-	"", // datestamp
-	"", // devphase
+	"2015-03-03", // datestamp
+	"alpha", // devphase
 	"", // revision
 	"", // configuration arguments
 };
 
+/**
+ * \brief Definition of the new pass added by the plugin
+ */
 struct gimple_opt_pass actdiag_extractor_pass =
 {
 	{
@@ -69,6 +87,28 @@ struct gimple_opt_pass actdiag_extractor_pass =
 
 static struct plugin_name_args* functions;
 
+/**
+ * \brief Attempt to open the file where everything must be dumped
+ *
+ * If something goes wrong, the error is actually caught later.
+ */
+static void prepare_dump_file (void*, void*)
+{
+  std::cerr << "processing " << main_input_filename << std::endl;
+
+  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
+  if (!out)
+	  std::cerr << "Couldn't open dump file." << std::endl;
+}
+
+
+/**
+ * \brief Plugin entry point
+ * \param plugin_args the command line options passed to the plugin
+ * \param version the plugin version information
+ * \return 0 if everything went well, -1 if the plugin is incompatible with
+ * the active version of GCC
+ */
 extern "C" int plugin_init (struct plugin_name_args *plugin_args,
                         struct plugin_gcc_version *version)
 {
@@ -97,6 +137,10 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 	return 0;
 }
 
+/**
+ * \brief Build the activity diagram for the function currently being compiled
+ * \param dumper the object building the activity diagram
+ */
 static void walk_through_current_fn(Dumper& dumper)
 {
 	try {
@@ -111,6 +155,14 @@ static void walk_through_current_fn(Dumper& dumper)
 	}
 }
 
+/**
+ * \brief Check in the functions list whether the current function is to be
+ * graphed
+ * \param current_fn the current function name
+ * \param filename the file containing the functions to graph, this is a
+ * parameter that can be passed to the plugin
+ * \return true if and only if the function must be graphed
+ */
 static bool look_for_target(const char* current_fn, const char* filename)
 {
 	std::ifstream fns(filename);
@@ -130,7 +182,15 @@ static bool look_for_target(const char* current_fn, const char* filename)
 	return found;
 }
 
-extern "C" unsigned int actdiag_extractor ()
+/**
+ * \brief Extract an activity diagram for every function reached if a graph
+ * is asked for it
+ *
+ * If there is a compilation error, no graph is produced.
+ * \return 0 even if there is an error, in order to build as many graphs as
+ * possible without making GCC crash
+ */
+extern "C" unsigned int actdiag_extractor()
 {
   // If there were errors during compilation,
   // let GCC handle the exit.
@@ -179,15 +239,6 @@ extern "C" unsigned int actdiag_extractor ()
   }
 
   return 0;
-}
-
-extern "C" void prepare_dump_file (void*, void*)
-{
-  std::cerr << "processing " << main_input_filename << std::endl;
-
-  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
-  if (!out)
-	  std::cerr << "Couldn't open dump file." << std::endl;
 }
 
 

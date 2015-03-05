@@ -1,3 +1,9 @@
+/**
+ * \file return_expr.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the ReturnExpr
+ */
 #include <cstdlib>
 #include <gcc-plugin.h>
 #include <gimple.h>

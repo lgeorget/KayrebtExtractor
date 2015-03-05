@@ -19,7 +19,6 @@ libcgrapher4gcc_la_SOURCES=\
 	case_label.cpp\
 	case_label.h\
 	cgrapher4gcc.cpp\
-	cgrapher4gcc.h\
 	cond_expr.cpp\
 	cond_expr.h\
 	debug.h\

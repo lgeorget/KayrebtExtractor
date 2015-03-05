@@ -1,3 +1,9 @@
+/**
+ * \file unary.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the Unary
+ */
 #include <iostream>
 #include <memory>
 #include <gcc-plugin.h>

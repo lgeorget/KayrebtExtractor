@@ -1,3 +1,9 @@
+/**
+ * \file array_ref.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the ArrayRef
+ */
 #include <iostream>
 #include <string>
 #include <memory>

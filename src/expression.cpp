@@ -1,3 +1,9 @@
+/**
+ * \file expression.cpp
+ * \author Laurent Georget
+ * \date 2015-03-03
+ * \brief Implementation of the virtual Expression
+ */
 #include <iostream>
 #include <memory>
 #include <cstdlib>
