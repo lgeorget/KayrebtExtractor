@@ -18,7 +18,7 @@ GotoExpr::GotoExpr(gimple t) : Expression(t)
 	if (gimple_code(t) != GIMPLE_GOTO)
 		throw BadGimpleException(t,"goto");
 
-//	_label = ValueFactory::INSTANCE.build(gimple_goto_dest(t));
+	_label = ValueFactory::INSTANCE.build(gimple_goto_dest(t));
 }
 
 void GotoExpr::accept(Dumper& d)

@@ -152,7 +152,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		edge_iterator ei;
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
 #ifndef NDEBUG
-			std::cerr << "Edge: " << ed << std::endl;
+			std::cerr << "Edge: " << ed << "(" << ed->src << ")" << std::endl;
 #endif
 #ifndef NDEBUG
 			std::cerr << "Edge->flags: " << ed->flags << std::endl;
@@ -160,8 +160,24 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 #ifndef NDEBUG
 			std::cerr << "Edge->dest: " << ed->dest << std::endl;
 #endif
-			if (_init_bb.find(ed->dest) != _init_bb.end())
+			if (_init_bb.find(ed->dest) != _init_bb.end()) {
 				_g.addEdge(start,*(_init_bb[ed->dest]));
+			} else if (ed->dest == EXIT_BLOCK_PTR) {
+#ifndef NDEBUG
+				std::cerr << "Fallthrough to end of function at end of bb " << bb << std::endl;
+#endif
+				_g.addEdge(start,_g.terminateActivity());
+			}
+#ifndef NDEBUG
+			else
+				std::cerr << "Edge going to no known bb! " << ed->dest << std::endl;
+#endif
+		}
+		if (EDGE_COUNT(bb->succs) == 0) {
+#ifndef NDEBUG
+			std::cerr << "bb without transition!!  " << bb << std::endl;
+#endif
+			_g.addEdge(start,_g.terminateActivity());
 		}
 	}
 }
@@ -195,7 +211,16 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building goto" << std::endl;
 #endif
-	updateLast(_g.addDecision());
+	auto gotol = _g.addDecision();
+	//if the label is available the edge
+	//is built right away, otherwise it is delayed
+	//until the end of the function dumping
+	if (e->_label) {
+		auto label = getLabel(e->_label->getUid());
+		_g.addEdge(gotol, label);
+		_outgoing_transitions_handled = true;
+	}
+	updateLast(gotol);
 }
 
 
@@ -220,13 +245,11 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building return" << std::endl;
 #endif
-	auto endingNode = _g.terminateActivity();
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
-		_g.addEdge(ret,endingNode);
 		updateLast(ret);
 	} else {
-		updateLast(endingNode);
+		_skip = true;
 	}
 }
 
