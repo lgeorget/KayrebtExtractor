@@ -108,10 +108,11 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 				_skip = false;
 			}
 		}
-		if (_ifs.find(_current_bb) == _ifs.end()) {
+		if (!_outgoing_transitions_handled) {
 			_gotos.emplace_back(std::move(_last), _current_bb);
 		}
 		_last = nullptr;
+		_outgoing_transitions_handled = false;
 	}
 
 #ifndef NDEBUG
@@ -185,6 +186,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 				e->_rhs->print();
 	_ifs[_current_bb] = std::make_pair(std::unique_ptr<kayrebt::MergeIdentifier>(new kayrebt::MergeIdentifier(decision)),condition);
 	updateLast(decision);
+	_outgoing_transitions_handled = true;
 }
 
 
@@ -202,7 +204,8 @@ void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building label" << std::endl;
 #endif
-	updateLast(_g.addDecision());
+	auto label = getLabel(e->_label->getUid());
+	updateLast(label);
 }
 
 
@@ -233,7 +236,17 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building switch" << std::endl;
 #endif
-	updateLast(_g.addDecision());
+	auto switchnode = _g.addDecision();
+
+	//Draw the edges for outgoing transitions ahead of time,
+	//otherwise their labels would be missed
+	for (auto casel : e->_labels) {
+		auto l = getLabel(casel->getUid());
+		_g.addGuard(switchnode, l, "[" + e->_var->print() + " == " + casel->print() + "]");
+	}
+	_outgoing_transitions_handled = true;
+
+	updateLast(switchnode);
 }
 
 
@@ -243,3 +256,14 @@ const ActivityGraph& ActivityGraphDumper::graph()
 	return _g;
 }
 
+kayrebt::Identifier ActivityGraphDumper::getLabel(unsigned int uid)
+{
+	auto it = _labels.find(uid);
+	if (it == _labels.end()) {
+		//we cannot use insert directly instead of
+		//find because it would build an unused decision
+		//node if the key already exist
+		it = _labels.emplace(uid, _g.addDecision()).first;
+	}
+	return it->second;
+}

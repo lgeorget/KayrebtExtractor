@@ -149,10 +149,15 @@ class ActivityGraphDumper : public Dumper
 		 * to the destination basic block the control flows to
 		 */
 		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,basic_block>> _gotos;
+
+		std::map<unsigned int, kayrebt::Identifier> _labels;
+
 		/**
 		 * Tell that the next Expression is to be skipped instead of dumped
 		 */
 		bool _skip;
+
+		bool _outgoing_transitions_handled;
 		/**
 		 * The current basic block being dumped
 		 */
@@ -170,6 +175,8 @@ class ActivityGraphDumper : public Dumper
 		 * \param node the new node that must replace \a last
 		 */
 		void updateLast(kayrebt::Identifier& node);
+
+		kayrebt::Identifier getLabel(unsigned int uid);
 };
 
 
