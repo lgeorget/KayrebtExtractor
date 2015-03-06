@@ -20,7 +20,6 @@ void minifunc()
 
 int main(int argc, char** argv);
 char other_function();
-void say_hello_and_die_maybe(int s);
 void function_with_numerous_args(int a, char b, struct greetings* c, int* d,
 		unsigned long long int e, char f, char* g, int h);
 
