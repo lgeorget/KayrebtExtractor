@@ -86,6 +86,12 @@ void say_hello_and_check_if_equal(int s)
 		case 0:
 			printf("either a or s is null\n");
 			break;
+		case 1:
+			printf("identity?\n");
+			break;
+		case 2:
+			printf("parity?\n");
+			break;
 		default:
 			other_function();
 			return;
