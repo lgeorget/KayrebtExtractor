@@ -60,7 +60,7 @@ libcgrapher4gcc_la_SOURCES=\
 	mem_ref.cpp\
 	mem_ref.h
 libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/
-libcgrapher4gcc_la_LDFLAGS  = -version-info 0:0:0
+libcgrapher4gcc_la_LDFLAGS  = -version-info 0:1:0
 libcgrapher4gcc_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la
 
 install-exec-local:
