@@ -185,7 +185,7 @@ namespace kayrebt
 			/**
 			 * \brief Output the activity diagram in GraphViz format
 			 */
-			friend std::ostream& operator<<(std::ostream& out, const ActivityGraph& graph);
+			std::ostream& graphVizify(std::ostream& out, std::function<std::string(unsigned int)> categoryDumper = nullptr) const;
 	};
 }
 #endif

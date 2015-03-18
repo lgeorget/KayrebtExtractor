@@ -180,16 +180,18 @@ namespace kayrebt
 	 * \brief Output the activity diagram in GraphViz format
 	 * \relates kayrebt::ActivityGraph
 	 */
-	std::ostream& operator<<(std::ostream& out, const ActivityGraph& graph)
+	std::ostream& ActivityGraph::graphVizify(std::ostream& out, std::function<std::string(unsigned int)> categoryDumper) const
 	{
-		unsigned int nb = num_vertices(graph._d->inner);
+		unsigned int nb = num_vertices(_d->inner);
+#ifndef NDEBUG
 		std::cerr << "Number of vertices in graph: " << nb << std::endl;
-		std::cerr << "Number of edges in graph: " << num_edges(graph._d->inner) << std::endl;
+		std::cerr << "Number of edges in graph: " << num_edges(_d->inner) << std::endl;
+#endif
 		out << "digraph d {" << std::endl;
 		if (nb > 0) {
-			auto dfs = make_dfs_visitor(NodeDumper(out));
+			auto dfs = make_dfs_visitor(NodeDumper(out, categoryDumper));
 			std::map<NodeDescriptor, boost::default_color_type> c_m;
-			depth_first_search(graph._d->inner, dfs, make_assoc_property_map(c_m));
+			depth_first_search(_d->inner, dfs, make_assoc_property_map(c_m));
 		}
 		out << "}" << std::endl;
 

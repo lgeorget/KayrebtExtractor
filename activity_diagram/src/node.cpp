@@ -32,7 +32,4 @@ namespace kayrebt
 	{
 		return SHAPES[static_cast<int>(s)];
 	}
-
-	NodeDumper::NodeDumper(std::ostream& out) : boost::base_visitor<NodeDumper>(), _out(out)
-	{}
 }
