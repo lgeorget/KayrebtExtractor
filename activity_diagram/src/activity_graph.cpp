@@ -30,19 +30,21 @@ namespace kayrebt
 		delete _d;
 	}
 
-	ActionIdentifier ActivityGraph::addAction(std::string label)
+	ActionIdentifier ActivityGraph::addAction(std::string label, unsigned int cat)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
 		_d->inner[v].shape = ACTION;
+		_d->inner[v].category = cat;
 		return ActionIdentifier(v);
 	}
 
-	ObjectIdentifier ActivityGraph::addObject(std::string label)
+	ObjectIdentifier ActivityGraph::addObject(std::string label, unsigned int cat)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
 		_d->inner[v].shape = OBJECT;
+		_d->inner[v].category = cat;
 		return ObjectIdentifier(v);
 	}
 
@@ -81,17 +83,19 @@ namespace kayrebt
 		return SyncIdentifier(v);
 	}
 
-	void ActivityGraph::addEdge(const Identifier& branch, const Identifier& head)
+	void ActivityGraph::addEdge(const Identifier& branch, const Identifier& head, unsigned int cat)
 	{
-		add_edge(*branch, *head, _d->inner);
+		auto e = add_edge(*branch, *head, _d->inner);
+		_d->inner[e.first].category = cat;
 	}
 
-	void ActivityGraph::addGuard(const Identifier& branch, const Identifier& head, std::string condition)
+	void ActivityGraph::addGuard(const Identifier& branch, const Identifier& head, std::string condition, unsigned int cat)
 	{
 		auto e = edge(*branch, *head, _d->inner);
 		if (!e.second)
 			e = add_edge(*branch, *head, _d->inner);
 		_d->inner[e.first].condition = condition;
+		_d->inner[e.first].category = cat;
 	}
 
 	void ActivityGraph::setLabel(Identifier& branch, std::string label)

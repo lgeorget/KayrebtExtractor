@@ -72,7 +72,9 @@ namespace kayrebt
 						for internal use only */
 		std::string label = ""; /*!< the node's label */
 		Shape shape = NO_NODE; /*!< the node's shape, or type */
-		unsigned int branch = 0; /*!< the node's branch number */
+		unsigned int category = 0; /*!< the node's category,
+					this field's semantics is unspecified
+					and left for use by external code */
 		static unsigned int index; /*!< a counter to generate unique
 					     identifiers for nodes
 					     \bug this counter may overflow,

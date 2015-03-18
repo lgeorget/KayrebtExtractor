@@ -24,7 +24,7 @@ namespace kayrebt
 {
 	const char* SHAPES[] = {"note", "ellipse", "diamond", "dot", "ellipse", "rect", "dot", "doublecircle", "ellipse", "invisible"};
 
-	Node::Node(std::string l, Shape s, unsigned int b) : label(l), shape(s), branch(b) {}
+	Node::Node(std::string l, Shape s, unsigned int c) : label(l), shape(s), category(c) {}
 
 	std::string Node::shapeToStr(Shape s)
 	{

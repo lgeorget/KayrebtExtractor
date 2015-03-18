@@ -57,13 +57,13 @@ namespace kayrebt
 			 * \param[in] label the label of the new action node
 			 * \return an identifier for the newly created node
 			 */
-			ActionIdentifier addAction(std::string label);
+			ActionIdentifier addAction(std::string label, unsigned int cat = 0);
 			/**
 			 * \brief Add an object node to the activity diagram
 			 * \param[in] label the label of the new object node
 			 * \return an identifier for the newly created node
 			 */
-			ObjectIdentifier addObject(std::string label);
+			ObjectIdentifier addObject(std::string label, unsigned int cat = 0);
 			/**
 			 * \brief Add a forking node to the activity diagram,
 			 * to start a concurrent area
@@ -102,7 +102,7 @@ namespace kayrebt
 			 * \param[in] head the destination node
 			 * \sa ActivityGraph::addGuard
 			 */
-			void addEdge(const Identifier& branch, const Identifier& head);
+			void addEdge(const Identifier& branch, const Identifier& head, unsigned int cat = 0);
 			/**
 			 * \brief Build a guarded edge between two nodes
 			 * \param[in] branch the source node
@@ -111,7 +111,7 @@ namespace kayrebt
 			 * as the edge label
 			 * \sa ActivityGraph::addEdge
 			 */
-			void addGuard(const Identifier& branch, const Identifier& head, std::string condition);
+			void addGuard(const Identifier& branch, const Identifier& head, std::string condition, unsigned int cat = 0);
 			/**
 			 * \brief Set the label of a given node
 			 *
