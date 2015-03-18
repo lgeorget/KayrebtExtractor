@@ -19,8 +19,6 @@ using namespace boost;
 
 namespace kayrebt
 {
-	unsigned int Node::index = 0;
-
 	ActivityGraph::ActivityGraph() : _d(new ActivityGraphInternals())
 	{
 	}

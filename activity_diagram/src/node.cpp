@@ -22,6 +22,8 @@ using namespace boost;
 
 namespace kayrebt
 {
+	unsigned int Node::index = 0;
+
 	const char* SHAPES[] = {"note", "ellipse", "diamond", "dot", "ellipse", "rect", "dot", "doublecircle", "ellipse", "invisible"};
 
 	Node::Node(std::string l, Shape s, unsigned int c) : label(l), shape(s), category(c) {}
