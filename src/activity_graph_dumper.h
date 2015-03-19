@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <functional>
 #include <stack>
 #include <utility>
 #include <memory>
@@ -50,7 +51,7 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * \brief Construct a new dumper for activity graphs
 		 */
-		ActivityGraphDumper();
+		ActivityGraphDumper(const std::function<unsigned int(std::string)>& categorizer);
 		/**
 		 * \brief Build the graph corresponding to an entire function
 		 * \param e the function to consider
@@ -116,6 +117,7 @@ class ActivityGraphDumper : public Dumper
 		const kayrebt::ActivityGraph& graph();
 
 	private:
+		const std::function<unsigned int(std::string)>& _categorizer;
 		/**
 		 * The graph in construction
 		 */
