@@ -29,7 +29,7 @@ class AsmExpr : public Expression
 		void accept(Dumper& h) override;
 
 	private:
-		const char* _stmt; /*!< The asm statement */
+		std::string _stmt; /*!< The asm statement */
 
 	friend class ActivityGraphDumper;
 };
