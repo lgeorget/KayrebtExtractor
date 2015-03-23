@@ -188,7 +188,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building call" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_built_str));
+	updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str)));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
