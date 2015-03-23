@@ -131,10 +131,10 @@ namespace kayrebt
 #ifndef NDEBUG
 			std::cerr << g[v].id << ": " << Node::shapeToStr(g[v].shape) << " " << g[v].label << std::endl;
 #endif
-			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape);
+			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape) << "\"";
 			if (g[v].category != 0)
 				_out << ", " << _catdump(g[v].category);
-			_out << "\"];" << std::endl;
+			_out << "];" << std::endl;
 			boost::graph_traits<GraphType>::adjacency_iterator vi,vend;
 			for (boost::tie(vi,vend) = adjacent_vertices(v,g) ;
 				vi != vend ;
