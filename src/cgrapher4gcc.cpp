@@ -10,7 +10,6 @@
 
 #include <gcc-plugin.h>
 
-#include <config.h>
 #include <system.h>
 #include <coretypes.h>
 #include <tree.h>
