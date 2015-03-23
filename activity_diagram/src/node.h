@@ -14,6 +14,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
 #include <boost/graph/visitors.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -72,7 +73,9 @@ namespace kayrebt
 						for internal use only */
 		std::string label = ""; /*!< the node's label */
 		Shape shape = NO_NODE; /*!< the node's shape, or type */
-		unsigned int branch = 0; /*!< the node's branch number */
+		unsigned int category = 0; /*!< the node's category,
+					this field's semantics is unspecified
+					and left for use by external code */
 		static unsigned int index; /*!< a counter to generate unique
 					     identifiers for nodes
 					     \bug this counter may overflow,
@@ -86,6 +89,8 @@ namespace kayrebt
 	 * display nodes
 	 *
 	 * Examples of use include depth- and breatdh-first searches.
+	 *
+	 * valid only if categories are NOT used
 	 */
 	struct NodeDumper : public boost::base_visitor<NodeDumper> {
 		/**
@@ -97,8 +102,20 @@ namespace kayrebt
 		/**
 		 * \brief Construct a NodeDumper with a given output
 		 * \param[in] out the output stream to dump the nodes
+		 * \param[in] catdump the function used to transform a
+		 * category to some textual representation usable in a
+		 * GraphViz node attributes list
+		 *
+		 * The \a catdump may be nullptr (the default) if categories
+		 * are not used. Otherwise, it must be a function taking an
+		 * unsigned int as argument and returning a string mapping
+		 * each category to some representation usable in the GraphViz
+		 * node attributes list (the function must NOT output the
+		 * brackets '[]'). An example of suche a function could be: 1
+		 * -> "bgcolor=blue" 2 -> "textcolor=red"...
 		 */
-		NodeDumper(std::ostream& out);
+		NodeDumper(std::ostream& out, std::function<std::string(unsigned int)> catdump = nullptr) : boost::base_visitor<NodeDumper>(), _out(out), _catdump(catdump)
+		{}
 
 		/**
 		 * \brief Dump a node with its out edges
@@ -111,17 +128,25 @@ namespace kayrebt
 		 */
 		template<typename Vertex, typename Graph>
 		void operator()(Vertex v, const Graph& g) {
-			//std::cout << g[v].id << ": " << g[v].shape << " " << g[v].label << std::endl;
-			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape) << "\"];" << std::endl;
+#ifndef NDEBUG
+			std::cerr << g[v].id << ": " << Node::shapeToStr(g[v].shape) << " " << g[v].label << std::endl;
+#endif
+			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape) << "\"";
+			if (g[v].category != 0)
+				_out << ", " << _catdump(g[v].category);
+			_out << "];" << std::endl;
 			boost::graph_traits<GraphType>::adjacency_iterator vi,vend;
 			for (boost::tie(vi,vend) = adjacent_vertices(v,g) ;
 				vi != vend ;
 				++vi) {
 				auto e = edge(v,*vi,g).first;
-				if (g[e].condition.empty())
-					_out << g[v].id << " -> " << g[*vi].id << ";" << std::endl;
-				else
-					_out << g[v].id << " -> " << g[*vi].id << "[label=\"" << g[e].condition << "\"];" << std::endl;
+				_out << g[v].id << " -> " << g[*vi].id;
+				if (g[e].category != 0) {
+					_out << "[" << _catdump(g[e].category)
+					     << ", label=\"" << g[e].condition << "\"];" << std::endl;
+				} else {
+					_out << "[label=\"" << g[e].condition << "\"];" << std::endl;
+				}
 			}
 
 		}
@@ -131,6 +156,7 @@ namespace kayrebt
 			 * The output stream to where the nodes are to be dumped
 			 */
 			std::ostream& _out;
+			std::function<std::string(unsigned int)> _catdump;
 	};
 
 	/**

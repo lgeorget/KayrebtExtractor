@@ -8,6 +8,8 @@
 #include <fstream>
 #include <string>
 
+#include "configurator.h"
+
 #include <gcc-plugin.h>
 
 #include <system.h>
@@ -29,7 +31,6 @@
 #include "activity_graph_dumper.h"
 #include "bad_tree_exception.h"
 #include "bad_gimple_exception.h"
-
 /**
  * \brief Must-be-defined value for license compatibility
  */
@@ -37,6 +38,7 @@ int plugin_is_GPL_compatible;
 
 extern "C" {
 static unsigned int actdiag_extractor();
+static std::unique_ptr<Configurator> global_config;
 
 /**
  * \brief Basic information about the plugin
@@ -87,17 +89,40 @@ struct gimple_opt_pass actdiag_extractor_pass =
 static struct plugin_name_args* functions;
 
 /**
- * \brief Attempt to open the file where everything must be dumped
+ * \brief Attempt to open and troncate the file where everything must be dumped
+ * and parse configuration file
  *
- * If something goes wrong, the error is actually caught later.
+ * If something goes wrong when opening the dump file, the error will be caught
+ * again later, and we don't want to make GCC crash  altogether. However, if the
+ * configuration file is not found, this is a fatal we want to make GCC crash.
  */
-static void prepare_dump_file (void*, void*)
+static void prepare_dumping(void*, void*)
 {
   std::cerr << "processing " << main_input_filename << std::endl;
 
   std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
-  if (!out)
+  if (!out) {
 	  std::cerr << "Couldn't open dump file." << std::endl;
+  }
+
+  std::string configFile = "config";
+  bool found = false;
+  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
+	if (strcmp(functions->argv[i].key, "config_file") == 0) {
+		configFile = functions->argv[i].value;
+		found = true;
+	} else {
+		std::cerr << "Discarded unknown parameter: " << functions->argv[i].key << std::endl;
+	}
+  }
+
+  std::ifstream config(configFile);
+  if (!config) {
+	  std::cerr << "Couldn't open config file \"" << configFile << "\", fatal error." << std::endl;
+  } else {
+	  global_config.reset(new Configurator(configFile, main_input_filename));
+  }
+  config.close();
 }
 
 
@@ -109,7 +134,7 @@ static void prepare_dump_file (void*, void*)
  * the active version of GCC
  */
 extern "C" int plugin_init (struct plugin_name_args *plugin_args,
-                        struct plugin_gcc_version *version)
+			struct plugin_gcc_version *version)
 {
 	if (strcmp(version->basever,myplugin_version.basever) != 0) {
 		return -1; // incompatible
@@ -130,7 +155,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 			&actdiag_extractor_pass_info);
 	register_callback("prepare_dump_file",
 			PLUGIN_START_UNIT,
-			&prepare_dump_file,
+			&prepare_dumping,
 			NULL);
 
 	return 0;
@@ -187,7 +212,8 @@ static bool look_for_target(const char* current_fn, const char* filename)
  *
  * If there is a compilation error, no graph is produced.
  * \return 0 even if there is an error, in order to build as many graphs as
- * possible without making GCC crash
+ * possible without making GCC crash, except if the error is global (missing
+ * configuration file...)
  */
 extern "C" unsigned int actdiag_extractor()
 {
@@ -197,20 +223,19 @@ extern "C" unsigned int actdiag_extractor()
   if (errorcount || sorrycount)
     return 0;
 
+  if (!global_config) {
+	  std::cerr << "Configuration not found!" << std::endl;
+	  return -1;
+  }
+
   // Name of the function currently being parsed
   const char* name = function_name(cfun);
 #ifndef NDEBUG
   std::cerr << "Reached: " << name << std::endl;
 #endif
-  bool found = false;
-  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
-	if (strcmp(functions->argv[i].key, "fn") == 0)
-		found = strcmp(name,functions->argv[i].value) == 0;
-	else if (strcmp(functions->argv[i].key,"fn_list") == 0)
-		found = look_for_target(name, functions->argv[i].value);
-  }
+  bool found = global_config->mustGraph(name);
 #ifndef NDEBUG
-  std::cerr << "Found: " << std::boolalpha << found << std::endl;
+  std::cerr << "Must be graphed: " << std::boolalpha << found << std::endl;
 #endif
 
   if (found)
@@ -226,12 +251,12 @@ extern "C" unsigned int actdiag_extractor()
 #ifndef NDEBUG
 	  std::cerr << "Initializing the dumper" << std::endl;
 #endif
-	  auto dumper = ActivityGraphDumper();
+	  auto dumper = ActivityGraphDumper(global_config->getCategorizer());
 #ifndef NDEBUG
 	  std::cerr << "Dumper initialized" << std::endl;
 #endif
 	  walk_through_current_fn(dumper);
-	  out << dumper.graph();
+	  dumper.graph().graphVizify(out, global_config->getCategoryDumper());
 
 	  out << std::endl << "-------------------------" << std::endl << std::endl;
 	  out.close();

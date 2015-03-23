@@ -23,6 +23,10 @@ namespace kayrebt
 		 * \brief Guard controlling the firing of the transition
 		 */
 		std::string condition;
+		/**
+		 * \brief Unspecified Category field, for use by external code
+		 */
+		unsigned int category = 0;
 	};
 }
 

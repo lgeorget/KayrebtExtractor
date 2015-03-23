@@ -32,7 +32,7 @@
 
 using namespace kayrebt;
 
-ActivityGraphDumper::ActivityGraphDumper() : Dumper()
+ActivityGraphDumper::ActivityGraphDumper(const std::function<unsigned int(std::string)>& categorizer) : Dumper(), _categorizer(categorizer)
 {
 	_skip = false;
 	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
@@ -63,7 +63,7 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building asm" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_stmt));
+	updateLast(_g.addAction(e->_stmt,_categorizer(e->_stmt)));
 }
 
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
@@ -80,9 +80,9 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 		e->_rhs1->print();
 
 	if (e->_anonymous) {
-		updateLast(_g.addAction(label));
+		updateLast(_g.addAction(label,_categorizer(label)));
 	} else {
-		updateLast(_g.addObject(label));
+		updateLast(_g.addObject(label,_categorizer(label)));
 	}
 }
 
@@ -188,7 +188,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building call" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_built_str));
+	updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str)));
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)

@@ -42,6 +42,7 @@ AM_COND_IF([HAVE_DOT], [AC_SUBST(DOT_IS_AVAILABLE,["YES"])], [AC_SUBST(DOT_IS_AV
 LT_INIT
 
 # Checks for libraries.
+PKG_CHECK_MODULES([YAML_CPP],[yaml-cpp])
 
 # Checks for header files.
 AX_GCC_PLUGIN
@@ -51,6 +52,7 @@ AC_CHECK_HEADER_STDBOOL
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-
 AC_CONFIG_FILES([Makefile src/Makefile])
+AC_SUBST([YAML_CPP_CFLAGS])
+AC_SUBST([YAML_CPP_LIBS])
 AC_OUTPUT
