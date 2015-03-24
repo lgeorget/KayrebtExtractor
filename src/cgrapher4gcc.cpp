@@ -180,33 +180,6 @@ static void walk_through_current_fn(Dumper& dumper)
 }
 
 /**
- * \brief Check in the functions list whether the current function is to be
- * graphed
- * \param current_fn the current function name
- * \param filename the file containing the functions to graph, this is a
- * parameter that can be passed to the plugin
- * \return true if and only if the function must be graphed
- */
-static bool look_for_target(const char* current_fn, const char* filename)
-{
-	std::ifstream fns(filename);
-	bool found = false;
-	std::string fn;
-	while (fns && !fns.eof() && !found) {
-		fns >> fn;
-#ifndef NDEBUG
-		std::cerr << "Comparing " << fn << " against " << current_fn << std::endl;
-#endif
-		found = strcmp(current_fn, fn.data()) == 0;
-	}
-	fns.close();
-#ifndef NDEBUG
-	std::cerr << "Graphing " << current_fn << ": " << std::boolalpha << found << std::endl;
-#endif
-	return found;
-}
-
-/**
  * \brief Extract an activity diagram for every function reached if a graph
  * is asked for it
  *
