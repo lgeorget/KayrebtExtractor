@@ -42,13 +42,13 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 			}
 		}
 		YAML::Node start_match = sourceConf["start_match"];
-		if (match.IsMap()) {
+		if (start_match.IsMap()) {
 			for (YAML::const_iterator it=start_match.begin();it!=start_match.end();++it) {
 				_categoryBeginning.push_back(std::make_pair(std::regex(it->first.as<std::string>()),it->second.as<unsigned int>()));
 			}
 		}
 		YAML::Node end_match = sourceConf["end_match"];
-		if (match.IsMap()) {
+		if (end_match.IsSequence()) {
 			for (YAML::const_iterator it=end_match.begin();it!=end_match.end();++it) {
 				_categoryEnding.push_back(std::regex(it->as<std::string>()));
 			}
@@ -84,13 +84,13 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 			}
 		}
 		YAML::Node start_match = generalConf["start_match"];
-		if (match.IsMap()) {
+		if (start_match.IsMap()) {
 			for (YAML::const_iterator it=start_match.begin();it!=start_match.end();++it) {
 				_categoryBeginning.push_back(std::make_pair(std::regex(it->first.as<std::string>()),it->second.as<unsigned int>()));
 			}
 		}
 		YAML::Node end_match = generalConf["end_match"];
-		if (match.IsMap()) {
+		if (end_match.IsSequence()) {
 			for (YAML::const_iterator it=end_match.begin();it!=end_match.end();++it) {
 				_categoryEnding.push_back(std::regex(it->as<std::string>()));
 			}
