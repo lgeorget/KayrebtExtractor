@@ -20,7 +20,7 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 		std::cerr << "Found section \'" << source << "\'" << std::endl;
 #endif
 		YAML::Node functions = sourceConf["functions"];
-		YAML::Node categories = sourceConf["functions"];
+		YAML::Node categories = sourceConf["categories"];
 		if (functions.IsScalar()) {
 			_functions.push_back(functions.as<std::string>());
 		} else if (functions.IsSequence()) {
@@ -136,7 +136,12 @@ Configurator::CategoryDumper::CategoryDumper(const Configurator& parent) : _pare
 
 std::string Configurator::CategoryDumper::operator()(unsigned int i)
 {
-	return _parent._categoriesRepresentation.at(i);
+	if (_parent._categoriesRepresentation.find(i) == _parent._categoriesRepresentation.end()) {
+		std::cerr << "No configuration to output category " << i << std::endl;
+		return "";
+	} else {
+		return  _parent._categoriesRepresentation.at(i);
+	}
 }
 
 Configurator::Categorizer::Categorizer(const Configurator& parent) : _parent(parent)
@@ -146,6 +151,8 @@ unsigned int Configurator::Categorizer::operator()(std::string content)
 {
 #ifndef NDEBUG
 	std::cerr << "CategoryStandalone size: " << _parent._categoryStandalone.size() << std::endl;
+	std::cerr << "CategoryBeginning size: " << _parent._categoryBeginning.size() << std::endl;
+	std::cerr << "CategoryEnding size: " << _parent._categoryEnding.size() << std::endl;
 #endif
 	if (_persistent) {
 		bool foundEnding = false;
