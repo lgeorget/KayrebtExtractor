@@ -27,8 +27,8 @@ class Configurator
 		class Categorizer {
 			private:
 				const Configurator& _parent;
-				unsigned int _currentCategory;
-				bool _persistent;
+				unsigned int _currentCategory = 0;
+				bool _persistent = false;
 
 			public:
 				Categorizer(const Configurator& parent);
