@@ -157,9 +157,9 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * Tell that the next Expression is to be skipped instead of dumped
 		 */
-		bool _skip;
+		bool _skip = false;
 
-		bool _outgoing_transitions_handled;
+		bool _outgoing_transitions_handled =false;
 		/**
 		 * The current basic block being dumped
 		 */
