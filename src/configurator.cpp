@@ -6,8 +6,9 @@
 #include <map>
 #include <yaml.h>
 #include "configurator.h"
+#include "url_finder.h"
 
-Configurator::Configurator(std::string config, std::string source) : _catdump(CategoryDumper(*this)), _categorizer(Categorizer(*this))
+Configurator::Configurator(std::string config, std::string source) : _catdump(CategoryDumper(*this)), _refcatdump(_catdump), _categorizer(Categorizer(*this)), _refcategorizer(_categorizer)
 {
 #ifndef NDEBUG
 	std::cerr << "Building configuration for " << source << std::endl;
@@ -99,6 +100,19 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 		YAML::Node greedy = generalConf["greedy"];
 		if (greedy.IsScalar() && greedy.as<int>() != 0)
 			_greedymode = true;
+
+		YAML::Node url = generalConf["url"];
+		if (url.IsMap()) {
+#ifndef NDEBUG
+			std::cerr << "Found URL configuration section" << std::endl;
+#endif
+			YAML::Node dbfile = url["dbfile"];
+			YAML::Node dbname = url["dbname"];
+			if (dbfile.IsScalar() && dbname.IsScalar()) {
+				_dbFile = dbfile.as<std::string>();
+				_dbName = dbname.as<std::string>();
+			}
+		}
 	}
 #ifndef NDEBUG
 	std::cerr << "Categories representations: " << std::endl;
@@ -107,7 +121,7 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 #endif
 }
 
-bool Configurator::mustGraph(std::string functionName)
+bool Configurator::mustGraph(std::string functionName) const
 {
 	if (_greedymode)
 		return true;
@@ -121,14 +135,14 @@ bool Configurator::mustGraph(std::string functionName)
 	return std::find(_functions.begin(), _functions.end(), functionName) != _functions.end();
 }
 
-const std::function<std::string(unsigned int)>& Configurator::getCategoryDumper()
+std::function<std::string(unsigned int)> Configurator::getCategoryDumper() const
 {
-	return _catdump;
+	return _refcatdump;
 }
 
-const std::function<unsigned int(std::string)>& Configurator::getCategorizer()
+std::function<unsigned int(std::string)> Configurator::getCategorizer() const
 {
-	return _categorizer;
+	return _refcategorizer;
 }
 
 Configurator::CategoryDumper::CategoryDumper(const Configurator& parent) : _parent(parent)
@@ -147,7 +161,7 @@ std::string Configurator::CategoryDumper::operator()(unsigned int i)
 Configurator::Categorizer::Categorizer(const Configurator& parent) : _parent(parent)
 {}
 
-unsigned int Configurator::Categorizer::operator()(std::string content)
+unsigned int Configurator::Categorizer::operator()(const std::string& content)
 {
 #ifndef NDEBUG
 	std::cerr << "CategoryStandalone size: " << _parent._categoryStandalone.size() << std::endl;
@@ -204,3 +218,17 @@ unsigned int Configurator::Categorizer::operator()(std::string content)
 	return _currentCategory;
 }
 
+bool Configurator::shallDumpUrls() const
+{
+	return !_dbFile.empty() && !_dbName.empty();
+}
+
+const std::string& Configurator::getDbFile() const
+{
+	return _dbFile;
+}
+
+const std::string& Configurator::getDbName() const
+{
+	return _dbName;
+}

@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <regex>
 #include <gcc-plugin.h>
 #include <basic-block.h>
 #include <activity_graph.h>
@@ -29,11 +30,15 @@
 #include "label.h"
 #include "operator.h"
 #include "case_label.h"
+#include "configurator.h"
 
 using namespace kayrebt;
 
-ActivityGraphDumper::ActivityGraphDumper(const std::function<unsigned int(std::string)>& categorizer) : Dumper(), _categorizer(categorizer)
+ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config) : Dumper(), _categorizer(global_config.getCategorizer()), _urlFinder()
 {
+	if (global_config.shallDumpUrls())
+		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
+	_skip = false;
 	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
 }
 
@@ -184,10 +189,20 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
+	std::string fn;
+	if (e->_name)
+		fn = e->_name->print();
+	if (_urlFinder && !fn.empty()) {
 #ifndef NDEBUG
-	std::cerr << "building call" << std::endl;
+		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str)));
+		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str), _urlFinder(fn)+"/"+e->_name->print()));
+	} else {
+#ifndef NDEBUG
+		std::cerr << "building call (URLs disabled)" << std::endl;
+#endif
+		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str)));
+	}
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)

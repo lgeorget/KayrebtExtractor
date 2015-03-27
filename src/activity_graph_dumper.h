@@ -7,7 +7,6 @@
 #ifndef ACTIVITY_DUMPER_H
 #define ACTIVITY_DUMPER_H
 
-#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -18,6 +17,7 @@
 #include <activity_graph.h>
 #include "dumper.h"
 #include "label.h"
+#include "url_finder.h"
 
 class AssignExpr;
 class FunctionBody;
@@ -29,6 +29,7 @@ class NopExpr;
 class ReturnExpr;
 class SwitchExpr;
 class Expression;
+class Configurator;
 
 /**
  * \brief Builder and handler of Kayrebt::ActivityGraph -s
@@ -51,7 +52,7 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * \brief Construct a new dumper for activity graphs
 		 */
-		ActivityGraphDumper(const std::function<unsigned int(std::string)>& categorizer);
+		ActivityGraphDumper(const Configurator& global_config);
 		/**
 		 * \brief Build the graph corresponding to an entire function
 		 * \param e the function to consider
@@ -117,7 +118,8 @@ class ActivityGraphDumper : public Dumper
 		const kayrebt::ActivityGraph& graph();
 
 	private:
-		const std::function<unsigned int(std::string)>& _categorizer;
+		std::function<unsigned int(const std::string&)> _categorizer;
+		UrlFinder _urlFinder;
 		/**
 		 * The graph in construction
 		 */

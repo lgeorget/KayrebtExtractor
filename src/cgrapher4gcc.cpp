@@ -224,7 +224,7 @@ extern "C" unsigned int actdiag_extractor()
 #ifndef NDEBUG
 	  std::cerr << "Initializing the dumper" << std::endl;
 #endif
-	  auto dumper = ActivityGraphDumper(global_config->getCategorizer());
+	  auto dumper = ActivityGraphDumper(*global_config);
 #ifndef NDEBUG
 	  std::cerr << "Dumper initialized" << std::endl;
 #endif
