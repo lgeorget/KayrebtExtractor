@@ -34,7 +34,6 @@ using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper(const std::function<unsigned int(std::string)>& categorizer) : Dumper(), _categorizer(categorizer)
 {
-	_skip = false;
 	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
 }
 
@@ -50,7 +49,7 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
 }
 
-void ActivityGraphDumper::dumpExpression(Expression* const e)
+void ActivityGraphDumper::dumpExpression(Expression* const)
 {
 #ifndef NDEBUG
 	std::cerr << "Discarded: " << *e  << std::endl;
