@@ -34,7 +34,7 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 		_name = ValueFactory::INSTANCE.build(DECL_NAME(fn));
 
 	_nbArgs = gimple_call_num_args(t);
-	for (int i = 0 ; i < _nbArgs ; i++) {
+	for (unsigned int i = 0 ; i < _nbArgs ; i++) {
 		_args.push_back(ValueFactory::INSTANCE.build(gimple_call_arg(t,i)));
 	}
 
