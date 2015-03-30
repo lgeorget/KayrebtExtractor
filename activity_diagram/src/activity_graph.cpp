@@ -28,12 +28,13 @@ namespace kayrebt
 		delete _d;
 	}
 
-	ActionIdentifier ActivityGraph::addAction(std::string label, unsigned int cat)
+	ActionIdentifier ActivityGraph::addAction(std::string label, unsigned int cat, std::string url)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
 		_d->inner[v].shape = ACTION;
 		_d->inner[v].category = cat;
+		_d->inner[v].url = url;
 		return ActionIdentifier(v);
 	}
 

@@ -57,7 +57,7 @@ namespace kayrebt
 			 * \param[in] label the label of the new action node
 			 * \return an identifier for the newly created node
 			 */
-			ActionIdentifier addAction(std::string label, unsigned int cat = 0);
+			ActionIdentifier addAction(std::string label, unsigned int cat = 0, std::string url = std::string());
 			/**
 			 * \brief Add an object node to the activity diagram
 			 * \param[in] label the label of the new object node

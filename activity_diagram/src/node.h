@@ -71,7 +71,7 @@ namespace kayrebt
 
 		unsigned int id = index++; /*!< the node unique identifier,
 						for internal use only */
-		std::string label = ""; /*!< the node's label */
+		std::string label; /*!< the node's label */
 		Shape shape = NO_NODE; /*!< the node's shape, or type */
 		unsigned int category = 0; /*!< the node's category,
 					this field's semantics is unspecified
@@ -82,6 +82,7 @@ namespace kayrebt
 					     and is shared between all graphs
 					     built during the lifespan of the
 					     process*/
+		std::string url; /*!< the node's reference */
 	};
 
 	/**
@@ -134,6 +135,8 @@ namespace kayrebt
 			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape) << "\"";
 			if (g[v].category != 0)
 				_out << ", " << _catdump(g[v].category);
+			if (!g[v].url.empty())
+				_out << ", URL=\"" << g[v].url << "\"";
 			_out << "];" << std::endl;
 			boost::graph_traits<GraphType>::adjacency_iterator vi,vend;
 			for (boost::tie(vi,vend) = adjacent_vertices(v,g) ;
