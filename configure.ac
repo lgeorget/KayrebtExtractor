@@ -43,6 +43,7 @@ LT_INIT
 
 # Checks for libraries.
 PKG_CHECK_MODULES([YAML_CPP],[yaml-cpp])
+PKG_CHECK_MODULES([SQLITE3],[sqlite3])
 
 # Checks for header files.
 AX_GCC_PLUGIN
@@ -55,4 +56,6 @@ AC_TYPE_SIZE_T
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_SUBST([YAML_CPP_CFLAGS])
 AC_SUBST([YAML_CPP_LIBS])
+AC_SUBST([SQLITE3_CFLAGS])
+AC_SUBST([SQLITE3_LIBS])
 AC_OUTPUT

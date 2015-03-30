@@ -60,10 +60,12 @@ libcgrapher4gcc_la_SOURCES=\
 	mem_ref.cpp\
 	mem_ref.h\
 	configurator.cpp\
-	configurator.h
-libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/ $(YAML_CPP_CFLAGS)
+	configurator.h\
+	url_finder.cpp\
+	url_finder.h
+libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/ $(YAML_CPP_CFLAGS) $(SQLITE3_CFLAGS)
 libcgrapher4gcc_la_LDFLAGS  = -version-info 0:1:0
-libcgrapher4gcc_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la $(YAML_CPP_LIBS)
+libcgrapher4gcc_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la $(YAML_CPP_LIBS) $(SQLITE3_LIBS)
 
 install-exec-local:
 	$(RM) `gcc -print-file-name=plugin`/cgrapher4gcc.so || true
