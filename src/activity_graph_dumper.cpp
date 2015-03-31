@@ -54,7 +54,7 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
 }
 
-void ActivityGraphDumper::dumpExpression(Expression* const)
+void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
 #ifndef NDEBUG
 	std::cerr << "Discarded: " << *e  << std::endl;
