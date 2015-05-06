@@ -132,11 +132,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
 #ifndef NDEBUG
 			std::cerr << "Edge: " << ed << std::endl;
-#endif
-#ifndef NDEBUG
 			std::cerr << "Edge->flags: " << ed->flags << std::endl;
-#endif
-#ifndef NDEBUG
 			std::cerr << "Edge->dest: " << ed->dest << std::endl;
 #endif
 			if (ed->flags & EDGE_TRUE_VALUE && _init_bb.find(ed->dest) != _init_bb.end())
@@ -157,11 +153,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
 #ifndef NDEBUG
 			std::cerr << "Edge: " << ed << "(" << ed->src << ")" << std::endl;
-#endif
-#ifndef NDEBUG
 			std::cerr << "Edge->flags: " << ed->flags << std::endl;
-#endif
-#ifndef NDEBUG
 			std::cerr << "Edge->dest: " << ed->dest << std::endl;
 #endif
 			if (_init_bb.find(ed->dest) != _init_bb.end()) {
