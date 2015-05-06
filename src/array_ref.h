@@ -2,7 +2,7 @@
  * \file array_ref.h
  * \author Laurent Georget
  * \date 2015-03-03
- * \brief
+ * \brief Definition of an indirection inside an array
  */
 #ifndef ARRAY_REF_H
 #define ARRAY_REF_H
