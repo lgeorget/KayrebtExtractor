@@ -31,6 +31,7 @@
 #include "operator.h"
 #include "case_label.h"
 #include "configurator.h"
+#include "make_unique.h"
 
 using namespace kayrebt;
 
@@ -39,19 +40,19 @@ ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config) : Du
 	if (global_config.shallDumpUrls())
 		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
 	_skip = false;
-	_gotos.emplace_back(std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(_g.initialNode())),ENTRY_BLOCK_PTR);
+	_gotos.emplace_back(make_unique<kayrebt::Identifier>(_g.initialNode()),ENTRY_BLOCK_PTR);
 }
 
 void ActivityGraphDumper::updateLast(kayrebt::Identifier&& node)
 {
 	_last_but_one = std::move(_last);
-	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
+	_last = make_unique<kayrebt::Identifier>(node);
 }
 
 void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 {
 	_last_but_one = std::move(_last);
-	_last = std::unique_ptr<kayrebt::Identifier>(new kayrebt::Identifier(node));
+	_last = make_unique<kayrebt::Identifier>(node);
 }
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
@@ -98,7 +99,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 	for (auto bb : e->_bb) {
 		auto node = _g.addDecision();
 		updateLast(node);
-		_init_bb[bb.first] = std::unique_ptr<kayrebt::MergeIdentifier>(new MergeIdentifier(node));
+		_init_bb[bb.first] = make_unique<kayrebt::MergeIdentifier>(node);
 #ifndef NDEBUG
 		std::cerr << "dumping basic block " << bb.first << std::endl;
 #endif
@@ -206,7 +207,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
-	_ifs[_current_bb] = std::make_pair(std::unique_ptr<kayrebt::MergeIdentifier>(new kayrebt::MergeIdentifier(decision)),condition);
+	_ifs[_current_bb] = std::make_pair(make_unique<kayrebt::MergeIdentifier>(decision),condition);
 	updateLast(decision);
 	_outgoing_transitions_handled = true;
 }
