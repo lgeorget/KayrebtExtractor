@@ -2,7 +2,7 @@
  * \file activity_graph_dumper.h
  * \author Laurent Georget
  * \date 2015-03-03
- * \brief
+ * \brief Interface of the main class : the activity graph dumper
  */
 #ifndef ACTIVITY_DUMPER_H
 #define ACTIVITY_DUMPER_H

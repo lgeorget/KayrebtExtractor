@@ -37,52 +37,52 @@
 int plugin_is_GPL_compatible;
 
 extern "C" {
-static unsigned int actdiag_extractor();
-static std::unique_ptr<Configurator> global_config;
+	static unsigned int actdiag_extractor();
+	static std::unique_ptr<Configurator> global_config;
 
-/**
- * \brief Basic information about the plugin
- */
-static struct plugin_info myplugin_info =
-{
-	"0.2", // version
-	"Later...", //help
-};
-
-/**
- * \brief Plugin version information
- */
-static struct plugin_gcc_version myplugin_version =
-{
-	"4.8.3", //basever
-	"2015-03-03", // datestamp
-	"alpha", // devphase
-	"", // revision
-	"", // configuration arguments
-};
-
-/**
- * \brief Definition of the new pass added by the plugin
- */
-struct gimple_opt_pass actdiag_extractor_pass =
-{
+	/**
+	 * \brief Basic information about the plugin
+	 */
+	static struct plugin_info myplugin_info =
 	{
-		GIMPLE_PASS, /* type */
-		"activity diagram extractor", /* name */
-		OPTGROUP_NONE, /* optinfo_flags */
-		NULL, /* gate */
-		actdiag_extractor, /* execute */
-		NULL, /* sub */
-		NULL, /* next */
-		0, /* static_pass_number */
-		TV_NONE, /* tv_id */
-		PROP_gimple_any, /* properties_required */
-		0, /* properties_provided */
-		0, /* properties_destroyed */
-		0, /* todo_flags_start */
-		0, /* todo_flags_finish */
-	}
-};
+		"1.0", // version
+		"KayrebtDumper: a GCC plugin to dump activity graphs from C functions", //help
+	};
+
+	/**
+	 * \brief Plugin version information
+	 */
+	static struct plugin_gcc_version myplugin_version =
+	{
+		"4.8.3", //basever
+		"2015-05-15", // datestamp
+		"beta", // devphase
+		"", // revision
+		"", // configuration arguments
+	};
+
+	/**
+	 * \brief Definition of the new pass added by the plugin
+	 */
+	struct gimple_opt_pass actdiag_extractor_pass =
+	{
+		{
+			GIMPLE_PASS, /* type */
+			"activity diagram extractor", /* name */
+			OPTGROUP_NONE, /* optinfo_flags */
+			NULL, /* gate */
+			actdiag_extractor, /* execute */
+			NULL, /* sub */
+			NULL, /* next */
+			0, /* static_pass_number */
+			TV_NONE, /* tv_id */
+			PROP_gimple_any, /* properties_required */
+			0, /* properties_provided */
+			0, /* properties_destroyed */
+			0, /* todo_flags_start */
+			0, /* todo_flags_finish */
+		}
+	};
 
 }
 
@@ -93,36 +93,37 @@ static struct plugin_name_args* functions;
  * and parse configuration file
  *
  * If something goes wrong when opening the dump file, the error will be caught
- * again later, and we don't want to make GCC crash  altogether. However, if the
- * configuration file is not found, this is a fatal we want to make GCC crash.
+ * again later, and we don't want to make GCC crash altogether. However, if the
+ * configuration file is not found, this is a fatal error and we do want GCC to
+ * crash.
  */
 static void prepare_dumping(void*, void*)
 {
-  std::cerr << "processing " << main_input_filename << std::endl;
+	std::cerr << "processing " << main_input_filename << std::endl;
 
-  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
-  if (!out) {
-	  std::cerr << "Couldn't open dump file." << std::endl;
-  }
-
-  std::string configFile = "config";
-  bool found = false;
-  for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
-	if (strcmp(functions->argv[i].key, "config_file") == 0) {
-		configFile = functions->argv[i].value;
-		found = true;
-	} else {
-		std::cerr << "Discarded unknown parameter: " << functions->argv[i].key << std::endl;
+	std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::trunc);
+	if (!out) {
+		std::cerr << "Couldn't open dump file." << std::endl;
 	}
-  }
 
-  std::ifstream config(configFile);
-  if (!config) {
-	  std::cerr << "Couldn't open config file \"" << configFile << "\", fatal error." << std::endl;
-  } else {
-	  global_config.reset(new Configurator(configFile, main_input_filename));
-  }
-  config.close();
+	std::string configFile = "config";
+	bool found = false;
+	for (unsigned int i=0 ; i<functions->argc && !found ; i++) {
+		if (strcmp(functions->argv[i].key, "config_file") == 0) {
+			configFile = functions->argv[i].value;
+			found = true;
+		} else {
+			std::cerr << "Discarded unknown parameter: " << functions->argv[i].key << std::endl;
+		}
+	}
+
+	std::ifstream config(configFile);
+	if (!config) {
+		std::cerr << "Couldn't open config file \"" << configFile << "\", fatal error." << std::endl;
+	} else {
+		global_config.reset(new Configurator(configFile, main_input_filename));
+	}
+	config.close();
 }
 
 
@@ -134,9 +135,11 @@ static void prepare_dumping(void*, void*)
  * the active version of GCC
  */
 extern "C" int plugin_init (struct plugin_name_args *plugin_args,
-			struct plugin_gcc_version *version)
+		struct plugin_gcc_version *version)
 {
 	if (strcmp(version->basever,myplugin_version.basever) != 0) {
+		std::cerr << "Sadly, the KayrebtDumper GCC plugin is only "
+			"available for GCC 4.8 for now." << std::endl;
 		return -1; // incompatible
 	}
 
@@ -190,52 +193,51 @@ static void walk_through_current_fn(Dumper& dumper)
  */
 extern "C" unsigned int actdiag_extractor()
 {
-  // If there were errors during compilation,
-  // let GCC handle the exit.
-  //
-  if (errorcount || sorrycount)
-    return 0;
+	// If there were errors during compilation,
+	// let GCC handle the exit.
+	if (errorcount || sorrycount)
+		return 0;
 
-  if (!global_config) {
-	  std::cerr << "Configuration not found!" << std::endl;
-	  return -1;
-  }
+	if (!global_config) {
+		std::cerr << "Configuration not found!" << std::endl;
+		return -1;
+	}
 
-  // Name of the function currently being parsed
-  const char* name = function_name(cfun);
+	// Name of the function currently being parsed
+	const char* name = function_name(cfun);
 #ifndef NDEBUG
-  std::cerr << "Reached: " << name << std::endl;
+	std::cerr << "Reached: " << name << std::endl;
 #endif
-  bool found = global_config->mustGraph(name);
+	bool found = global_config->mustGraph(name);
 #ifndef NDEBUG
-  std::cerr << "Must be graphed: " << std::boolalpha << found << std::endl;
+	std::cerr << "Must be graphed: " << std::boolalpha << found << std::endl;
 #endif
 
-  if (found)
-  {
-	  std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
-	  if (!out) {
-		  std::cerr << "Couldn't open dump file, skipping." << std::endl;
-		  return 0;
-	  }
+	if (found)
+	{
+		std::ofstream out(std::string(main_input_filename) + ".dump", std::ofstream::app);
+		if (!out) {
+			std::cerr << "Couldn't open dump file, skipping." << std::endl;
+			return 0;
+		}
 
-	  std::cerr << "Trying to graph function " << name << std::endl;
-	  out << "Function " << name << std::endl;
+		std::cerr << "Trying to graph function " << name << std::endl;
+		out << "Function " << name << std::endl;
 #ifndef NDEBUG
-	  std::cerr << "Initializing the dumper" << std::endl;
+		std::cerr << "Initializing the dumper" << std::endl;
 #endif
-	  auto dumper = ActivityGraphDumper(*global_config);
+		auto dumper = ActivityGraphDumper(*global_config);
 #ifndef NDEBUG
-	  std::cerr << "Dumper initialized" << std::endl;
+		std::cerr << "Dumper initialized" << std::endl;
 #endif
-	  walk_through_current_fn(dumper);
-	  dumper.graph().graphVizify(out, global_config->getCategoryDumper());
+		walk_through_current_fn(dumper);
+		dumper.graph().graphVizify(out, global_config->getCategoryDumper());
 
-	  out << std::endl << "-------------------------" << std::endl << std::endl;
-	  out.close();
-  }
+		out << "\n-------------------------" << std::endl;
+		out.close();
+	}
 
-  return 0;
+	return 0;
 }
 
 
