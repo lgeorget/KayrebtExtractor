@@ -1,3 +1,10 @@
+/**
+ * \file url_finder.cpp
+ * \author Laurent Georget
+ * \date 2015-05-13
+ * \brief Implementation of the database querier
+ */
+
 #include <iostream>
 #include <stdexcept>
 #include <sqlite3.h>
