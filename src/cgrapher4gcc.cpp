@@ -54,7 +54,7 @@ extern "C" {
 	 */
 	static struct plugin_gcc_version myplugin_version =
 	{
-		"4.8.3", //basever
+		"4.8", //basever
 		"2015-05-15", // datestamp
 		"beta", // devphase
 		"", // revision
@@ -137,8 +137,9 @@ static void prepare_dumping(void*, void*)
 extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 		struct plugin_gcc_version *version)
 {
-	if (strcmp(version->basever,myplugin_version.basever) != 0) {
-		std::cerr << "Sadly, the KayrebtDumper GCC plugin is only "
+	// Check that GCC base version starts with "4.8"
+	if (strncmp(version->basever,myplugin_version.basever,3) != 0) {
+		std::cerr << "Sadly, the KayrebtExtractor GCC plugin is only "
 			"available for GCC 4.8 for now." << std::endl;
 		return -1; // incompatible
 	}
