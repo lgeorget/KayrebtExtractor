@@ -133,7 +133,7 @@ class ActivityGraphDumper : public Dumper
 		 */
 		std::unique_ptr<kayrebt::Identifier> _last_but_one;
 		/**
-		 * The values built during dumping the graph
+		 * The values built while dumping the graph
 		 */
 		std::stack<std::string> _values;
 		/**
