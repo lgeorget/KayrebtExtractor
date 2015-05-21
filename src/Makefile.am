@@ -62,7 +62,8 @@ libcgrapher4gcc_la_SOURCES=\
 	configurator.cpp\
 	configurator.h\
 	url_finder.cpp\
-	url_finder.h
+	url_finder.h\
+	make_unique.h
 libcgrapher4gcc_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/ $(YAML_CPP_CFLAGS) $(SQLITE3_CFLAGS)
 libcgrapher4gcc_la_LDFLAGS  = -version-info 0:2:0
 libcgrapher4gcc_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la $(YAML_CPP_LIBS) $(SQLITE3_LIBS)
