@@ -4,7 +4,7 @@
 #include <iterator>
 #include <vector>
 #include <map>
-#include <yaml.h>
+#include <yaml-cpp/yaml.h>
 #include "configurator.h"
 #include "url_finder.h"
 
