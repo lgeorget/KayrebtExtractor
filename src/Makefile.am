@@ -70,6 +70,6 @@ libkayrebt_extractor_la_LDFLAGS  = -version-info 0:2:0
 libkayrebt_extractor_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la $(YAML_CPP_LIBS) $(SQLITE3_LIBS)
 
 install-exec-local:
-	$(RM) `gcc -print-file-name=plugin`/cgrapher4gcc.so || true
-	$(LN_S) @libdir@/libkayrebt_extractor.so `gcc -print-file-name=plugin`/cgrapher4gcc.so || echo "Couldn't install plugin in `gcc -print-file-name=plugin`"
+	$(RM) `gcc -print-file-name=plugin`/kayrebt_extractor.so || true
+	$(LN_S) @libdir@/libkayrebt_extractor.so `gcc -print-file-name=plugin`/kayrebt_extractor.so || echo "Couldn't install plugin in `gcc -print-file-name=plugin`"
 
