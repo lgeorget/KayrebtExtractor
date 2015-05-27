@@ -16,7 +16,7 @@ UrlFinder::UrlFinder() : _db(nullptr), _urlFetcher(nullptr)
 
 void UrlFinder::open(const char* filename, const char* dbname)
 {
-	_fetchStmt = "SELECT dir FROM ";
+	_fetchStmt = "SELECT dir,file FROM ";
 	_fetchStmt += dbname;
 	_fetchStmt += " WHERE symbol=?1;";
 #ifndef NDEBUG
@@ -58,12 +58,17 @@ std::string UrlFinder::operator()(const std::string& function)
 	std::cerr << "Looking for function " << function << " in the database" << std::endl;
 #endif
 	sqlite3_bind_text(_urlFetcher, 1, function.c_str(), function.length(), SQLITE_STATIC);
-	const char* dir = ".";
+	std::string res(".");
 	if (sqlite3_step(_urlFetcher) == SQLITE_ROW) {
 		sqlite3_column_text(_urlFetcher, 0);
+		const char *dir;
+		const char *file;
 		dir = reinterpret_cast<const char*>(sqlite3_column_blob(_urlFetcher, 0));
+		file = reinterpret_cast<const char*>(sqlite3_column_blob(_urlFetcher, 1));
+		res = dir;
+		res += "/";
+		res += file;
 	}
-	std::string res(dir);
 	sqlite3_reset(_urlFetcher);
 
 	return res;
