@@ -220,6 +220,10 @@ extern "C" unsigned int actdiag_extractor()
 		if (!out) {
 			std::cerr << "Couldn't open dump file, skipping." << std::endl;
 			return 0;
+		} else {
+#ifndef NDEBUG
+			std::cerr << "Dumping into " << main_input_filename << ".dump" << std::endl;
+#endif
 		}
 
 		std::cerr << "Trying to graph function " << name << std::endl;
