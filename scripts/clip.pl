@@ -7,12 +7,17 @@ use warnings;
 my $function;
 my $output;
 
-while (<>)
+my $newdir = ".";
+if (@ARGV > 0) {
+	$newdir = $ARGV[0];
+}
+
+while (<STDIN>)
 {
-	if (/^Function (\w+)/)
+	if (/^Function (\.+)$/)
 	{
 		$function = $1;
-		open($output, ">$function.dot") or warn "Couldn't open output file for $function";
+		open($output, ">$newdir/$function.dot") or warn "Couldn't open output file for $function";
 	}
 	elsif (/digraph d/ ... /^\}$/)
 	{
