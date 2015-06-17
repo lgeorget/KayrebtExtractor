@@ -1,11 +1,9 @@
-cgrapher4gcc
-============
+Kayrebt::Extractor
+==================
 
-`cgrapher4gcc` is a simple gcc plugin aiming at dumping the AST of every
-function in a C file in a human-readable form. As its name suggests, it's
-supposed to print graphs, and more specifically UML2-like activity diagrams.
-However, as it's still a preversion, it justs outputs lines of text describing
-more or less precisely what happens in the code.
+`Kayrebt::Extractor` is a simple gcc plugin aiming at dumping the CFG of any
+function in a C file in a human-readable form. It
+outputs graphs, and more specifically UML2-like activity diagrams.
 
 Compiling
 ---------
@@ -26,13 +24,13 @@ GCC plugin installation directory.
 Running
 -------
 
-`grapher4gcc` is shipped with a C source file example, namely `test.c`. Don't
+`Kayrebt::Extractor` is shipped with a C source file example, namely `test.c`. Don't
 try to understand the code written in this file, it's merely a torture tool for
 the plugin. `make run` runs GCC with the plugin on `test.c`. Of course, you can
 use other source files but the plugin currently doesn't handle anything else
-than C, not even C++. You can try any language supported by GCC as the AST are
-all written in the same language, GENERIC. However, some syntactic constructs
-will not be supported. Even in C, you may find some lacking stuff.
+than C, not even C++. You can try any language supported by GCC as the CFG are
+all written in the same language, GIMPLE. However, the output is likely to be
+mangled enough to be unusable.
 
 In short, change the `run` target to suit your needs, or just make your own
 Makefile based on the shipped-in one and it should do the job.
