@@ -189,7 +189,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str), _urlFinder(fn)+"/"+e->_name->print()));
+		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str), _urlFinder(fn)));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
