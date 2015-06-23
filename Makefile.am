@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = activity_diagram src
 
-EXTRA_DIST = Doxyfile.in custom.css
+EXTRA_DIST = Doxyfile.in custom.css LICENSE
 
 if HAVE_DOXYGEN
 doxyfile.stamp:
