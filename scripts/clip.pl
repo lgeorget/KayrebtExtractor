@@ -11,13 +11,14 @@ my $newdir = ".";
 if (@ARGV > 0) {
 	$newdir = $ARGV[0];
 }
+print "outputting to dir '$newdir'\n";
 
 while (<STDIN>)
 {
-	if (/^Function (\.+)$/)
+	if (/^Function (.+)$/)
 	{
 		$function = $1;
-		open($output, ">$newdir/$function.dot") or warn "Couldn't open output file for $function";
+		open($output, ">", "$newdir/$function.dot") or warn "Couldn't open output file for $function";
 	}
 	elsif (/digraph d/ ... /^\}$/)
 	{
