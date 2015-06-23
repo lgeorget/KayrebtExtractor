@@ -57,8 +57,11 @@ std::string UrlFinder::operator()(const std::string& function)
 #ifndef NDEBUG
 	std::cerr << "Looking for function " << function << " in the database" << std::endl;
 #endif
-	sqlite3_bind_text(_urlFetcher, 1, function.c_str(), function.length(), SQLITE_STATIC);
-	std::string res(".");
+	// handle optimizing symbols such as ISRA
+	// This should be correct, dots are not allowed in identifiers
+	std::string realSymbol = function.substr(0, function.find('.'));
+	sqlite3_bind_text(_urlFetcher, 1, realSymbol.c_str(), realSymbol.length(), SQLITE_STATIC);
+	std::string res("./" + realSymbol);
 	if (sqlite3_step(_urlFetcher) == SQLITE_ROW) {
 		sqlite3_column_text(_urlFetcher, 0);
 		const char *dir;
@@ -68,6 +71,7 @@ std::string UrlFinder::operator()(const std::string& function)
 		res = dir;
 		res += "/";
 		res += file;
+		res += "/" + realSymbol;
 	}
 	sqlite3_reset(_urlFetcher);
 
