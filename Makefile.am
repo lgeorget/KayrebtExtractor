@@ -10,5 +10,6 @@ CLEANFILES = doxyfile.stamp
 
 all-local: doxyfile.stamp
 clean-local:
+	rm Doxyfile
 	rm -rf doc
 endif
