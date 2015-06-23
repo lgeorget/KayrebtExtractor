@@ -18,19 +18,16 @@ The plugin is packaged with autotools so:
   make
   make install
 
-You may want to make a symlink from your library `libgrapher4gcc.so` to the
+You may want to make a symlink from your library `kayrebt_extractor.so` to the
 GCC plugin installation directory.
 
 Running
 -------
 
-`Kayrebt::Extractor` is shipped with a C source file example, namely `test.c`. Don't
-try to understand the code written in this file, it's merely a torture tool for
-the plugin. `make run` runs GCC with the plugin on `test.c`. Of course, you can
-use other source files but the plugin currently doesn't handle anything else
-than C, not even C++. You can try any language supported by GCC as the CFG are
-all written in the same language, GIMPLE. However, the output is likely to be
-mangled enough to be unusable.
+`Kayrebt::Extractor` works best with C. You can try any language supported by
+GCC as the CFG are all written in the same language, GIMPLE. However, the
+output is likely to be mangled enough to be unusable.
 
-In short, change the `run` target to suit your needs, or just make your own
-Makefile based on the shipped-in one and it should do the job.
+To compile a project, add a configuration file and run with
+
+    make CC=gcc CFLAGS=-fplugin=kayrebt_extractor
