@@ -130,9 +130,9 @@ namespace kayrebt
 		template<typename Vertex, typename Graph>
 		void operator()(Vertex v, const Graph& g) {
 #ifndef NDEBUG
-			std::cerr << g[v].id << ": " << Node::shapeToStr(g[v].shape) << " " << g[v].label << std::endl;
+			std::cerr << g[v].id << ": " << g[v].shape << " (" << Node::shapeToStr(g[v].shape) << ") " << g[v].label << std::endl;
 #endif
-			_out << g[v].id << "[label=\"" << g[v].label << "\", shape=\"" << Node::shapeToStr(g[v].shape) << "\"";
+			_out << g[v].id << "[label=\"" << g[v].label << "\", type=" << g[v].shape << ", shape=\"" << Node::shapeToStr(g[v].shape) << "\"";
 			if (g[v].category != 0)
 				_out << ", " << _catdump(g[v].category);
 			if (!g[v].url.empty())
