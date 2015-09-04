@@ -10,6 +10,7 @@
 #include <gcc-plugin.h>
 #include <tree.h>
 #include <gimple.h>
+#include <input.h>
 #include <function.h>
 #include "expression.h"
 #include "bad_gimple_exception.h"

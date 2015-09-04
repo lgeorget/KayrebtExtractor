@@ -330,7 +330,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = activity_diagram src
-EXTRA_DIST = Doxyfile.in custom.css LICENSE README.md scripts
+EXTRA_DIST = Doxyfile.in custom.css LICENSE README.md
 @HAVE_DOXYGEN_TRUE@CLEANFILES = doxyfile.stamp
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

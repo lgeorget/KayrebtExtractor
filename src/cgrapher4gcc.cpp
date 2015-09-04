@@ -46,7 +46,7 @@ extern "C" {
 	static struct plugin_info myplugin_info =
 	{
 		"1.0", // version
-		"KayrebtDumper: a GCC plugin to dump activity graphs from C functions", //help
+		"KayrebtExtractor: a GCC plugin to dump activity graphs from C functions", //help
 	};
 
 	/**
@@ -55,8 +55,8 @@ extern "C" {
 	static struct plugin_gcc_version myplugin_version =
 	{
 		"4.8", //basever
-		"2015-05-15", // datestamp
-		"beta", // devphase
+		"2015-09-04", // datestamp
+		"alpha", // devphase
 		"", // revision
 		"", // configuration arguments
 	};
@@ -89,7 +89,7 @@ extern "C" {
 static struct plugin_name_args* functions;
 
 /**
- * \brief Attempt to open and troncate the file where everything must be dumped
+ * \brief Attempt to open and truncate the file where everything must be dumped
  * and parse configuration file
  *
  * If something goes wrong when opening the dump file, the error will be caught
@@ -231,7 +231,16 @@ extern "C" unsigned int actdiag_extractor()
 #ifndef NDEBUG
 		std::cerr << "Initializing the dumper" << std::endl;
 #endif
-		auto dumper = ActivityGraphDumper(*global_config);
+		std::string file;
+		int line = 0;
+		if (LOCATION_LOCUS (cfun->function_start_locus) != UNKNOWN_LOCATION) {
+			line = LOCATION_LINE(cfun->function_start_locus);
+			if (LOCATION_FILE(cfun->function_start_locus))
+				//we cannot rely on main_input filename
+				//because "compilation unit" != "source file"
+				file.assign(LOCATION_FILE(cfun->function_start_locus));
+		}
+		auto dumper = ActivityGraphDumper(*global_config, file, line);
 #ifndef NDEBUG
 		std::cerr << "Dumper initialized" << std::endl;
 #endif
