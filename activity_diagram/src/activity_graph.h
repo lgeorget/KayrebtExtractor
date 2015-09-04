@@ -41,6 +41,16 @@ namespace kayrebt
 			 * \brief Pointer to private implementation
 			 */
 			ActivityGraphInternals* _d;
+			/**
+			 * \brief Source file where the function corresponding
+			 * to the graph is defined
+			 */
+			std::string _file;
+			/**
+			 * \brief Line where the function corresponding to the
+			 * graph is defined in the source code
+			 */
+			int _line;
 
 		public:
 			/**
@@ -52,24 +62,38 @@ namespace kayrebt
 			 * \brief Destruct the activity diagram, freeing all memory
 			 */
 			~ActivityGraph();
+
+			/**
+			 * \brief Set the source code file where the function
+			 * corresponding to the graph is defined
+			 * \param[in] the source code file
+			 */
+			void setFile(const std::string& file) { _file = file; };
+			/**
+			 * \brief Set the source code line where the function
+			 * corresponding to the graph is defined in the source
+			 * file
+			 * \param[in] the source code line
+			 */
+			void setLine(int line) { _line = line; };
 			/**
 			 * \brief Add an action node to the activity diagram
 			 * \param[in] label the label of the new action node
 			 * \return an identifier for the newly created node
 			 */
-			ActionIdentifier addAction(std::string label, unsigned int cat = 0, std::string url = std::string());
+			ActionIdentifier addAction(std::string label, int line = 0, unsigned int cat = 0, std::string url = std::string());
 			/**
 			 * \brief Add an object node to the activity diagram
 			 * \param[in] label the label of the new object node
 			 * \return an identifier for the newly created node
 			 */
-			ObjectIdentifier addObject(std::string label, unsigned int cat = 0);
+			ObjectIdentifier addObject(std::string label, int line = 0, unsigned int cat = 0);
 			/**
 			 * \brief Add a forking node to the activity diagram,
 			 * to start a concurrent area
 			 * \return an identifier for the newly created node
 			 */
-			ForkIdentifier fork();
+			ForkIdentifier fork(int line = 0);
 			/**
 			 * \brief Add an end-of-flow node in the activity
 			 * diagram
@@ -89,13 +113,13 @@ namespace kayrebt
 			 * current implementation.
 			 * \return an identifier for the newly created node
 			 */
-			MergeIdentifier addDecision();
+			MergeIdentifier addDecision(int line = 0);
 			/**
 			 * \brief Add a synchronization node in the activity
 			 * diagram, to close a concurrent section
 			 * \return an identifier for the newly creaed node
 			 */
-			SyncIdentifier synchronize();
+			SyncIdentifier synchronize(int line = 0);
 			/**
 			 * \brief Build an unguarded edge between two nodes
 			 * \param[in] branch the source node

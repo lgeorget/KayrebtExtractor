@@ -8,6 +8,8 @@
 #ifndef IDENTIFIER_H
 #define IDENTIFIER_H
 
+#include <string>
+
 namespace kayrebt
 {
 	/**

@@ -58,9 +58,9 @@ namespace kayrebt
 		 * \brief Construct a node with some preinitialized attributes
 		 * \param[in] l the node's label
 		 * \param[in] s the node's shape, or type
-		 * \param[in] b the node's branch number
+		 * \param[in] c the node's category
 		 */
-		Node(std::string l, Shape s, unsigned int b=0);
+		Node(std::string l, Shape s, unsigned int c=0);
 
 		/**
 		 * \brief Convert a node's shape into a string
@@ -83,6 +83,8 @@ namespace kayrebt
 					     built during the lifespan of the
 					     process*/
 		std::string url; /*!< the node's reference */
+		int line = 0; /*!< the line in the source code file corresponding
+			    to the node */
 	};
 
 	/**
@@ -137,6 +139,8 @@ namespace kayrebt
 				_out << ", " << _catdump(g[v].category);
 			if (!g[v].url.empty())
 				_out << ", URL=\"" << g[v].url << "\"";
+			if (g[v].line != 0)
+				_out << ", line=" << g[v].line;
 			_out << "];" << std::endl;
 			boost::graph_traits<GraphType>::adjacency_iterator vi,vend;
 			for (boost::tie(vi,vend) = adjacent_vertices(v,g) ;

@@ -28,29 +28,32 @@ namespace kayrebt
 		delete _d;
 	}
 
-	ActionIdentifier ActivityGraph::addAction(std::string label, unsigned int cat, std::string url)
+	ActionIdentifier ActivityGraph::addAction(std::string label, int line, unsigned int cat, std::string url)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
 		_d->inner[v].shape = ACTION;
 		_d->inner[v].category = cat;
 		_d->inner[v].url = url;
+		_d->inner[v].line = line;
 		return ActionIdentifier(v);
 	}
 
-	ObjectIdentifier ActivityGraph::addObject(std::string label, unsigned int cat)
+	ObjectIdentifier ActivityGraph::addObject(std::string label, int line, unsigned int cat)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
 		_d->inner[v].shape = OBJECT;
 		_d->inner[v].category = cat;
+		_d->inner[v].line = line;
 		return ObjectIdentifier(v);
 	}
 
-	ForkIdentifier ActivityGraph::fork()
+	ForkIdentifier ActivityGraph::fork(int line)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = FORK;
+		_d->inner[v].line = line;
 		return ForkIdentifier(v);
 	}
 
@@ -68,17 +71,19 @@ namespace kayrebt
 		return EndOfActivityIdentifier(v);
 	}
 
-	MergeIdentifier ActivityGraph::addDecision()
+	MergeIdentifier ActivityGraph::addDecision(int line)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = MERGE;
+		_d->inner[v].line = line;
 		return MergeIdentifier(v);
 	}
 
-	SyncIdentifier ActivityGraph::synchronize()
+	SyncIdentifier ActivityGraph::synchronize(int line)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = SYNC;
+		_d->inner[v].line = line;
 		return SyncIdentifier(v);
 	}
 
@@ -194,6 +199,10 @@ namespace kayrebt
 			std::map<NodeDescriptor, boost::default_color_type> c_m;
 			depth_first_search(_d->inner, dfs, make_assoc_property_map(c_m));
 		}
+		if (!_file.empty())
+			out << "file=\"" << _file << "\";\n";
+		if (_line != 0)
+			out << "line=" << _line << ";\n";
 		out << "}" << std::endl;
 
 		return out;
