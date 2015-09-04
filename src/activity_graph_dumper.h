@@ -52,7 +52,7 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * \brief Construct a new dumper for activity graphs
 		 */
-		ActivityGraphDumper(const Configurator& global_config);
+		ActivityGraphDumper(const Configurator& global_config, const std::string& file, int line);
 		/**
 		 * \brief Build the graph corresponding to an entire function
 		 * \param e the function to consider

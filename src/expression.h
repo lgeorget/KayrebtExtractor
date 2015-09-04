@@ -10,6 +10,7 @@
 #include <iostream>
 #include <gcc-plugin.h>
 #include <gimple.h>
+#include <string>
 
 class Dumper;
 
@@ -33,6 +34,11 @@ class Expression
 		 * \param d the visiting dumper, which must be called back
 		 */
 		virtual void accept(Dumper& d); // Visitor design pattern
+
+	protected:
+		/** The line number at which the expression is found in the
+		 * source file */
+		int _line = 0;
 
 	private:
 		/** The gimple expression */

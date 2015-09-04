@@ -35,8 +35,12 @@
 
 using namespace kayrebt;
 
-ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config) : Dumper(), _categorizer(global_config.getCategorizer()), _urlFinder()
+ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
+	const std::string& file, int line) :
+	Dumper(), _categorizer(global_config.getCategorizer()), _urlFinder()
 {
+	_g.setFile(file);
+	_g.setLine(line);
 	if (global_config.shallDumpUrls())
 		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
 	_skip = false;
@@ -68,7 +72,7 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building asm" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_stmt,_categorizer(e->_stmt)));
+	updateLast(_g.addAction(e->_stmt,e->_line,_categorizer(e->_stmt)));
 }
 
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
@@ -85,9 +89,9 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 		e->_rhs1->print();
 
 	if (e->_anonymous) {
-		updateLast(_g.addAction(label,_categorizer(label)));
+		updateLast(_g.addAction(label,e->_line,_categorizer(label)));
 	} else {
-		updateLast(_g.addObject(label,_categorizer(label)));
+		updateLast(_g.addObject(label,e->_line,_categorizer(label)));
 	}
 }
 
@@ -189,12 +193,12 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str), _urlFinder(fn)));
+		updateLast(_g.addAction(e->_built_str,e->_line, _categorizer(e->_built_str), _urlFinder(fn)));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
 #endif
-		updateLast(_g.addAction(e->_built_str, _categorizer(e->_built_str)));
+		updateLast(_g.addAction(e->_built_str,e->_line, _categorizer(e->_built_str)));
 	}
 }
 
@@ -203,7 +207,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building cond" << std::endl;
 #endif
-	auto decision = _g.addDecision();
+	auto decision = _g.addDecision(e->_line);
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
@@ -218,7 +222,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building goto" << std::endl;
 #endif
-	auto gotol = _g.addDecision();
+	auto gotol = _g.addDecision(e->_line);
 	//if the label is available the edge
 	//is built right away, otherwise it is delayed
 	//until the end of the function dumping
@@ -253,7 +257,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	std::cerr << "building return" << std::endl;
 #endif
 	if (e->_value) {
-		auto ret = _g.addObject(e->_value->print());
+		auto ret = _g.addObject(e->_value->print(),e->_line);
 		updateLast(ret);
 	} else {
 		_skip = true;
@@ -266,7 +270,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building switch" << std::endl;
 #endif
-	auto switchnode = _g.addDecision();
+	auto switchnode = _g.addDecision(e->_line);
 
 	//Draw the edges for outgoing transitions ahead of time,
 	//otherwise their labels would be missed

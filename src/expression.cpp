@@ -13,7 +13,11 @@
 #include "dumper.h"
 
 Expression::Expression(gimple t) : _expr(t)
-{}
+{
+	if (gimple_has_location(t)) {
+		_line = gimple_lineno(t);
+	}
+}
 
 void Expression::accept(Dumper& d)
 {
