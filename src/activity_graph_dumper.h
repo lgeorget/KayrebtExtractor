@@ -118,7 +118,15 @@ class ActivityGraphDumper : public Dumper
 		const kayrebt::ActivityGraph& graph();
 
 	private:
+		/**
+		 * The function which gives for each node its category based on
+		 * its label
+		 */
 		std::function<unsigned int(const std::string&)> _categorizer;
+		/**
+		 * The function call resolver. Its task is to find the place
+		 * where a called function is defined.
+		 */
 		UrlFinder _urlFinder;
 		/**
 		 * The graph in construction
@@ -154,14 +162,32 @@ class ActivityGraphDumper : public Dumper
 		 */
 		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,basic_block>> _gotos;
 
+		/**
+		 * \brief Map case labels to control flow blocks in switch/case
+		 * constructions
+		 *
+		 * Maps each case to the corresponding control flow block entry
+		 * node (a decision node). Extra care must be taken in order not
+		 * to create twice the same node and not to create extra edges
+		 * because the order is which the nodes are discovered/dumped
+		 * is not always the same from function to function.
+		 */
 		std::map<unsigned int, kayrebt::Identifier> _labels;
-
 		/**
 		 * Tell that the next Expression is to be skipped instead of dumped
 		 */
 		bool _skip = false;
-
+		/**
+		 * \brief Tell that there is no need to create the edge from
+		 * the current control flow block to the successors
+		 *
+		 * In some cases, outgoing edges must npt be created in the
+		 * main loop because they have already been taken care of.
+		 * This happens in switch/case constructions: the switch
+		 * statement is already linked with the cases.
+		 */
 		bool _outgoing_transitions_handled =false;
+
 		/**
 		 * The current basic block being dumped
 		 */
@@ -180,6 +206,18 @@ class ActivityGraphDumper : public Dumper
 		 */
 		void updateLast(kayrebt::Identifier& node);
 
+		/**
+		 * \brief Return the control flow block entry node corresponding
+		 * to a case in a switch/case statement
+		 *
+		 * Queries and updates if necessary the \a _labels map in order
+		 * to make sure not to create twice the same node.
+		 * \param uid the identifier for the case label
+		 * \see _labels
+		 * \return the identifier of the node corresponding to the
+		 * beginning of the control flow block for the case identified
+		 * by \a uid
+		 */
 		kayrebt::Identifier getLabel(unsigned int uid);
 };
 

@@ -296,7 +296,7 @@ kayrebt::Identifier ActivityGraphDumper::getLabel(unsigned int uid)
 	if (it == _labels.end()) {
 		//we cannot use insert directly instead of
 		//find because it would build an unused decision
-		//node if the key already exist
+		//node if the key already exists
 		it = _labels.emplace(uid, _g.addDecision()).first;
 	}
 	return it->second;
