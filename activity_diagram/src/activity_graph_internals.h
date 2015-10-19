@@ -9,6 +9,7 @@
 #include <memory>
 #include "types.h"
 #include "node.h"
+#include "attribute.h"
 #include "init_identifier.h"
 
 namespace kayrebt
@@ -26,7 +27,8 @@ namespace kayrebt
 		 */
 		ActivityGraphInternals()
 		{
-			initNode = std::unique_ptr<InitIdentifier>(new InitIdentifier(add_vertex(Node{"INIT",INIT}, inner)));
+			auto v = add_vertex(inner);
+			initNode = std::unique_ptr<InitIdentifier>(new InitIdentifier(v));
 		}
 
 		GraphType inner; /*!< The underlying Boost graph */

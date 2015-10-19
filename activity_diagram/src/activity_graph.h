@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <map>
+#include <vector>
 #include "action_identifier.h"
 #include "flow_identifier.h"
 #include "end_of_flow_identifier.h"
@@ -20,6 +22,8 @@
 #include "merge_identifier.h"
 #include "object_identifier.h"
 #include "sync_identifier.h"
+#include "property_writer.h"
+#include "shape.h"
 
 /**
  * Covers all the activity diagram library
@@ -41,16 +45,10 @@ namespace kayrebt
 			 * \brief Pointer to private implementation
 			 */
 			ActivityGraphInternals* _d;
-			/**
-			 * \brief Source file where the function corresponding
-			 * to the graph is defined
-			 */
-			std::string _file;
-			/**
-			 * \brief Line where the function corresponding to the
-			 * graph is defined in the source code
-			 */
-			int _line;
+			std::map<NodeDescriptor,std::vector<std::unique_ptr<BaseAttribute>>> _nodeAttrs;
+			std::vector<std::unique_ptr<BaseAttribute>> _graphAttrs;
+
+			void setShape(const NodeDescriptor& v, const Shape& s);
 
 		public:
 			/**
@@ -63,37 +61,34 @@ namespace kayrebt
 			 */
 			~ActivityGraph();
 
-			/**
-			 * \brief Set the source code file where the function
-			 * corresponding to the graph is defined
-			 * \param[in] the source code file
-			 */
-			void setFile(const std::string& file) { _file = file; };
-			/**
-			 * \brief Set the source code line where the function
-			 * corresponding to the graph is defined in the source
-			 * file
-			 * \param[in] the source code line
-			 */
-			void setLine(int line) { _line = line; };
+			template<typename T, typename Outputter = default_outputter<T>>
+			void addGraphAttribute(const std::string& name, const T& value, const Outputter& out = Outputter()) {
+				_graphAttrs.push_back(std::unique_ptr<BaseAttribute>(new Attribute<T>(name,value,out)));
+			}
+
+			template<typename T, typename Outputter = default_outputter<T>>
+			void addNodeAttribute(const Identifier& i, const std::string& name, const T& value, const Outputter& out = Outputter()) {
+				_nodeAttrs[*i].push_back(std::unique_ptr<BaseAttribute>(new Attribute<T>(name,value,out)));
+			}
+
 			/**
 			 * \brief Add an action node to the activity diagram
 			 * \param[in] label the label of the new action node
 			 * \return an identifier for the newly created node
 			 */
-			ActionIdentifier addAction(std::string label, int line = 0, unsigned int cat = 0, std::string url = std::string());
+			ActionIdentifier addAction(std::string label);
 			/**
 			 * \brief Add an object node to the activity diagram
 			 * \param[in] label the label of the new object node
 			 * \return an identifier for the newly created node
 			 */
-			ObjectIdentifier addObject(std::string label, int line = 0, unsigned int cat = 0);
+			ObjectIdentifier addObject(std::string label);
 			/**
 			 * \brief Add a forking node to the activity diagram,
 			 * to start a concurrent area
 			 * \return an identifier for the newly created node
 			 */
-			ForkIdentifier fork(int line = 0);
+			ForkIdentifier fork();
 			/**
 			 * \brief Add an end-of-flow node in the activity
 			 * diagram
@@ -113,20 +108,20 @@ namespace kayrebt
 			 * current implementation.
 			 * \return an identifier for the newly created node
 			 */
-			MergeIdentifier addDecision(int line = 0);
+			MergeIdentifier addDecision();
 			/**
 			 * \brief Add a synchronization node in the activity
 			 * diagram, to close a concurrent section
 			 * \return an identifier for the newly creaed node
 			 */
-			SyncIdentifier synchronize(int line = 0);
+			SyncIdentifier synchronize();
 			/**
 			 * \brief Build an unguarded edge between two nodes
 			 * \param[in] branch the source node
 			 * \param[in] head the destination node
 			 * \sa ActivityGraph::addGuard
 			 */
-			void addEdge(const Identifier& branch, const Identifier& head, unsigned int cat = 0);
+			void addEdge(const Identifier& branch, const Identifier& head);
 			/**
 			 * \brief Build a guarded edge between two nodes
 			 * \param[in] branch the source node
@@ -135,7 +130,7 @@ namespace kayrebt
 			 * as the edge label
 			 * \sa ActivityGraph::addEdge
 			 */
-			void addGuard(const Identifier& branch, const Identifier& head, std::string condition, unsigned int cat = 0);
+			void addGuard(const Identifier& branch, const Identifier& head, std::string condition);
 			/**
 			 * \brief Set the label of a given node
 			 *
@@ -209,7 +204,7 @@ namespace kayrebt
 			/**
 			 * \brief Output the activity diagram in GraphViz format
 			 */
-			std::ostream& graphVizify(std::ostream& out, std::function<std::string(unsigned int)> categoryDumper = nullptr) const;
+			std::ostream& graphVizify(std::ostream& out) const;
 	};
 }
 #endif

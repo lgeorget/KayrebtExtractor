@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <boost/graph/graphviz.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -13,6 +14,7 @@
 #include "activity_graph_internals.h"
 #include "node.h"
 #include "edge.h"
+#include "shape.h"
 
 using namespace kayrebt;
 using namespace boost;
@@ -21,6 +23,9 @@ namespace kayrebt
 {
 	ActivityGraph::ActivityGraph() : _d(new ActivityGraphInternals())
 	{
+		const NodeDescriptor& v = **(_d->initNode);
+		_d->inner[v].label = "INIT";
+		setShape(v,INIT);
 	}
 
 	ActivityGraph::~ActivityGraph()
@@ -28,78 +33,84 @@ namespace kayrebt
 		delete _d;
 	}
 
-	ActionIdentifier ActivityGraph::addAction(std::string label, int line, unsigned int cat, std::string url)
+	void ActivityGraph::setShape(const NodeDescriptor& v, const Shape& s) {
+		_d->inner[v].shape = s;
+		_nodeAttrs[v].push_back(std::unique_ptr<Attribute<Shape>>(new Attribute<Shape>("shape",s)));
+	}
+
+
+	ActionIdentifier ActivityGraph::addAction(std::string label)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
-		_d->inner[v].shape = ACTION;
-		_d->inner[v].category = cat;
+/*		_d->inner[v].category = cat;
 		_d->inner[v].url = url;
-		_d->inner[v].line = line;
+		_d->inner[v].line = line;*/
+		setShape(v,ACTION);
 		return ActionIdentifier(v);
 	}
 
-	ObjectIdentifier ActivityGraph::addObject(std::string label, int line, unsigned int cat)
+	ObjectIdentifier ActivityGraph::addObject(std::string label)
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].label = label;
-		_d->inner[v].shape = OBJECT;
-		_d->inner[v].category = cat;
-		_d->inner[v].line = line;
+/*		_d->inner[v].category = cat;
+		_d->inner[v].line = line;*/
+		setShape(v,OBJECT);
 		return ObjectIdentifier(v);
 	}
 
-	ForkIdentifier ActivityGraph::fork(int line)
+	ForkIdentifier ActivityGraph::fork()
 	{
 		auto v = add_vertex(_d->inner);
-		_d->inner[v].shape = FORK;
-		_d->inner[v].line = line;
+/*		_d->inner[v].line = line;*/
+		setShape(v,FORK);
 		return ForkIdentifier(v);
 	}
 
 	EndOfFlowIdentifier ActivityGraph::closeFlow()
 	{
 		auto v = add_vertex(_d->inner);
-		_d->inner[v].shape = END_OF_FLOW;
+		setShape(v,END_OF_FLOW);
 		return EndOfFlowIdentifier(v);
 	}
 
 	EndOfActivityIdentifier ActivityGraph::terminateActivity()
 	{
 		auto v = add_vertex(_d->inner);
-		_d->inner[v].shape = END_OF_ACTIVITY;
+		setShape(v,END_OF_ACTIVITY);
 		return EndOfActivityIdentifier(v);
 	}
 
-	MergeIdentifier ActivityGraph::addDecision(int line)
+	MergeIdentifier ActivityGraph::addDecision()
 	{
 		auto v = add_vertex(_d->inner);
-		_d->inner[v].shape = MERGE;
-		_d->inner[v].line = line;
+		setShape(v,MERGE);
+/*		_d->inner[v].line = line;*/
 		return MergeIdentifier(v);
 	}
 
-	SyncIdentifier ActivityGraph::synchronize(int line)
+	SyncIdentifier ActivityGraph::synchronize()
 	{
 		auto v = add_vertex(_d->inner);
-		_d->inner[v].shape = SYNC;
-		_d->inner[v].line = line;
+		setShape(v,SYNC);
+/*		_d->inner[v].line = line;*/
 		return SyncIdentifier(v);
 	}
 
-	void ActivityGraph::addEdge(const Identifier& branch, const Identifier& head, unsigned int cat)
+	void ActivityGraph::addEdge(const Identifier& branch, const Identifier& head)
 	{
 		auto e = add_edge(*branch, *head, _d->inner);
-		_d->inner[e.first].category = cat;
+		/*_d->inner[e.first].category = cat;*/
 	}
 
-	void ActivityGraph::addGuard(const Identifier& branch, const Identifier& head, std::string condition, unsigned int cat)
+	void ActivityGraph::addGuard(const Identifier& branch, const Identifier& head, std::string condition)
 	{
 		auto e = edge(*branch, *head, _d->inner);
 		if (!e.second)
 			e = add_edge(*branch, *head, _d->inner);
 		_d->inner[e.first].condition = condition;
-		_d->inner[e.first].category = cat;
+		/*_d->inner[e.first].category = cat;*/
 	}
 
 	void ActivityGraph::setLabel(Identifier& branch, std::string label)
@@ -186,25 +197,14 @@ namespace kayrebt
 	 * \brief Output the activity diagram in GraphViz format
 	 * \relates kayrebt::ActivityGraph
 	 */
-	std::ostream& ActivityGraph::graphVizify(std::ostream& out, std::function<std::string(unsigned int)> categoryDumper) const
+	std::ostream& ActivityGraph::graphVizify(std::ostream& out) const
 	{
 		unsigned int nb = num_vertices(_d->inner);
 #ifndef NDEBUG
 		std::cerr << "Number of vertices in graph: " << nb << std::endl;
 		std::cerr << "Number of edges in graph: " << num_edges(_d->inner) << std::endl;
 #endif
-		out << "digraph d {" << std::endl;
-		if (nb > 0) {
-			auto dfs = make_dfs_visitor(NodeDumper(out, categoryDumper));
-			std::map<NodeDescriptor, boost::default_color_type> c_m;
-			depth_first_search(_d->inner, dfs, make_assoc_property_map(c_m));
-		}
-		if (!_file.empty())
-			out << "file=\"" << _file << "\";\n";
-		if (_line != 0)
-			out << "line=" << _line << ";\n";
-		out << "}" << std::endl;
-
+		write_graphviz(out,_d->inner,NodeWriter(_nodeAttrs),boost::default_writer(),GraphWriter(_graphAttrs), get(&Node::id,_d->inner));
 		return out;
 	}
 
