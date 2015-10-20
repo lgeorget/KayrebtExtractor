@@ -9,6 +9,7 @@
 #define ATTRIBUTE_H
 
 #include <string>
+#include <boost/graph/graphviz.hpp>
 #include "identifier.h"
 
 namespace kayrebt {
@@ -38,7 +39,7 @@ namespace kayrebt {
 	{
 		public:
 			void operator()(std::ostream& out, const std::string& value) const {
-				out << "\"" << value << "\"";
+				out << boost::escape_dot_string(value);
 			}
 	};
 
@@ -47,7 +48,7 @@ namespace kayrebt {
 	{
 		public:
 			void operator()(std::ostream& out, const char*& value) const {
-				out << "\"" << value << "\"";
+				out << boost::escape_dot_string(value);
 			}
 	};
 
