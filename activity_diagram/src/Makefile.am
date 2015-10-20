@@ -24,7 +24,7 @@ libactivity_diagram_la_SOURCES=\
 	shape.h
 libactivity_diagram_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 libactivity_diagram_la_CXXFLAGS = -std=c++11
-libactivity_diagram_la_LDFLAGS = -version-info 3:0:0
+libactivity_diagram_la_LDFLAGS = -version-info 4:0:0
 pkginclude_HEADERS =\
 	action_identifier.h\
 	activity_graph.h\
