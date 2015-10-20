@@ -123,6 +123,7 @@ class ActivityGraphDumper : public Dumper
 		 * its label
 		 */
 		std::function<unsigned int(const std::string&)> _categorizer;
+		std::function<const std::vector<std::pair<std::string,std::string>>* (unsigned int)> _categorydumper;
 		/**
 		 * The function call resolver. Its task is to find the place
 		 * where a called function is defined.
@@ -219,6 +220,9 @@ class ActivityGraphDumper : public Dumper
 		 * by \a uid
 		 */
 		kayrebt::Identifier getLabel(unsigned int uid);
+
+		void addAttributesForCategory(const kayrebt::Identifier& i,
+						   unsigned int cat);
 };
 
 

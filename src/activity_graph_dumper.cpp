@@ -37,7 +37,8 @@ using namespace kayrebt;
 
 ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 	const std::string& file, int line) :
-	Dumper(), _categorizer(global_config.getCategorizer()), _urlFinder()
+	Dumper(), _categorizer(global_config.getCategorizer()),
+	_categorydumper(global_config.getCategoryDumper()), _urlFinder()
 {
 	_g.addGraphAttribute("file",file);
 	_g.addGraphAttribute("line",line);
@@ -59,6 +60,17 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 	_last = make_unique<kayrebt::Identifier>(node);
 }
 
+void ActivityGraphDumper::addAttributesForCategory(
+		const kayrebt::Identifier& i, unsigned int cat)
+{
+	const std::vector<std::pair<std::string,std::string>>* rep;
+	if (!cat || !(rep = _categorydumper(cat)))
+		return;
+	for (const auto& attr : *rep) {
+		_g.addNodeAttribute(i,attr.first,attr.second);
+	}
+}
+
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
 #ifndef NDEBUG
@@ -74,7 +86,8 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 #endif
 	auto i = _g.addAction(e->_stmt);
 	_g.addNodeAttribute(i,"line",e->_line);
-	updateLast(std::move(i));//,e->_line,_categorizer(e->_stmt)));
+	addAttributesForCategory(i,_categorizer(e->_stmt));
+	updateLast(std::move(i));
 
 }
 
@@ -94,11 +107,13 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 	if (e->_anonymous) {
 		auto i = _g.addAction(label);
 		_g.addNodeAttribute(i,"line",e->_line);
-		updateLast(i);//,e->_line,_categorizer(e->_stmt)));
+		addAttributesForCategory(i,_categorizer(label));
+		updateLast(i);
 	} else {
 		auto i = _g.addObject(label);
 		_g.addNodeAttribute(i,"line",e->_line);
-		updateLast(i);//,e->_line,_categorizer(e->_stmt)));
+		addAttributesForCategory(i,_categorizer(label));
+		updateLast(i);
 	}
 }
 
@@ -196,22 +211,21 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	std::string fn;
 	if (e->_name)
 		fn = e->_name->print();
+
+	auto i = _g.addObject(e->_built_str);
+	_g.addNodeAttribute(i,"line",e->_line);
+	addAttributesForCategory(i,_categorizer(e->_built_str));
 	if (_urlFinder && !fn.empty()) {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		auto i = _g.addObject(e->_built_str);
-		_g.addNodeAttribute(i,"line",e->_line);
 		_g.addNodeAttribute(i,"URL",_urlFinder(fn));
-		updateLast(i); // _categorizer(e->_built_str), _urlFinder(fn)));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
 #endif
-		auto i = _g.addObject(e->_built_str);
-		_g.addNodeAttribute(i,"line",e->_line);
-		updateLast(i); // _categorizer(e->_built_str)));
 	}
+	updateLast(i);
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
@@ -220,6 +234,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	std::cerr << "building cond" << std::endl;
 #endif
 	auto decision = _g.addDecision();
+	addAttributesForCategory(decision,_categorizer(std::string()));
 	_g.addNodeAttribute(decision,"line",e->_line);
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
@@ -237,6 +252,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 #endif
 	auto gotol = _g.addDecision();
 	_g.addNodeAttribute(gotol,"line",e->_line);
+	addAttributesForCategory(gotol,_categorizer(std::string()));
 	//if the label is available the edge
 	//is built right away, otherwise it is delayed
 	//until the end of the function dumping
@@ -273,6 +289,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
 		_g.addNodeAttribute(ret,"line",e->_line);
+		addAttributesForCategory(ret,_categorizer(e->_value->print()));
 		updateLast(ret);
 	} else {
 		_skip = true;
@@ -287,6 +304,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 #endif
 	auto switchnode = _g.addDecision();
 	_g.addNodeAttribute(switchnode,"line",e->_line);
+	addAttributesForCategory(switchnode,_categorizer(std::string()));
 
 	//Draw the edges for outgoing transitions ahead of time,
 	//otherwise their labels would be missed

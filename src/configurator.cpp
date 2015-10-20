@@ -32,7 +32,13 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 
 		if (categories.IsMap()) {
 			for (YAML::const_iterator it=categories.begin();it!=categories.end();++it) {
-				_categoriesRepresentation[it->first.as<unsigned int>()] = it->second.as<std::string>();
+				YAML::Node rep = it->second;
+				if (rep.IsMap()) {
+					for (YAML::const_iterator repIt=rep.begin();repIt!=rep.end();++repIt) {
+						_categoriesRepresentation[it->first.as<unsigned int>()]
+							.emplace_back(repIt->first.as<std::string>(),repIt->second.as<std::string>());
+					}
+				}
 			}
 		}
 
@@ -73,8 +79,17 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 
 		if (categories.IsMap()) {
 			for (YAML::const_iterator it=categories.begin();it!=categories.end();++it) {
-				//do not overwrite existing categories
-				_categoriesRepresentation.insert(std::make_pair(it->first.as<unsigned int>(), it->second.as<std::string>()));
+				unsigned int cat = it->first.as<unsigned int>();
+				if (_categoriesRepresentation.find(cat) != _categoriesRepresentation.cend())
+					continue; //do not overwrite representations
+
+				YAML::Node rep = it->second;
+				if (rep.IsMap()) {
+					for (YAML::const_iterator repIt=rep.begin();repIt!=rep.end();++repIt) {
+						_categoriesRepresentation[cat]
+							.emplace_back(repIt->first.as<std::string>(),repIt->second.as<std::string>());
+					}
+				}
 			}
 		}
 
@@ -116,8 +131,13 @@ Configurator::Configurator(std::string config, std::string source) : _catdump(Ca
 	}
 #ifndef NDEBUG
 	std::cerr << "Categories representations: " << std::endl;
-	for (auto categ : _categoriesRepresentation)
-		std::cerr << categ.first << ": " << categ.second << std::endl;
+	for (auto categ : _categoriesRepresentation) {
+		std::cerr << categ.first << ":\n";
+		std::transform(categ.second.cbegin(), categ.second.cend(),
+			  std::ostream_iterator<std::string>(std::cerr, "; "),
+			  [](const std::pair<std::string,std::string>& elem) { return elem.first + ": " + elem.second; });
+		std::cerr << std::endl;
+	}
 #endif
 }
 
@@ -135,7 +155,7 @@ bool Configurator::mustGraph(std::string functionName) const
 	return std::find(_functions.begin(), _functions.end(), functionName) != _functions.end();
 }
 
-std::function<std::string(unsigned int)> Configurator::getCategoryDumper() const
+std::function<const std::vector<std::pair<std::string,std::string>>*(unsigned int)> Configurator::getCategoryDumper() const
 {
 	return _refcatdump;
 }
@@ -148,13 +168,13 @@ std::function<unsigned int(std::string)> Configurator::getCategorizer() const
 Configurator::CategoryDumper::CategoryDumper(const Configurator& parent) : _parent(parent)
 {}
 
-std::string Configurator::CategoryDumper::operator()(unsigned int i)
+const std::vector<std::pair<std::string,std::string>>* Configurator::CategoryDumper::operator()(unsigned int i)
 {
 	if (_parent._categoriesRepresentation.find(i) == _parent._categoriesRepresentation.end()) {
 		std::cerr << "No configuration to output category " << i << std::endl;
-		return "";
+		return nullptr;
 	} else {
-		return  _parent._categoriesRepresentation.at(i);
+		return  &_parent._categoriesRepresentation.at(i);
 	}
 }
 
