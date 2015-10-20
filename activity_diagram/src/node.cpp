@@ -26,10 +26,14 @@ namespace kayrebt
 
 	const char* SHAPES[] = {"note", "ellipse", "diamond", "dot", "ellipse", "rect", "dot", "doublecircle", "ellipse", "invisible"};
 
-	Node::Node(std::string l, Shape s, unsigned int c) : label(l), shape(s), category(c) {}
 
 	std::string Node::shapeToStr(Shape s)
 	{
 		return SHAPES[static_cast<int>(s)];
 	}
+
+}
+
+std::ostream& operator<<(std::ostream& out, const kayrebt::Shape& s) {
+	return out << kayrebt::Node::shapeToStr(s);
 }

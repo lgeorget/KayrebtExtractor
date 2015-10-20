@@ -125,7 +125,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libactivity_diagram_la_LIBADD =
 am_libactivity_diagram_la_OBJECTS =  \
 	libactivity_diagram_la-activity_graph.lo \
-	libactivity_diagram_la-node.lo
+	libactivity_diagram_la-node.lo \
+	libactivity_diagram_la-attribute.lo
 libactivity_diagram_la_OBJECTS = $(am_libactivity_diagram_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -364,11 +365,15 @@ libactivity_diagram_la_SOURCES = \
 	node.h\
 	object_identifier.h\
 	sync_identifier.h\
-	types.h
+	types.h\
+	attribute.h\
+	attribute.cpp\
+	property_writer.h\
+	shape.h
 
 libactivity_diagram_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 libactivity_diagram_la_CXXFLAGS = -std=c++11
-libactivity_diagram_la_LDFLAGS = -version-info 3:0:0
+libactivity_diagram_la_LDFLAGS = -version-info 4:0:0
 pkginclude_HEADERS = \
 	action_identifier.h\
 	activity_graph.h\
@@ -381,7 +386,8 @@ pkginclude_HEADERS = \
 	init_identifier.h\
 	merge_identifier.h\
 	object_identifier.h\
-	sync_identifier.h
+	sync_identifier.h\
+	shape.h
 
 all: all-am
 
@@ -463,6 +469,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libactivity_diagram_la-activity_graph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libactivity_diagram_la-attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libactivity_diagram_la-node.Plo@am__quote@
 
 .cpp.o:
@@ -499,6 +506,13 @@ libactivity_diagram_la-node.lo: node.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='node.cpp' object='libactivity_diagram_la-node.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libactivity_diagram_la_CPPFLAGS) $(CPPFLAGS) $(libactivity_diagram_la_CXXFLAGS) $(CXXFLAGS) -c -o libactivity_diagram_la-node.lo `test -f 'node.cpp' || echo '$(srcdir)/'`node.cpp
+
+libactivity_diagram_la-attribute.lo: attribute.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libactivity_diagram_la_CPPFLAGS) $(CPPFLAGS) $(libactivity_diagram_la_CXXFLAGS) $(CXXFLAGS) -MT libactivity_diagram_la-attribute.lo -MD -MP -MF $(DEPDIR)/libactivity_diagram_la-attribute.Tpo -c -o libactivity_diagram_la-attribute.lo `test -f 'attribute.cpp' || echo '$(srcdir)/'`attribute.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libactivity_diagram_la-attribute.Tpo $(DEPDIR)/libactivity_diagram_la-attribute.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='attribute.cpp' object='libactivity_diagram_la-attribute.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libactivity_diagram_la_CPPFLAGS) $(CPPFLAGS) $(libactivity_diagram_la_CXXFLAGS) $(CXXFLAGS) -c -o libactivity_diagram_la-attribute.lo `test -f 'attribute.cpp' || echo '$(srcdir)/'`attribute.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

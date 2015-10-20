@@ -17,10 +17,14 @@ libactivity_diagram_la_SOURCES=\
 	node.h\
 	object_identifier.h\
 	sync_identifier.h\
-	types.h
+	types.h\
+	attribute.h\
+	attribute.cpp\
+	property_writer.h\
+	shape.h
 libactivity_diagram_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 libactivity_diagram_la_CXXFLAGS = -std=c++11
-libactivity_diagram_la_LDFLAGS = -version-info 3:0:0
+libactivity_diagram_la_LDFLAGS = -version-info 4:0:0
 pkginclude_HEADERS =\
 	action_identifier.h\
 	activity_graph.h\
@@ -33,4 +37,5 @@ pkginclude_HEADERS =\
 	init_identifier.h\
 	merge_identifier.h\
 	object_identifier.h\
-	sync_identifier.h
+	sync_identifier.h\
+	shape.h

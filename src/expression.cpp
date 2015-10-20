@@ -16,8 +16,6 @@ Expression::Expression(gimple t) : _expr(t)
 {
 	if (gimple_has_location(t)) {
 		_line = gimple_lineno(t);
-		if (gimple_filename(t))
-			_file.assign(gimple_filename(t));
 	}
 }
 

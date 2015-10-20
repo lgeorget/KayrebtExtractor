@@ -48,6 +48,9 @@ namespace kayrebt
 			 */
 			Identifier(NodeDescriptor n) : _n(n) {}
 
+			bool operator==(const Identifier& other) { return _n == other._n; }
+			bool operator<(const Identifier& other) { return _n < other._n; }
+
 		private:
 			/**
 			 * \brief the Boost Graph Library node descriptor

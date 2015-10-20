@@ -39,8 +39,8 @@ ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 	const std::string& file, int line) :
 	Dumper(), _categorizer(global_config.getCategorizer()), _urlFinder()
 {
-	_g.setFile(file);
-	_g.setLine(line);
+	_g.addGraphAttribute("file",file);
+	_g.addGraphAttribute("line",line);
 	if (global_config.shallDumpUrls())
 		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
 	_skip = false;
@@ -62,7 +62,7 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 void ActivityGraphDumper::dumpExpression(Expression* const e)
 {
 #ifndef NDEBUG
-	std::cerr << "Discarded: " << *e  << std::endl;
+	std::cerr << "Discarded: " << *e << std::endl;
 #endif
 	_skip = true;
 }
@@ -72,7 +72,10 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building asm" << std::endl;
 #endif
-	updateLast(_g.addAction(e->_stmt,e->_file,e->_line,_categorizer(e->_stmt)));
+	auto i = _g.addAction(e->_stmt);
+	_g.addNodeAttribute(i,"line",e->_line);
+	updateLast(std::move(i));//,e->_line,_categorizer(e->_stmt)));
+
 }
 
 void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
@@ -89,9 +92,13 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 		e->_rhs1->print();
 
 	if (e->_anonymous) {
-		updateLast(_g.addAction(label,e->_file,e->_line,_categorizer(label)));
+		auto i = _g.addAction(label);
+		_g.addNodeAttribute(i,"line",e->_line);
+		updateLast(i);//,e->_line,_categorizer(e->_stmt)));
 	} else {
-		updateLast(_g.addObject(label,e->_file,e->_line,_categorizer(label)));
+		auto i = _g.addObject(label);
+		_g.addNodeAttribute(i,"line",e->_line);
+		updateLast(i);//,e->_line,_categorizer(e->_stmt)));
 	}
 }
 
@@ -193,12 +200,17 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		updateLast(_g.addAction(e->_built_str,e->_file,e->_line, _categorizer(e->_built_str), _urlFinder(fn)));
+		auto i = _g.addObject(e->_built_str);
+		_g.addNodeAttribute(i,"line",e->_line);
+		_g.addNodeAttribute(i,"URL",_urlFinder(fn));
+		updateLast(i); // _categorizer(e->_built_str), _urlFinder(fn)));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
 #endif
-		updateLast(_g.addAction(e->_built_str,e->_file,e->_line, _categorizer(e->_built_str)));
+		auto i = _g.addObject(e->_built_str);
+		_g.addNodeAttribute(i,"line",e->_line);
+		updateLast(i); // _categorizer(e->_built_str)));
 	}
 }
 
@@ -207,7 +219,8 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building cond" << std::endl;
 #endif
-	auto decision = _g.addDecision(e->_file,e->_line);
+	auto decision = _g.addDecision();
+	_g.addNodeAttribute(decision,"line",e->_line);
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
@@ -222,7 +235,8 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building goto" << std::endl;
 #endif
-	auto gotol = _g.addDecision(e->_file,e->_line);
+	auto gotol = _g.addDecision();
+	_g.addNodeAttribute(gotol,"line",e->_line);
 	//if the label is available the edge
 	//is built right away, otherwise it is delayed
 	//until the end of the function dumping
@@ -257,7 +271,8 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	std::cerr << "building return" << std::endl;
 #endif
 	if (e->_value) {
-		auto ret = _g.addObject(e->_value->print(),e->_file,e->_line);
+		auto ret = _g.addObject(e->_value->print());
+		_g.addNodeAttribute(ret,"line",e->_line);
 		updateLast(ret);
 	} else {
 		_skip = true;
@@ -270,7 +285,8 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "building switch" << std::endl;
 #endif
-	auto switchnode = _g.addDecision(e->_file,e->_line);
+	auto switchnode = _g.addDecision();
+	_g.addNodeAttribute(switchnode,"line",e->_line);
 
 	//Draw the edges for outgoing transitions ahead of time,
 	//otherwise their labels would be missed
@@ -296,7 +312,7 @@ kayrebt::Identifier ActivityGraphDumper::getLabel(unsigned int uid)
 	if (it == _labels.end()) {
 		//we cannot use insert directly instead of
 		//find because it would build an unused decision
-		//node if the key already exist
+		//node if the key already exists
 		it = _labels.emplace(uid, _g.addDecision()).first;
 	}
 	return it->second;
