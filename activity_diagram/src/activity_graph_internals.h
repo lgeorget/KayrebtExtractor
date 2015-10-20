@@ -7,6 +7,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <memory>
+#include <map>
+#include <vector>
 #include "types.h"
 #include "node.h"
 #include "attribute.h"
@@ -25,11 +27,8 @@ namespace kayrebt
 		/**
 		 * \brief Construct kayrebt::ActivityGraph's attributes
 		 */
-		ActivityGraphInternals()
-		{
-			auto v = add_vertex(inner);
-			initNode = std::unique_ptr<InitIdentifier>(new InitIdentifier(v));
-		}
+		ActivityGraphInternals() : initNode(new InitIdentifier(add_vertex(inner)))
+		{}
 
 		GraphType inner; /*!< The underlying Boost graph */
 		std::unique_ptr<InitIdentifier> initNode; /*!< The top node in the graph */

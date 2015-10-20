@@ -245,7 +245,7 @@ extern "C" unsigned int actdiag_extractor()
 		std::cerr << "Dumper initialized" << std::endl;
 #endif
 		walk_through_current_fn(dumper);
-		dumper.graph().graphVizify(out, global_config->getCategoryDumper());
+		dumper.graph().graphVizify(out);//, global_config->getCategoryDumper());
 
 		out << "\n-------------------------" << std::endl;
 		out.close();

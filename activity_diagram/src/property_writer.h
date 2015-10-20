@@ -16,34 +16,39 @@
 #include "attribute.h"
 
 namespace kayrebt {
+	template<typename Graph>
 	class NodeWriter
 	{
 		public:
-			NodeWriter(const std::map<NodeDescriptor,std::vector<std::unique_ptr<BaseAttribute>>>& attrs) : _attrs(attrs) {}
+			NodeWriter(const Graph& g, const std::map<NodeDescriptor,std::vector<std::shared_ptr<BaseAttribute>>>& attrs) : _attrs(attrs), _g(g) {}
 			template<typename VertexOrEdge>
 			void operator()(std::ostream& out, const VertexOrEdge& v) {
-				auto it = _attrs.find(v);
-				if (it == _attrs.cend())
-					return;
-				
-				auto attrIt = it->second.cbegin();
-				if (attrIt == it->second.cend())
-					return;
+				//First, output mandatory attributes
+				out << "[shape=\"" << _g[v].shape << "\"";
+				if (!_g[v].label.empty())
+					out << ",label=\"" << _g[v].label << "\"";
 
-				out << "[";
-				out << **attrIt;
-				for ( ; attrIt != it->second.cend() ; ++attrIt)
-					out << "," << **attrIt;
+				//and then, the supplementary attributes
+				auto it = _attrs.find(v);
+				if (it != _attrs.cend()) {
+					for (auto attrIt = it->second.cbegin() ;
+					     attrIt != it->second.cend() ;
+					     ++attrIt)
+						out << "," << **attrIt;
+				}
+
+				//end
 				out << "]";
 			}
 		private:
-			const std::map<NodeDescriptor,std::vector<std::unique_ptr<BaseAttribute>>>& _attrs;
+			const std::map<NodeDescriptor,std::vector<std::shared_ptr<BaseAttribute>>>& _attrs;
+			const Graph& _g;
 	};
 
 	class GraphWriter
 	{
 		public:
-			GraphWriter(const std::vector<std::unique_ptr<BaseAttribute>>& attrs) : _attrs(attrs) {}
+			GraphWriter(const std::vector<std::shared_ptr<BaseAttribute>>& attrs) : _attrs(attrs) {}
 			void operator()(std::ostream& out) {
 				auto attrIt = _attrs.cbegin();
 				if (attrIt == _attrs.cend())
@@ -51,12 +56,12 @@ namespace kayrebt {
 
 				out << "graph [";
 				out << **attrIt;
-				for ( ; attrIt != _attrs.cend() ; ++attrIt)
+				for (++attrIt ; attrIt != _attrs.cend() ; ++attrIt)
 					out << "," << **attrIt;
 				out << "]\n";
 			}
 		private:
-			const std::vector<std::unique_ptr<BaseAttribute>>& _attrs;
+			const std::vector<std::shared_ptr<BaseAttribute>>& _attrs;
 	};
 }
 

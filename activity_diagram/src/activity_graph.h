@@ -45,10 +45,8 @@ namespace kayrebt
 			 * \brief Pointer to private implementation
 			 */
 			ActivityGraphInternals* _d;
-			std::map<NodeDescriptor,std::vector<std::unique_ptr<BaseAttribute>>> _nodeAttrs;
-			std::vector<std::unique_ptr<BaseAttribute>> _graphAttrs;
-
-			void setShape(const NodeDescriptor& v, const Shape& s);
+			std::map<NodeDescriptor,std::vector<std::shared_ptr<BaseAttribute>>> _nodeAttrs;
+			std::vector<std::shared_ptr<BaseAttribute>> _graphAttrs;
 
 		public:
 			/**
@@ -63,12 +61,12 @@ namespace kayrebt
 
 			template<typename T, typename Outputter = default_outputter<T>>
 			void addGraphAttribute(const std::string& name, const T& value, const Outputter& out = Outputter()) {
-				_graphAttrs.push_back(std::unique_ptr<BaseAttribute>(new Attribute<T>(name,value,out)));
+				_graphAttrs.emplace_back(new Attribute<T>(name,value,out));
 			}
 
 			template<typename T, typename Outputter = default_outputter<T>>
 			void addNodeAttribute(const Identifier& i, const std::string& name, const T& value, const Outputter& out = Outputter()) {
-				_nodeAttrs[*i].push_back(std::unique_ptr<BaseAttribute>(new Attribute<T>(name,value,out)));
+				_nodeAttrs[*i].emplace_back(new Attribute<T>(name,value,out));
 			}
 
 			/**

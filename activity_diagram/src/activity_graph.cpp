@@ -25,19 +25,13 @@ namespace kayrebt
 	{
 		const NodeDescriptor& v = **(_d->initNode);
 		_d->inner[v].label = "INIT";
-		setShape(v,INIT);
+		_d->inner[v].shape = INIT;
 	}
 
 	ActivityGraph::~ActivityGraph()
 	{
 		delete _d;
 	}
-
-	void ActivityGraph::setShape(const NodeDescriptor& v, const Shape& s) {
-		_d->inner[v].shape = s;
-		_nodeAttrs[v].push_back(std::unique_ptr<Attribute<Shape>>(new Attribute<Shape>("shape",s)));
-	}
-
 
 	ActionIdentifier ActivityGraph::addAction(std::string label)
 	{
@@ -46,7 +40,7 @@ namespace kayrebt
 /*		_d->inner[v].category = cat;
 		_d->inner[v].url = url;
 		_d->inner[v].line = line;*/
-		setShape(v,ACTION);
+		_d->inner[v].shape = ACTION;
 		return ActionIdentifier(v);
 	}
 
@@ -56,7 +50,7 @@ namespace kayrebt
 		_d->inner[v].label = label;
 /*		_d->inner[v].category = cat;
 		_d->inner[v].line = line;*/
-		setShape(v,OBJECT);
+		_d->inner[v].shape = OBJECT;
 		return ObjectIdentifier(v);
 	}
 
@@ -64,28 +58,29 @@ namespace kayrebt
 	{
 		auto v = add_vertex(_d->inner);
 /*		_d->inner[v].line = line;*/
-		setShape(v,FORK);
+		_d->inner[v].shape = FORK;
 		return ForkIdentifier(v);
 	}
 
 	EndOfFlowIdentifier ActivityGraph::closeFlow()
 	{
 		auto v = add_vertex(_d->inner);
-		setShape(v,END_OF_FLOW);
+		_d->inner[v].shape = END_OF_FLOW;
 		return EndOfFlowIdentifier(v);
 	}
 
 	EndOfActivityIdentifier ActivityGraph::terminateActivity()
 	{
 		auto v = add_vertex(_d->inner);
-		setShape(v,END_OF_ACTIVITY);
+		_d->inner[v].shape = END_OF_ACTIVITY;
+		_d->inner[v].label = "END";
 		return EndOfActivityIdentifier(v);
 	}
 
 	MergeIdentifier ActivityGraph::addDecision()
 	{
 		auto v = add_vertex(_d->inner);
-		setShape(v,MERGE);
+		_d->inner[v].shape = MERGE;
 /*		_d->inner[v].line = line;*/
 		return MergeIdentifier(v);
 	}
@@ -93,14 +88,14 @@ namespace kayrebt
 	SyncIdentifier ActivityGraph::synchronize()
 	{
 		auto v = add_vertex(_d->inner);
-		setShape(v,SYNC);
+		_d->inner[v].shape = SYNC;
 /*		_d->inner[v].line = line;*/
 		return SyncIdentifier(v);
 	}
 
 	void ActivityGraph::addEdge(const Identifier& branch, const Identifier& head)
 	{
-		auto e = add_edge(*branch, *head, _d->inner);
+		add_edge(*branch, *head, _d->inner);
 		/*_d->inner[e.first].category = cat;*/
 	}
 
@@ -204,7 +199,14 @@ namespace kayrebt
 		std::cerr << "Number of vertices in graph: " << nb << std::endl;
 		std::cerr << "Number of edges in graph: " << num_edges(_d->inner) << std::endl;
 #endif
-		write_graphviz(out,_d->inner,NodeWriter(_nodeAttrs),boost::default_writer(),GraphWriter(_graphAttrs), get(&Node::id,_d->inner));
+		write_graphviz(
+			out,
+			_d->inner,
+			NodeWriter<GraphType>(_d->inner,_nodeAttrs),
+			boost::make_label_writer(get(&Edge::condition,_d->inner)),
+			GraphWriter(_graphAttrs),
+			get(&Node::id,_d->inner)
+		);
 		return out;
 	}
 
