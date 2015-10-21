@@ -1015,8 +1015,8 @@ uninstall-am: uninstall-libLTLIBRARIES
 
 
 install-exec-local:
-	$(RM) `gcc -print-file-name=plugin`/kayrebt_extractor.so || true
-	$(LN_S) @libdir@/libkayrebt_extractor.so `gcc -print-file-name=plugin`/kayrebt_extractor.so || echo "Couldn't install plugin in `gcc -print-file-name=plugin`"
+	$(RM) `$(CC) -print-file-name=plugin`/kayrebt_extractor.so || true
+	$(LN_S) @libdir@/libkayrebt_extractor.so `$(CC) -print-file-name=plugin`/kayrebt_extractor.so || echo "Couldn't install plugin in `$(CC) -print-file-name=plugin`"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

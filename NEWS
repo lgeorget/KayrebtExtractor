@@ -48,3 +48,11 @@ Kayrebt::Extractor NEWS -- history of user visible changes.
 	    bgcolor: blue
 	  2:
 	    bgcolor: green
+
+	-- does not compile, sorry
+
+* 3.0.0-rc3
+	* Fix compilation issue due to the exporting of boost headers in the
+	plugin code.
+	* Fix the installation of the symlink to $(gcc -print-file-name=plugin)
+	(by the way, this may be the bad way of doing it)
