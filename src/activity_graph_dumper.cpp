@@ -46,6 +46,7 @@ ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
 	_skip = false;
 	_gotos.emplace_back(make_unique<kayrebt::Identifier>(_g.initialNode()),ENTRY_BLOCK_PTR);
+	_g.addNodeAttribute(_g.initialNode(), "type", std::string("init"));
 }
 
 void ActivityGraphDumper::updateLast(kayrebt::Identifier&& node)
@@ -193,6 +194,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 				std::cerr << "Fallthrough to end of function at end of bb " << bb << std::endl;
 #endif
 				auto end = _g.terminateActivity();
+				_g.addNodeAttribute(end,"type",std::string("end_of_activity"));
 				_g.addEdge(start,end);
 			}
 #ifndef NDEBUG
@@ -205,6 +207,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 			std::cerr << "bb without transition!!  " << bb << std::endl;
 #endif
 			auto end = _g.terminateActivity();
+			_g.addNodeAttribute(end,"type",std::string("end_of_activity"));
 			_g.addEdge(start,end);
 		}
 	}
