@@ -25,8 +25,8 @@ namespace kayrebt {
 			void operator()(std::ostream& out, const VertexOrEdge& v) {
 				//First, output mandatory attributes
 				out << "[shape=\"" << _g[v].shape << "\"";
-				if (!_g[v].label.empty())
-					out << ",label=\"" << _g[v].label << "\"";
+				// label is printed even if empty
+				out << ",label=\"" << _g[v].label << "\"";
 
 				//and then, the supplementary attributes
 				auto it = _attrs.find(v);

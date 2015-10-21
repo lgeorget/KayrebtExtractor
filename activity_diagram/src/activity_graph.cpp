@@ -59,7 +59,6 @@ namespace kayrebt
 		auto v = add_vertex(_d->inner);
 /*		_d->inner[v].line = line;*/
 		_d->inner[v].shape = FORK;
-		_d->inner[v].label = std::string();
 		return ForkIdentifier(v);
 	}
 
@@ -67,7 +66,6 @@ namespace kayrebt
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = END_OF_FLOW;
-		_d->inner[v].label = std::string();
 		return EndOfFlowIdentifier(v);
 	}
 
@@ -83,7 +81,6 @@ namespace kayrebt
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = MERGE;
-		_d->inner[v].label = std::string();
 /*		_d->inner[v].line = line;*/
 		return MergeIdentifier(v);
 	}
@@ -92,7 +89,6 @@ namespace kayrebt
 	{
 		auto v = add_vertex(_d->inner);
 		_d->inner[v].shape = SYNC;
-		_d->inner[v].label = std::string();
 /*		_d->inner[v].line = line;*/
 		return SyncIdentifier(v);
 	}
