@@ -34,3 +34,17 @@ Kayrebt::Extractor NEWS -- history of user visible changes.
 	addGraphAttributes(key,value) and addNodeAttributes(node,key,value)
 	No support for attributes lacking a default operator<<, nor for the
 	categories yet but the API is ready for it.
+
+* 3.0.0-rc2
+	* Incorporate the configuration-defined categories in the new
+	attributes API
+	The format of the configuration file has changed a little. Now the
+	categories of representations must be YAML maps. For example:
+
+	categories:
+	  1:
+	    style: filled
+	    fillcolor: yellow
+	    bgcolor: blue
+	  2:
+	    bgcolor: green

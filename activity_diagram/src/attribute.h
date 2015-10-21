@@ -37,19 +37,13 @@ namespace kayrebt {
 	class default_outputter<std::string>
 	{
 		public:
-			void operator()(std::ostream& out, const std::string& value) const {
-				out << "\"" << value << "\"";
-			}
-	};
+			void operator()(std::ostream& out, const std::string& value) const;	};
 
 	template<>
 	class default_outputter<const char*>
 	{
 		public:
-			void operator()(std::ostream& out, const char*& value) const {
-				out << "\"" << value << "\"";
-			}
-	};
+			void operator()(std::ostream& out, const char*& value) const;		};
 
 	template<typename T, typename Outputter = default_outputter<T>>
 	class Attribute : public BaseAttribute

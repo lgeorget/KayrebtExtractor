@@ -115,7 +115,7 @@ namespace kayrebt
 		//and object, but they're not part of the graph until we draw it
 	}
 
-	bool ActivityGraph::validate()
+	bool ActivityGraph::validate() const
 	{
 		std::vector<unsigned int> reachable;
 		std::vector<NodeDescriptor> wrongEndingNodes;
@@ -132,6 +132,7 @@ namespace kayrebt
 						     [](NodeDescriptor v, const GraphType& g) -> bool {
 							auto it = out_edges(v,g);
 							return g[v].shape == MERGE &&
+								out_degree(v,g) > 1 &&
 								std::any_of(it.first, it.second,
 								[&g](decltype(*(it.first)) edge) -> bool { return g[edge].condition.empty(); });
 							}),
@@ -142,12 +143,19 @@ namespace kayrebt
 							       g[v].shape != END_OF_ACTIVITY; })
 					))),
 				make_assoc_property_map(c_m));
-		return reachable.size() == num_vertices(_d->inner) &&
-		       wrongEndingNodes.size() == 0 &&
-		       mergeNodesOutEdgesWithoutGuards.size() == 0;
+		bool testReachability = reachable.size() == num_vertices(_d->inner);
+		bool testBranchesEnding = wrongEndingNodes.size() == 0;
+		bool testGuards = mergeNodesOutEdgesWithoutGuards.size() == 0;
+		if (!testReachability)
+			std::cerr << "WARNING: not all the edges are accessible from the INIT node" << std::endl;
+		if (!testBranchesEnding)
+			std::cerr << "WARNING: not all the branches end with an END node" << std::endl;
+		if (!testGuards)
+			std::cerr << "WARNING: some conditional edges have no guards" << std::endl;
+		return testReachability && testGuards && testBranchesEnding;
 	}
 
-	bool ActivityGraph::validateConnexity()
+	bool ActivityGraph::validateConnexity() const
 	{
 		std::vector<unsigned int> reachable;
 		std::map<NodeDescriptor, boost::default_color_type> c_m;
@@ -160,7 +168,7 @@ namespace kayrebt
 		return reachable.size() == num_vertices(_d->inner);
 	}
 
-	bool ActivityGraph::validateBranchesEndings()
+	bool ActivityGraph::validateBranchesEndings() const
 	{
 		std::vector<NodeDescriptor> nodes;
 		NodeIterator vi,vend;
@@ -171,7 +179,7 @@ namespace kayrebt
 		return nodes.size() == 0;
 	}
 
-	bool ActivityGraph::validateMergeEdges()
+	bool ActivityGraph::validateMergeEdges() const
 	{
 		std::vector<NodeDescriptor> nodes;
 		std::map<NodeDescriptor, boost::default_color_type> c_m;
@@ -181,6 +189,7 @@ namespace kayrebt
 						     [](NodeDescriptor v, const GraphType& g) -> bool {
 							auto it = out_edges(v,g);
 							return (g[v].shape == MERGE &&
+								out_degree(v,g) > 1 &&
 								std::any_of(it.first, it.second,
 								[&g](decltype(*(it.first)) edge) -> bool { return g[edge].condition.empty(); }));
 							})),
@@ -199,6 +208,7 @@ namespace kayrebt
 		std::cerr << "Number of vertices in graph: " << nb << std::endl;
 		std::cerr << "Number of edges in graph: " << num_edges(_d->inner) << std::endl;
 #endif
+		std::cerr << "Is the diagram well-formed: " << (validate() ? "yes" : "NO!") << std::endl;
 		write_graphviz(
 			out,
 			_d->inner,

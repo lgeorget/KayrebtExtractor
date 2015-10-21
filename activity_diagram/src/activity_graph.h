@@ -148,9 +148,10 @@ namespace kayrebt
 			 * validate BranchesEndings() &&
 			 * validateMergeEdges()
 			 * </code>
+			 * but outputs warning message if one of the test fails
 			 * \return true if and only if the diagram is well-formed
 			 */
-			bool validate();
+			bool validate() const;
 			/**
 			 * \brief Verify that the activity diagram is a tree,
 			 * i.e. every node is reachable from the initial node
@@ -161,7 +162,7 @@ namespace kayrebt
 			 * \return true if and only if every node is reachable
 			 * from the initial node
 			 */
-			bool validateConnexity();
+			bool validateConnexity() const;
 			/**
 			 * \brief Verify that every node either is an ending
 			 * node or has an outgoing edge
@@ -171,7 +172,7 @@ namespace kayrebt
 			 * \return true if and only if every branch in the
 			 * activity diagram ends with an ending node
 			 */
-			bool validateBranchesEndings();
+			bool validateBranchesEndings() const;
 			/**
 			 * \brief Verify that for every decision nodes, either
 			 * it has only one outgoing transition or every of its
@@ -181,7 +182,7 @@ namespace kayrebt
 			 * transitions when having more than one outgoing
 			 * transition.
 			 */
-			bool validateMergeEdges();
+			bool validateMergeEdges() const;
 			//TODO validateForkSync();
 			/**
 			 * \brief Eliminate redundant decision nodes

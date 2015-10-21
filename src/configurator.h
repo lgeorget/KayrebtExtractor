@@ -13,6 +13,7 @@
 #include <iterator>
 #include <vector>
 #include <map>
+#include <utility>
 #include <regex>
 #include "url_finder.h"
 
@@ -30,7 +31,7 @@ class Configurator
 		 * \brief Map each category to the string to add in the
 		 * attribute section of the objects of this category
 		 */
-		std::map<unsigned int, std::string> _categoriesRepresentation;
+		std::map<unsigned int, std::vector<std::pair<std::string,std::string>>> _categoriesRepresentation;
 		/**
 		 * \brief A set of regexes identifying the beginning of a
 		 * category
@@ -100,7 +101,7 @@ class Configurator
 				 * \return the string to add to nodes of the
 				 * given category
 				 */
-				std::string operator()(unsigned int i);
+				const std::vector<std::pair<std::string,std::string>>* operator()(unsigned int i);
 		};
 		/**
 		 * \brief An instance of the \a CategoryDumper
@@ -200,7 +201,7 @@ class Configurator
 		 *
 		 * \return a category dumper for the current configuration
 		 */
-		std::function<std::string(unsigned int)> getCategoryDumper() const;
+		std::function<const std::vector<std::pair<std::string,std::string>>*(unsigned int)> getCategoryDumper() const;
 		/**
 		 * \brief Give a reference to an instance of \a Categorizer
 		 *
