@@ -86,6 +86,7 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 #endif
 	auto i = _g.addAction(e->_stmt);
 	_g.addNodeAttribute(i,"line",e->_line);
+	_g.addNodeAttribute(i,"type",std::string("asm"));
 	addAttributesForCategory(i,_categorizer(e->_stmt));
 	updateLast(std::move(i));
 
@@ -107,11 +108,13 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 	if (e->_anonymous) {
 		auto i = _g.addAction(label);
 		_g.addNodeAttribute(i,"line",e->_line);
+		_g.addNodeAttribute(i,"type",std::string("assign"));
 		addAttributesForCategory(i,_categorizer(label));
 		updateLast(i);
 	} else {
 		auto i = _g.addObject(label);
 		_g.addNodeAttribute(i,"line",e->_line);
+		_g.addNodeAttribute(i,"type",std::string("assign"));
 		addAttributesForCategory(i,_categorizer(label));
 		updateLast(i);
 	}
@@ -222,6 +225,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
 
 	_g.addNodeAttribute(*i,"line",e->_line);
+	_g.addNodeAttribute(i,"type",std::string("call"));
 	addAttributesForCategory(*i,_categorizer(e->_built_str));
 	if (_urlFinder && !fn.empty()) {
 #ifndef NDEBUG
@@ -244,6 +248,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 	auto decision = _g.addDecision();
 	addAttributesForCategory(decision,_categorizer(std::string()));
 	_g.addNodeAttribute(decision,"line",e->_line);
+	_g.addNodeAttribute(decision,"type",std::string("cond"));
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
 				e->_rhs->print();
@@ -260,6 +265,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 #endif
 	auto gotol = _g.addDecision();
 	_g.addNodeAttribute(gotol,"line",e->_line);
+	_g.addNodeAttribute(gotol,"type",std::string("goto"));
 	addAttributesForCategory(gotol,_categorizer(std::string()));
 	//if the label is available the edge
 	//is built right away, otherwise it is delayed
@@ -279,6 +285,7 @@ void ActivityGraphDumper::dumpLabelExpr(LabelExpr* const e)
 	std::cerr << "building label" << std::endl;
 #endif
 	auto label = getLabel(e->_label->getUid());
+	_g.addNodeAttribute(label,"type",std::string("label"));
 	updateLast(label);
 }
 
@@ -297,6 +304,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
 		_g.addNodeAttribute(ret,"line",e->_line);
+		_g.addNodeAttribute(ret,"type",std::string("return"));
 		addAttributesForCategory(ret,_categorizer(e->_value->print()));
 		updateLast(ret);
 	} else {
@@ -312,6 +320,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 #endif
 	auto switchnode = _g.addDecision();
 	_g.addNodeAttribute(switchnode,"line",e->_line);
+	_g.addNodeAttribute(switchnode,"type",std::string("switch"));
 	addAttributesForCategory(switchnode,_categorizer(std::string()));
 
 	//Draw the edges for outgoing transitions ahead of time,
