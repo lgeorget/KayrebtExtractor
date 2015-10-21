@@ -38,8 +38,13 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 		_args.push_back(ValueFactory::INSTANCE.build(gimple_call_arg(t,i)));
 	}
 
-	if (_var)
-		_built_str += _var->print() + " = ";
+	if (_var) {
+		std::string _varname = _var->print();
+		_built_str += _varname + " = ";
+		_anonymous = _varname.find('<') != std::string::npos ||
+			     _varname.find('.') != std::string::npos;
+	}
+
 	if (_name)
 		_built_str += _name->print();
 	else

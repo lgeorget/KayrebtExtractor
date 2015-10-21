@@ -189,7 +189,8 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 #ifndef NDEBUG
 				std::cerr << "Fallthrough to end of function at end of bb " << bb << std::endl;
 #endif
-				_g.addEdge(start,_g.terminateActivity());
+				auto end = _g.terminateActivity();
+				_g.addEdge(start,end);
 			}
 #ifndef NDEBUG
 			else
@@ -200,7 +201,8 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 #ifndef NDEBUG
 			std::cerr << "bb without transition!!  " << bb << std::endl;
 #endif
-			_g.addEdge(start,_g.terminateActivity());
+			auto end = _g.terminateActivity();
+			_g.addEdge(start,end);
 		}
 	}
 }
@@ -212,20 +214,26 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	if (e->_name)
 		fn = e->_name->print();
 
-	auto i = _g.addObject(e->_built_str);
-	_g.addNodeAttribute(i,"line",e->_line);
-	addAttributesForCategory(i,_categorizer(e->_built_str));
+	std::unique_ptr<kayrebt::Identifier> i;
+
+	if (e->_anonymous)
+		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
+	else
+		i.reset(new kayrebt::Identifier(_g.addAction(e->_built_str)));
+
+	_g.addNodeAttribute(*i,"line",e->_line);
+	addAttributesForCategory(*i,_categorizer(e->_built_str));
 	if (_urlFinder && !fn.empty()) {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		_g.addNodeAttribute(i,"URL",_urlFinder(fn));
+		_g.addNodeAttribute(*i,"URL",_urlFinder(fn));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
 #endif
 	}
-	updateLast(i);
+	updateLast(*i);
 }
 
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
