@@ -217,9 +217,9 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	std::unique_ptr<kayrebt::Identifier> i;
 
 	if (e->_anonymous)
-		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
-	else
 		i.reset(new kayrebt::Identifier(_g.addAction(e->_built_str)));
+	else
+		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
 
 	_g.addNodeAttribute(*i,"line",e->_line);
 	addAttributesForCategory(*i,_categorizer(e->_built_str));

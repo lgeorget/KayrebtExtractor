@@ -56,3 +56,14 @@ Kayrebt::Extractor NEWS -- history of user visible changes.
 	plugin code.
 	* Fix the installation of the symlink to $(gcc -print-file-name=plugin)
 	(by the way, this may be the bad way of doing it)
+
+* 3.0.0-rc4
+	* When a node has no label, dot uses its id as a label. This is not
+	desirable in our case, therefore, we explicitly give an empty label
+	to all nameless nodes.
+	* Call nodes and Assign nodes had different policies about when
+	generating an object node (rectangle) or an action node (ellipse). Now,
+	they both output an action node when the left-hand side of the
+	assignment is an anonymous or temporary variable (or, in the case of
+	void functions, when there is no assignment at all), and an object
+	node in the other case.
