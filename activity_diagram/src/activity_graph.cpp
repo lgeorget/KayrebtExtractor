@@ -124,7 +124,7 @@ namespace kayrebt
 		depth_first_search(_d->inner,
 				make_dfs_visitor(
 					make_pair(
-					write_property(get(&Node::id,_d->inner),
+					write_property(get(boost::vertex_index,_d->inner),
 							std::back_inserter(reachable),
 							on_discover_vertex()),
 					make_pair(
@@ -161,7 +161,7 @@ namespace kayrebt
 		std::map<NodeDescriptor, boost::default_color_type> c_m;
 		depth_first_search(_d->inner,
 				make_dfs_visitor(
-					write_property(get(&Node::id,_d->inner),
+					write_property(get(boost::vertex_index,_d->inner),
 							std::back_inserter(reachable),
 							on_discover_vertex())),
 				make_assoc_property_map(c_m));
@@ -214,8 +214,7 @@ namespace kayrebt
 			_d->inner,
 			NodeWriter<GraphType>(_d->inner,_nodeAttrs),
 			boost::make_label_writer(get(&Edge::condition,_d->inner)),
-			GraphWriter(_graphAttrs),
-			get(&Node::id,_d->inner)
+			GraphWriter(_graphAttrs)
 		);
 		return out;
 	}
