@@ -25,10 +25,9 @@ fi
 LT_INIT
 
 # Checks for libraries.
-BOOST_REQUIRE([1.52])
-BOOST_GRAPH
 
 # Checks for header files.
+BOOST_FIND_HEADER([boost/graph/graphviz.hpp])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
