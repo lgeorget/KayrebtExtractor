@@ -818,7 +818,6 @@ uninstall-am:
 
 @HAVE_DOXYGEN_TRUE@all-local: doxyfile.stamp
 @HAVE_DOXYGEN_TRUE@clean-local:
-@HAVE_DOXYGEN_TRUE@	rm Doxyfile
 @HAVE_DOXYGEN_TRUE@	rm -rf doc
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

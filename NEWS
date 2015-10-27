@@ -69,3 +69,9 @@ Kayrebt::Extractor NEWS -- history of user visible changes.
 	node in the other case.
 
 	== version 3.0 released on 2015-10-22 ==
+
+* 3.1.0
+	* Give a type to each node as a string ("init","call","asm",...).
+	* Fix the dependencies for libactivity_diagram
+
+	== version 3.1 released on 2015-10-27 ==

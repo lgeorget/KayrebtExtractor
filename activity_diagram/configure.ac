@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Kayrebt::Actdiags], [2.0.0-r1], [laurent.georget@irisa.fr])
+AC_INIT([Kayrebt::Actdiags], [2.0.1], [laurent.georget@irisa.fr])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([1.11 foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/end_of_flow_identifier.h])
@@ -25,10 +25,9 @@ fi
 LT_INIT
 
 # Checks for libraries.
-BOOST_REQUIRE([1.52])
-BOOST_GRAPH
 
 # Checks for header files.
+BOOST_FIND_HEADER([boost/graph/graphviz.hpp])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

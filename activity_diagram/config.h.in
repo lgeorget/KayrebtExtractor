@@ -3,8 +3,8 @@
 /* Defined if the requested minimum BOOST version is satisfied */
 #undef HAVE_BOOST
 
-/* Define to 1 if you have <boost/graph/adjacency_list.hpp> */
-#undef HAVE_BOOST_GRAPH_ADJACENCY_LIST_HPP
+/* Define to 1 if you have <boost/graph/graphviz.hpp> */
+#undef HAVE_BOOST_GRAPH_GRAPHVIZ_HPP
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
