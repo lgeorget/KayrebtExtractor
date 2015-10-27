@@ -52,8 +52,16 @@ namespace kayrebt
 		 */
 		static std::string shapeToStr(Shape s);
 
+		unsigned int id = index++; /*!< the node unique identifier,
+						for internal use only */
 		std::string label; /*!< the node's label */
 		Shape shape = NO_NODE; /*!< the node's shape, or type */
+		static unsigned int index; /*!< a counter to generate unique
+					     identifiers for nodes
+					     \bug this counter may overflow,
+					     and is shared between all graphs
+					     built during the lifespan of the
+					     process*/
 	};
 
 	/**

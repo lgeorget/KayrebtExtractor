@@ -22,7 +22,7 @@ namespace kayrebt
 	 * Underlying type of Boost graph used for representation
 	 * and manipulation of activity diagrams
 	 */
-	typedef boost::adjacency_list<boost::vecS,boost::vecS,boost::bidirectionalS,Node,Edge> GraphType;
+	typedef boost::adjacency_list<boost::listS,boost::setS,boost::bidirectionalS,Node,Edge> GraphType;
 	/**
 	 * Underlying type of Boost vertex descriptor for manipulation
 	 * of the nodes in the activity diagrams

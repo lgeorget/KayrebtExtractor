@@ -19,7 +19,7 @@ namespace kayrebt
 	 * Unfortunately, the typedef has to be hardcoded in order not to
 	 * propagate the Boost headers to client code.
 	 */
-	typedef long unsigned int NodeDescriptor;
+	typedef void* NodeDescriptor;
 
 	/**
 	 * \brief Uniquely identify a node in the activity diagram
