@@ -206,8 +206,8 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 #ifndef NDEBUG
 			std::cerr << "bb without transition!!  " << bb << std::endl;
 #endif
-			auto end = _g.terminateActivity();
-			_g.addNodeAttribute(end,"type",std::string("end_of_activity"));
+			auto end = _g.closeFlow();
+			_g.addNodeAttribute(end,"type",std::string("end_of_flow"));
 			_g.addEdge(start,end);
 		}
 	}
