@@ -228,7 +228,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
 
 	_g.addNodeAttribute(*i,"line",e->_line);
-	_g.addNodeAttribute(i,"type",std::string("call"));
+	_g.addNodeAttribute(*i,"type",std::string("call"));
 	addAttributesForCategory(*i,_categorizer(e->_built_str));
 	if (_urlFinder && !fn.empty()) {
 #ifndef NDEBUG
