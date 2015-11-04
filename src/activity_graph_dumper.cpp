@@ -35,6 +35,18 @@
 
 using namespace kayrebt;
 
+std::ostream& operator<<(std::ostream& out, std::vector<std::shared_ptr<Value>> v) {
+	out << "\"";
+	if (!v.empty()) {
+		auto it = v.cbegin();
+		out << (*it)->print();
+		for (++it ; it != v.cend() ; ++it)
+			out << "," << (*it)->print();
+	}
+	out << "\"";
+	return out;
+}
+
 ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 	const std::string& file, int line) :
 	Dumper(), _categorizer(global_config.getCategorizer()),
@@ -126,6 +138,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 #ifndef NDEBUG
 	std::cerr << "function body" << std::endl;
 #endif
+	_g.addGraphAttribute("parameters",e->getFormalParameters());
 	for (auto bb : e->_bb) {
 		auto node = _g.addDecision();
 		updateLast(node);

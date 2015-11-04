@@ -17,6 +17,7 @@
 #include "expr_factory.h"
 #include "dumper.h"
 #include "function_body.h"
+#include "value_factory.h"
 
 FunctionBody::FunctionBody(function* fn) : _fn(fn)
 {
@@ -41,9 +42,23 @@ FunctionBody::FunctionBody(function* fn) : _fn(fn)
 		}
 		_bb.emplace_back(bb,stmts);
 	}
+
+	tree args = DECL_ARGUMENTS(fn->decl);
+	if (args) {
+		tree next_arg = TREE_CHAIN(args);
+		while (next_arg) {
+			_args.emplace_back(ValueFactory::INSTANCE.build(TREE_VALUE(next_arg)));
+			next_arg = TREE_CHAIN(next_arg);
+		}
+	}
 }
 
 void FunctionBody::accept(Dumper& d)
 {
 	d.dumpFunctionBody(this);
+}
+
+std::vector<std::shared_ptr<Value>> FunctionBody::getFormalParameters()
+{
+	return _args;
 }

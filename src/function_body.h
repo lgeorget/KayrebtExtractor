@@ -14,6 +14,7 @@
 #include <tree.h>
 #include <gimple.h>
 #include <function.h>
+#include "value.h"
 #include "expression.h"
 
 class Dumper;
@@ -35,12 +36,19 @@ class FunctionBody
 		 * \param d the visiting dumper
 		 */
 		void accept(Dumper& d);
+		/**
+		 * \brief Return the formal parameters of the function
+		 */
+		std::vector<std::shared_ptr<Value>> getFormalParameters();
 
 	private:
 		/** The list of basic blocks with their function */
 		std::vector<std::pair<basic_block,std::vector<std::shared_ptr<Expression>>>> _bb;
 		/** The function */
 		function* _fn;
+
+		/** The formal parameter of the function **/
+		std::vector<std::shared_ptr<Value>> _args;
 
 	friend class ActivityGraphDumper;
 };
