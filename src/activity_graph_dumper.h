@@ -22,6 +22,7 @@
 class AssignExpr;
 class FunctionBody;
 class CallExpr;
+class PhiExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -73,6 +74,11 @@ class ActivityGraphDumper : public Dumper
 		 * \param e the calling expression to dump
 		 */
 		void dumpCallExpr(CallExpr* const e) override;
+		/**
+		 * \brief Build the subgraph corresponding to a phi node
+		 * \param e the phi expression to dump
+		 */
+		void dumpPhiExpr(PhiExpr* const e) override;
 		/**
 		 * \brief Build the subgraph corresponding to a condition
 		 * \param e the condition expression to dump
@@ -223,6 +229,9 @@ class ActivityGraphDumper : public Dumper
 
 		void addAttributesForCategory(const kayrebt::Identifier& i,
 						   unsigned int cat);
+
+		void addLineAndFileAttributes(const kayrebt::Identifier& i,
+				int line, const std::string& filename);
 };
 
 

@@ -15,6 +15,7 @@
 #include "asm_expr.h"
 #include "assign_expr.h"
 #include "call_expr.h"
+#include "phi_expr.h"
 #include "cond_expr.h"
 #include "expr_factory.h"
 #include "expression.h"
@@ -49,6 +50,9 @@ std::shared_ptr<Expression> ExprFactory::build(gimple t)
 
 		case GIMPLE_RETURN:
 			return std::make_shared<ReturnExpr>(ReturnExpr(t));
+
+		//case GIMPLE_PHI:
+			//return std::make_shared<PhiExpr>(PhiExpr(t));
 
 		case GIMPLE_ASSIGN:
 			if (!gimple_clobber_p(t))

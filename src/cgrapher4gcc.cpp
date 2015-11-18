@@ -146,7 +146,7 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 
 	struct register_pass_info actdiag_extractor_pass_info = {
 		.pass				= &actdiag_extractor_pass.pass,
-		.reference_pass_name		= "ssa",
+		.reference_pass_name		= "ehdisp",
 		.ref_pass_instance_number	= 1,
 		.pos_op				= PASS_POS_INSERT_BEFORE
 	};

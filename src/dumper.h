@@ -11,6 +11,7 @@ class AsmExpr;
 class AssignExpr;
 class FunctionBody;
 class CallExpr;
+class PhiExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -40,10 +41,15 @@ class Dumper
 		 */
 		virtual void dumpAssignExpr(AssignExpr* const e) = 0;
 		/**
-		 * \brief Dump an function calling statement
+		 * \brief Dump a function calling statement
 		 * \param e the function calling expression
 		 */
 		virtual void dumpCallExpr(CallExpr* const e) = 0;
+		/**
+		 * \brief Dump a phi statement
+		 * \param e the phi expression
+		 */
+		virtual void dumpPhiExpr(PhiExpr* const e) = 0;
 		/**
 		 * \brief dump a conditional branching
 		 * \param e the condition expression

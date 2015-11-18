@@ -22,6 +22,7 @@
 #include "label.h"
 #include "case_label.h"
 #include "unary.h"
+#include "ssa_name.h"
 
 //the instance itself is not const, because of the maps
 ValueFactory ValueFactory::INSTANCE;
@@ -58,6 +59,12 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 			it = idents.find(t);
 			if (it == idents.end())
 				it = idents.insert(std::make_pair(t,std::make_shared<Identifier>(Identifier(DECL_NAME(t))))).first;
+			return it->second;
+
+		case SSA_NAME:
+			it = ssas.find(t);
+			if (it == ssas.end())
+				it = ssas.insert(std::make_pair(t,std::make_shared<SsaName>(SsaName(t)))).first;
 			return it->second;
 
 		case IDENTIFIER_NODE:

@@ -64,6 +64,10 @@ libkayrebt_extractor_la_SOURCES=\
 	url_finder.cpp\
 	url_finder.h\
 	make_unique.h\
+	ssa_name.cpp\
+	ssa_name.h\
+	phi_expr.cpp\
+	phi_expr.h\
 	doxygen.h
 libkayrebt_extractor_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/ $(YAML_CPP_CFLAGS) $(SQLITE3_CFLAGS)
 libkayrebt_extractor_la_LDFLAGS  = -version-info 2:0:0

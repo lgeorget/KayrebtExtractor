@@ -19,6 +19,7 @@
 #include "assign_expr.h"
 #include "function_body.h"
 #include "call_expr.h"
+#include "phi_expr.h"
 #include "cond_expr.h"
 #include "expression.h"
 #include "goto_expr.h"
@@ -73,7 +74,7 @@ void ActivityGraphDumper::updateLast(kayrebt::Identifier& node)
 	_last = make_unique<kayrebt::Identifier>(node);
 }
 
-void ActivityGraphDumper::addAttributesForCategory(
+inline void ActivityGraphDumper::addAttributesForCategory(
 		const kayrebt::Identifier& i, unsigned int cat)
 {
 	const std::vector<std::pair<std::string,std::string>>* rep;
@@ -82,6 +83,16 @@ void ActivityGraphDumper::addAttributesForCategory(
 	for (const auto& attr : *rep) {
 		_g.addNodeAttribute(i,attr.first,attr.second);
 	}
+}
+
+inline void ActivityGraphDumper::addLineAndFileAttributes(
+		const kayrebt::Identifier& i, int line,
+		const std::string& filename)
+{
+	if (line > 0)
+		_g.addNodeAttribute(i,"line",line);
+	if (!filename.empty())
+		_g.addNodeAttribute(i,"filename",filename);
 }
 
 void ActivityGraphDumper::dumpExpression(Expression* const e)
@@ -98,7 +109,7 @@ void ActivityGraphDumper::dumpAsmExpr(AsmExpr* const e)
 	std::cerr << "building asm" << std::endl;
 #endif
 	auto i = _g.addAction(e->_stmt);
-	_g.addNodeAttribute(i,"line",e->_line);
+	addLineAndFileAttributes(i,e->_line,e->_file);
 	_g.addNodeAttribute(i,"type",std::string("asm"));
 	addAttributesForCategory(i,_categorizer(e->_stmt));
 	updateLast(std::move(i));
@@ -116,20 +127,24 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 		e->_rhs2->print()
 		:
 		e->_whatToSet->print() + " = " +
-		e->_rhs1->print();
+		e->_rhs1->print()
+		;
 
+#ifndef NDEBUG
+	std::cerr << "got a label for assign stmt" << std::endl;
+#endif
 	if (e->_anonymous) {
 		auto i = _g.addAction(label);
-		_g.addNodeAttribute(i,"line",e->_line);
+		addLineAndFileAttributes(i,e->_line,e->_file);
 		_g.addNodeAttribute(i,"type",std::string("assign"));
 		addAttributesForCategory(i,_categorizer(label));
-		updateLast(i);
+		updateLast(std::move(i));
 	} else {
 		auto i = _g.addObject(label);
-		_g.addNodeAttribute(i,"line",e->_line);
+		addLineAndFileAttributes(i,e->_line,e->_file);
 		_g.addNodeAttribute(i,"type",std::string("assign"));
 		addAttributesForCategory(i,_categorizer(label));
-		updateLast(i);
+		updateLast(std::move(i));
 	}
 }
 
@@ -139,7 +154,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 	std::cerr << "function body" << std::endl;
 #endif
 	_g.addGraphAttribute("parameters",e->getFormalParameters());
-	for (auto bb : e->_bb) {
+	for (const auto& bb : e->_bb) {
 		auto node = _g.addDecision();
 		updateLast(node);
 		_init_bb[bb.first] = make_unique<kayrebt::MergeIdentifier>(node);
@@ -147,7 +162,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		std::cerr << "dumping basic block " << bb.first << std::endl;
 #endif
 		_current_bb = bb.first;
-		for (auto expr : bb.second) {
+		for (const auto& expr : bb.second) {
 			expr->accept(*this);
 			if (!_skip) {
 				if (_last_but_one && _last)
@@ -156,6 +171,9 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 				_skip = false;
 			}
 		}
+#ifndef NDEBUG
+		std::cerr << "all statements dumped " << bb.first << std::endl;
+#endif
 		if (!_outgoing_transitions_handled) {
 			_gotos.emplace_back(std::move(_last), _current_bb);
 		}
@@ -236,7 +254,7 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	else
 		i.reset(new kayrebt::Identifier(_g.addObject(e->_built_str)));
 
-	_g.addNodeAttribute(*i,"line",e->_line);
+	addLineAndFileAttributes(*i,e->_line,e->_file);
 	_g.addNodeAttribute(*i,"type",std::string("call"));
 	addAttributesForCategory(*i,_categorizer(e->_built_str));
 	if (_urlFinder && !e->_internalOrDynamicCall) {
@@ -252,6 +270,19 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	updateLast(*i);
 }
 
+void ActivityGraphDumper::dumpPhiExpr(PhiExpr* const e)
+{
+#ifndef NDEBUG
+	std::cerr << "building phi" << std::endl;
+#endif
+	auto i = _g.addAction(e->_built_str);
+
+	addLineAndFileAttributes(i,e->_line,e->_file);
+	_g.addNodeAttribute(i,"type",std::string("phi"));
+	addAttributesForCategory(i,_categorizer(e->_built_str));
+	updateLast(std::move(i));
+}
+
 void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 {
 #ifndef NDEBUG
@@ -259,7 +290,7 @@ void ActivityGraphDumper::dumpCondExpr(CondExpr* const e)
 #endif
 	auto decision = _g.addDecision();
 	addAttributesForCategory(decision,_categorizer(std::string()));
-	_g.addNodeAttribute(decision,"line",e->_line);
+	addLineAndFileAttributes(decision,e->_line,e->_file);
 	_g.addNodeAttribute(decision,"type",std::string("cond"));
 	std::string condition = e->_lhs->print() + " " +
 				Operator::print(e->_op) + " " +
@@ -276,7 +307,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 	std::cerr << "building goto" << std::endl;
 #endif
 	auto gotol = _g.addDecision();
-	_g.addNodeAttribute(gotol,"line",e->_line);
+	addLineAndFileAttributes(gotol,e->_line,e->_file);
 	_g.addNodeAttribute(gotol,"type",std::string("goto"));
 	addAttributesForCategory(gotol,_categorizer(std::string()));
 	//if the label is available the edge
@@ -315,7 +346,7 @@ void ActivityGraphDumper::dumpReturnExpr(ReturnExpr* const e)
 #endif
 	if (e->_value) {
 		auto ret = _g.addObject(e->_value->print());
-		_g.addNodeAttribute(ret,"line",e->_line);
+		addLineAndFileAttributes(ret,e->_line,e->_file);
 		_g.addNodeAttribute(ret,"type",std::string("return"));
 		addAttributesForCategory(ret,_categorizer(e->_value->print()));
 		updateLast(ret);
@@ -331,7 +362,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	std::cerr << "building switch" << std::endl;
 #endif
 	auto switchnode = _g.addDecision();
-	_g.addNodeAttribute(switchnode,"line",e->_line);
+	addLineAndFileAttributes(switchnode,e->_line,e->_file);
 	_g.addNodeAttribute(switchnode,"type",std::string("switch"));
 	addAttributesForCategory(switchnode,_categorizer(std::string()));
 
