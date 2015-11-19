@@ -56,8 +56,11 @@ std::shared_ptr<Expression> ExprFactory::build(gimple t)
 		// 'don't care'-expressions
 		case GIMPLE_PREDICT:
 		case GIMPLE_NOP:
-		default:
+		case GIMPLE_DEBUG:
 			return std::make_shared<Expression>(Expression(t));
+
+		default:
+			throw std::runtime_error(gimple_code_name[gimple_code(t)]);
 	}
 }
 
