@@ -51,8 +51,8 @@ std::shared_ptr<Expression> ExprFactory::build(gimple t)
 		case GIMPLE_RETURN:
 			return std::make_shared<ReturnExpr>(ReturnExpr(t));
 
-		//case GIMPLE_PHI:
-			//return std::make_shared<PhiExpr>(PhiExpr(t));
+		case GIMPLE_PHI:
+			return std::make_shared<PhiExpr>(PhiExpr(t));
 
 		case GIMPLE_ASSIGN:
 			if (!gimple_clobber_p(t))
