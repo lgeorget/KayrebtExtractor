@@ -9,6 +9,7 @@
 #include <memory>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include <tree-flow.h>
 #include <gimple.h>
 #include <input.h>
 #include <function.h>
@@ -31,13 +32,34 @@ FunctionBody::FunctionBody(function* fn) : _fn(fn)
 		std::cerr << "Entering basic block" << std::endl;
 #endif
 		std::vector<std::shared_ptr<Expression>> stmts;
+		//dump phis
+		for (gimple_stmt_iterator it = gsi_start_phis(bb) ;
+				!gsi_end_p(it) ;
+				gsi_next(&it)) {
+			gimple inner = gsi_stmt(it);
+			if (gimple_code(inner) != GIMPLE_PHI)
+				continue; //discard silently
+
+			tree var = gimple_phi_result(inner);
+			std::shared_ptr<Value> phivar;
+			if (var != NULL && var != NULL_TREE)
+				phivar = ValueFactory::INSTANCE.build(var);
+			if (phivar->print() == ".MEM")
+				continue; //discard silently .MEM assignments
+
+#ifndef NDEBUG
+			std::cerr << "Next expression " << gimple_code_name[gimple_code(inner)]  << std::endl;
+#endif
+			stmts.push_back(ExprFactory::INSTANCE.build(inner));
+		}
+		//dump stmts
 		for (gimple_stmt_iterator it = gsi_start_bb(bb) ;
 				!gsi_end_p(it) ;
 				gsi_next(&it)) {
-#ifndef NDEBUG
-			std::cerr << "Next expression" << std::endl;
-#endif
 			gimple inner = gsi_stmt(it);
+#ifndef NDEBUG
+			std::cerr << "Next expression " << gimple_code_name[gimple_code(inner)]  << std::endl;
+#endif
 			stmts.push_back(ExprFactory::INSTANCE.build(inner));
 		}
 		_bb.emplace_back(bb,stmts);

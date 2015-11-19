@@ -37,10 +37,10 @@ PhiExpr::PhiExpr(gimple t) : Expression(t)
 
 	if (_var) {
 		std::string _varname = _var->print();
-		_built_str += _varname + " = phi";
+		_built_str += _varname + " = PHI";
 	}
 
-	_built_str += "(";
+	_built_str += " <";
 	if (_nbArgs > 0) {
 		_built_str += _args.front()->print();
 		auto it = _args.cbegin();
@@ -48,7 +48,7 @@ PhiExpr::PhiExpr(gimple t) : Expression(t)
 			_built_str += ", " + (*it)->print();
 		}
 	}
-	_built_str += ")";
+	_built_str += ">";
 }
 
 void PhiExpr::accept(Dumper& d)
