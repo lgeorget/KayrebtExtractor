@@ -16,8 +16,7 @@ const std::string& Operator::print(tree_code op)
 		return symbols.at(op);
 	} catch (std::out_of_range& e) {
 		std::cerr << " Unknown expression or operator " << TREE_CODE_CLASS_STRING(op) << std::endl;
-		throw e;
-		//return symbols.at(LAST_AND_UNUSED_TREE_CODE);
+		return symbols.at(LAST_AND_UNUSED_TREE_CODE);
 	}
 }
 
@@ -60,6 +59,6 @@ const std::map<tree_code,std::string> Operator::symbols =
 	{ BIT_FIELD_REF,	" . " },
 	{ MIN_EXPR,		" `min` " },
 	{ MAX_EXPR,		" `max` " },
-	{ LAST_AND_UNUSED_TREE_CODE,	""}
+	{ LAST_AND_UNUSED_TREE_CODE,	" `op` "}
 };
 
