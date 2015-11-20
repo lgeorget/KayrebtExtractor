@@ -20,9 +20,15 @@ MemRef::MemRef(tree t) : Value(t)
 		throw BadTreeException(t,"mem_ref");
 
 	_ptr = ValueFactory::INSTANCE.build(TREE_OPERAND(t,0));
+	_hasOffset = !integer_zerop(TREE_OPERAND(t, 1));
+	if (_hasOffset)
+		_offset = std::to_string(mem_ref_offset(t).to_shwi()); //safe, see <tree-inline.h>
 }
 
 std::string MemRef::print() const
 {
-	return "*(" + _ptr->print() + ")";
+	if (_hasOffset)
+		return "MEM[&" + _ptr->print() + ", offset: " + _offset + "B]";
+	else
+		return "*(" + _ptr->print() + ")";
 }

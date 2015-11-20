@@ -30,8 +30,10 @@ class MemRef : public Value
 	private:
 		/** The symbol whose address is taken */
 		std::shared_ptr<Value> _ptr;
+		std::string _offset;
+		bool _hasOffset;
 		/** The operator used to take the address of \a _ptr (usually '&') */
-		const std::string _symbol;
+//		const std::string _symbol;
 };
 
 #endif
