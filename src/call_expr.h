@@ -42,6 +42,7 @@ class CallExpr : public Expression
 		/** String representing the function for dumping purpose */
 		std::string _built_str;
 		bool _anonymous = true;
+		bool _internalOrDynamicCall = true;
 
 	friend class ActivityGraphDumper;
 };

@@ -229,10 +229,6 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
-	std::string fn;
-	if (e->_name)
-		fn = e->_name->print();
-
 	std::unique_ptr<kayrebt::Identifier> i;
 
 	if (e->_anonymous)
@@ -243,11 +239,11 @@ void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 	_g.addNodeAttribute(*i,"line",e->_line);
 	_g.addNodeAttribute(*i,"type",std::string("call"));
 	addAttributesForCategory(*i,_categorizer(e->_built_str));
-	if (_urlFinder && !fn.empty()) {
+	if (_urlFinder && !e->_internalOrDynamicCall) {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs enabled)" << std::endl;
 #endif
-		_g.addNodeAttribute(*i,"URL",_urlFinder(fn));
+		_g.addNodeAttribute(*i,"URL",_urlFinder(e->_name->print()));
 	} else {
 #ifndef NDEBUG
 		std::cerr << "building call (URLs disabled)" << std::endl;
