@@ -29,6 +29,7 @@ class SsaName : public Value
 		/** The value of the identifier, i.e., the name of the object
 		 * identified*/
 		std::string _name;
+		unsigned int _version = 0;
 		/** A counter to give an almost unique name to anonymous objects */
 		static unsigned int counter;
 };

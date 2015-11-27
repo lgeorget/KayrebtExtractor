@@ -44,7 +44,7 @@ FunctionBody::FunctionBody(function* fn) : _fn(fn)
 			std::shared_ptr<Value> phivar;
 			if (var != NULL && var != NULL_TREE)
 				phivar = ValueFactory::INSTANCE.build(var);
-			if (phivar->print() == ".MEM")
+			if (phivar->print().find(".MEM") == 0) //var looks like .MEM.<version>
 				continue; //discard silently .MEM assignments
 
 #ifndef NDEBUG

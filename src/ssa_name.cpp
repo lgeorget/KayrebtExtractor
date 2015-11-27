@@ -19,6 +19,7 @@ SsaName::SsaName(tree t) : Value(t)
 		throw BadTreeException(t,"ssa_name");
 
 	tree ident = SSA_NAME_IDENTIFIER(t);
+	_version = SSA_NAME_VERSION(t);
 
 	if (ident && ident != NULL_TREE && TREE_CODE(ident) == IDENTIFIER_NODE)
 		_name = IDENTIFIER_POINTER(ident);
@@ -28,6 +29,6 @@ SsaName::SsaName(tree t) : Value(t)
 
 std::string SsaName::print() const
 {
-	return _name;
+	return _name + "." + std::to_string(_version);
 }
 
