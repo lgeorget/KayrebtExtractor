@@ -61,14 +61,15 @@ namespace kayrebt
 
 			template<typename T, typename Outputter = default_outputter<T>>
 			void addGraphAttribute(const std::string& name, const T& value, const Outputter& out = Outputter()) {
-				_graphAttrs.emplace_back(new Attribute<T>(name,value,out));
+				_graphAttrs.emplace_back(new Attribute<T,Outputter>(name,value,out));
 			}
 
 			template<typename T, typename Outputter = default_outputter<T>>
 			void addNodeAttribute(const Identifier& i, const std::string& name, const T& value, const Outputter& out = Outputter()) {
-				_nodeAttrs[*i].emplace_back(new Attribute<T>(name,value,out));
+				_nodeAttrs[*i].emplace_back(new Attribute<T,Outputter>(name,value,out));
 			}
 
+			void printNodeId(std::ostream& out, const Identifier& i);
 			/**
 			 * \brief Add an action node to the activity diagram
 			 * \param[in] label the label of the new action node
@@ -153,8 +154,9 @@ namespace kayrebt
 			 */
 			bool validate() const;
 			/**
-			 * \brief Verify that the activity diagram is a tree,
-			 * i.e. every node is reachable from the initial node
+			 * \brief Verify that the activity diagram has as a
+			 * spanning tree, i.e. every node is reachable from the
+			 * initial node
 			 *
 			 * Guards cannot be verified, so even if the path to a
 			 * node contains some, it will still be considered as
@@ -193,6 +195,12 @@ namespace kayrebt
 			 * successor of the decision/merging node.
 			 */
 			void simplifyMergeNodes();
+
+			/**
+			 * \brief Eliminate the nodes which we left behind for
+			 * their attributes but which must not be displayed
+			 */
+			void purgeGraph();
 			/**
 			 * \brief Get the initial node of the activity diagram
 			 * \return the identifier for the initial node in the

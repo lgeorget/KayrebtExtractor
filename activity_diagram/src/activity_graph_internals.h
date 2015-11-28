@@ -9,6 +9,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <vector>
 #include "types.h"
 #include "node.h"
 #include "attribute.h"
@@ -32,5 +33,6 @@ namespace kayrebt
 
 		GraphType inner; /*!< The underlying Boost graph */
 		std::unique_ptr<InitIdentifier> initNode; /*!< The top node in the graph */
+		std::vector<NodeDescriptor> spuriousNodes;
 	};
 }
