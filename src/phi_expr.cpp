@@ -7,11 +7,15 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <vector>
 #include <cstdlib>
-#include <list>
 #include <gcc-plugin.h>
 #include <tree.h>
+#include <function.h>
 #include <gimple.h>
+#include <basic-block.h>
+#include <tree-flow.h>
+#include <tree-flow-inline.h>
 #include "bad_gimple_exception.h"
 #include "value_factory.h"
 #include "expression.h"
@@ -29,10 +33,16 @@ PhiExpr::PhiExpr(gimple t) : Expression(t)
 		_var = ValueFactory::INSTANCE.build(var);
 
 	_nbArgs = gimple_phi_num_args(t);
+	_args.reserve(_nbArgs);
+	_predsBBs.reserve(_nbArgs);
 	for (unsigned int i = 0 ; i < _nbArgs ; i++) {
 		phi_arg_d* arg = gimple_phi_arg(t,i);
-		if (arg)
+		if (arg) {
+			edge e = gimple_phi_arg_edge(t,i);
+			if (e)
+				_predsBBs.push_back(e->src);
 			_args.push_back(ValueFactory::INSTANCE.build(arg->def));
+		}
 	}
 
 	if (_var) {

@@ -114,6 +114,7 @@ class ActivityGraphDumper : public Dumper
 		 * \param e the untyped expression to dump
 		 */
 		void dumpExpression(Expression* const e) override;
+
 		/**
 		 * \brief Return the graph built
 		 *
@@ -164,10 +165,13 @@ class ActivityGraphDumper : public Dumper
 		 */
 		std::map<basic_block,std::pair<std::unique_ptr<kayrebt::MergeIdentifier>,std::string>> _ifs;
 		/**
-		 * List of pairs mapping nodes at the end of their basic block
+		 * Mapping between nodes at the end of their basic block
 		 * to the destination basic block the control flows to
+		 * unconditionally
 		 */
-		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,basic_block>> _gotos;
+		std::map<basic_block,std::unique_ptr<kayrebt::Identifier>> _gotos;
+
+		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,PhiExpr*>> _phiNodes;
 
 		/**
 		 * \brief Map case labels to control flow blocks in switch/case
@@ -212,6 +216,11 @@ class ActivityGraphDumper : public Dumper
 		 * \param node the new node that must replace \a last
 		 */
 		void updateLast(kayrebt::Identifier& node);
+		/**
+		 * \brief Walk the entire function body after all nodes are
+		 * dumped for post-treatment
+		 */
+		void postDumpingPass();
 
 		/**
 		 * \brief Return the control flow block entry node corresponding

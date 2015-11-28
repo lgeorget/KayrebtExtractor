@@ -58,7 +58,7 @@ ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 	if (global_config.shallDumpUrls())
 		_urlFinder.open(global_config.getDbFile().c_str(), global_config.getDbName().c_str());
 	_skip = false;
-	_gotos.emplace_back(make_unique<kayrebt::Identifier>(_g.initialNode()),ENTRY_BLOCK_PTR);
+	_gotos[ENTRY_BLOCK_PTR] = make_unique<kayrebt::Identifier>(_g.initialNode());
 	_g.addNodeAttribute(_g.initialNode(), "type", std::string("init"));
 }
 
@@ -175,7 +175,7 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		std::cerr << "all statements dumped " << bb.first << std::endl;
 #endif
 		if (!_outgoing_transitions_handled) {
-			_gotos.emplace_back(std::move(_last), _current_bb);
+			_gotos[_current_bb] = std::move(_last);
 		}
 		_last = nullptr;
 		_outgoing_transitions_handled = false;
@@ -208,8 +208,8 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 	std::cerr << "dumping fallthrough" << std::endl;
 #endif
 	for (auto& fallthru : _gotos) {
-		basic_block bb = fallthru.second;
-		kayrebt::Identifier& start = *(fallthru.first);
+		basic_block bb = fallthru.first;
+		kayrebt::Identifier& start = *(fallthru.second);
 		edge ed;
 		edge_iterator ei;
 		FOR_EACH_EDGE(ed, ei, bb->succs) {
@@ -242,8 +242,49 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 			_g.addEdge(start,end);
 		}
 	}
+
+	//Ensure the graph won't change anymore before the post-dumping pass
+	_g.simplifyMergeNodes();
+	postDumpingPass();
 }
 
+void ActivityGraphDumper::postDumpingPass()
+{
+	auto outputter = [this](std::ostream& out,
+			const std::vector<basic_block>& bbs)
+	{
+		auto printOnePred = [this](std::ostream& out, const basic_block& bb) {
+			//std::cerr << "Trying to find bb " << bb << std::endl;
+			auto itIfs = _ifs.find(bb);
+			if (itIfs != _ifs.cend()) {
+				_g.printNodeId(out,*(itIfs->second.first));
+				return;
+			}
+			auto itGotos = _gotos.find(bb);
+			if (itGotos != _gotos.cend()) {
+				_g.printNodeId(out,*(itGotos->second));
+				return;
+			}
+			//ups...
+		};
+		if (!bbs.empty()) {
+			out << "\"";
+			auto it = bbs.cbegin();
+			printOnePred(out,*it);
+			for (++it ; it != bbs.cend() ; ++it) {
+				out << ",";
+				printOnePred(out, *it);
+			}
+			out << "\"";
+		}
+	};
+
+	for (const auto& p : _phiNodes) {
+		kayrebt::Identifier& i = *(p.first);
+		PhiExpr* phi = p.second;
+		_g.addNodeAttribute(i,"predecessors",phi->_predsBBs,outputter);
+	}
+}
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
@@ -280,6 +321,7 @@ void ActivityGraphDumper::dumpPhiExpr(PhiExpr* const e)
 	addLineAndFileAttributes(i,e->_line,e->_file);
 	_g.addNodeAttribute(i,"type",std::string("phi"));
 	addAttributesForCategory(i,_categorizer(e->_built_str));
+	_phiNodes.emplace_back(make_unique<kayrebt::Identifier>(i), e);
 	updateLast(std::move(i));
 }
 
@@ -380,7 +422,10 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 
 const ActivityGraph& ActivityGraphDumper::graph()
 {
-	_g.simplifyMergeNodes();
+	//All the unnecessary nodes are still there, which we maintained in the
+	//graph to to be able to access their attributes are still here at this
+	//point, we need to remove them
+	_g.purgeGraph();
 	return _g;
 }
 

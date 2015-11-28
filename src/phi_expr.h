@@ -10,9 +10,10 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <list>
+#include <vector>
 #include <gcc-plugin.h>
 #include <gimple.h>
+#include <basic-block.h>
 #include "expression.h"
 #include "value.h"
 #include "dumper.h"
@@ -36,7 +37,8 @@ class PhiExpr : public Expression
 		/** Variable the returned value from the function is assigned to */
 		std::shared_ptr<Value> _var;
 		/** Arguments of the function */
-		std::list<std::shared_ptr<Value>> _args;
+		std::vector<std::shared_ptr<Value>> _args;
+		std::vector<basic_block> _predsBBs;
 		/** String representing the function for dumping purpose */
 		std::string _built_str;
 
