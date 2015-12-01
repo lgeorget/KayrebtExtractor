@@ -320,6 +320,7 @@ void ActivityGraphDumper::dumpPhiExpr(PhiExpr* const e)
 
 	addLineAndFileAttributes(i,e->_line,e->_file);
 	_g.addNodeAttribute(i,"type",std::string("phi"));
+	_g.addNodeAttribute(i,"args",e->_args);
 	addAttributesForCategory(i,_categorizer(e->_built_str));
 	_phiNodes.emplace_back(make_unique<kayrebt::Identifier>(i), e);
 	updateLast(std::move(i));
