@@ -243,13 +243,14 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		}
 	}
 
-	//Ensure the graph won't change anymore before the post-dumping pass
-	_g.simplifyMergeNodes();
 	postDumpingPass();
 }
 
 void ActivityGraphDumper::postDumpingPass()
 {
+	//Ensure the graph won't change anymore
+	_g.simplifyMergeNodes();
+
 	auto outputter = [this](std::ostream& out,
 			const std::vector<basic_block>& bbs)
 	{
@@ -284,6 +285,11 @@ void ActivityGraphDumper::postDumpingPass()
 		PhiExpr* phi = p.second;
 		_g.addNodeAttribute(i,"predecessors",phi->_predsBBs,outputter);
 	}
+
+	//All the unnecessary nodes are still there, which we maintained in the
+	//graph to to be able to access their attributes are still here at this
+	//point, we need to remove them
+	_g.purgeGraph();
 }
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
@@ -423,10 +429,6 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 
 const ActivityGraph& ActivityGraphDumper::graph()
 {
-	//All the unnecessary nodes are still there, which we maintained in the
-	//graph to to be able to access their attributes are still here at this
-	//point, we need to remove them
-	_g.purgeGraph();
 	return _g;
 }
 
