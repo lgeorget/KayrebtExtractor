@@ -32,6 +32,9 @@ class MemRef : public Value
 		std::shared_ptr<Value> _ptr;
 		std::string _offset;
 		bool _hasOffset;
+		std::shared_ptr<Value> _index;
+		std::shared_ptr<Value> _index2;
+		std::shared_ptr<Value> _step;
 		/** The operator used to take the address of \a _ptr (usually '&') */
 //		const std::string _symbol;
 };

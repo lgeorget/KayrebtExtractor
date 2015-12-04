@@ -103,6 +103,9 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 		case MEM_REF:
 			return std::make_shared<MemRef>(MemRef(t));
 
+		case TARGET_MEM_REF:
+			return std::make_shared<MemRef>(MemRef(t));
+
 		default:
 #ifndef NDEBUG
 			std::cerr << "Building " << tree_code_name[TREE_CODE(t)] << std::endl;
