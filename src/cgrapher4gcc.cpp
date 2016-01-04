@@ -233,12 +233,12 @@ extern "C" unsigned int actdiag_extractor()
 #endif
 		std::string file;
 		int line = 0;
-		if (LOCATION_LOCUS (cfun->function_start_locus) != UNKNOWN_LOCATION) {
-			line = LOCATION_LINE(cfun->function_start_locus);
-			if (LOCATION_FILE(cfun->function_start_locus))
+		if (DECL_SOURCE_LOCATION (cfun->decl) != UNKNOWN_LOCATION) {
+			line = DECL_SOURCE_LINE(cfun->decl);
+			if (DECL_SOURCE_FILE(cfun->decl))
 				//we cannot rely on main_input filename
 				//because "compilation unit" != "source file"
-				file.assign(LOCATION_FILE(cfun->function_start_locus));
+				file.assign(DECL_SOURCE_FILE(cfun->decl));
 		}
 		auto dumper = ActivityGraphDumper(*global_config, file, line);
 #ifndef NDEBUG
