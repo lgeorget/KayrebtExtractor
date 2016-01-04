@@ -47,6 +47,7 @@ std::shared_ptr<Value> ValueFactory::build(tree t)
 
 		case NOP_EXPR: //happens when functions arguments need trivial cast
 		case CONVERT_EXPR:
+		case VIEW_CONVERT_EXPR:
 			return build(TREE_OPERAND(t,0));
 
 		case VAR_DECL:
