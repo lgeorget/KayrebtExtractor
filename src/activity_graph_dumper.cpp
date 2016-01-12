@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream& out, std::vector<std::shared_ptr<Value>> 
 ActivityGraphDumper::ActivityGraphDumper(const Configurator& global_config,
 	const std::string& file, int line) :
 	Dumper(), _categorizer(global_config.getCategorizer()),
-	_categorydumper(global_config.getCategoryDumper()), _urlFinder()
+	_categorydumper(global_config.getCategoryDumper()), _urlFinder(main_input_filename)
 {
 	_g.addGraphAttribute("file",file);
 	_g.addGraphAttribute("line",line);

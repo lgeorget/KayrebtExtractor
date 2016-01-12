@@ -29,8 +29,11 @@ public:
 	 *
 	 * This constructor does not initialize the database connection. This is
 	 * delayed until a call to UrlFinder::open().
+	 *
+	 * \param prefix the path leading to the function being dumped (it
+	 * corresponds to the file it is defined in)
 	 */
-	UrlFinder();
+	UrlFinder(std::string prefix);
 	/**
 	 * \brief Open the database connection
 	 * \param filename the database file
@@ -61,6 +64,8 @@ private:
 	sqlite3* _db = nullptr; /*! the database handler */
 	sqlite3_stmt* _urlFetcher = nullptr; /*! the prepared statement */
 	std::string _fetchStmt; /*! the prepared statement as a string */
+	std::string _prefix; /*! the path based on which the UrlFinder will
+			       build relative URLs */
 };
 
 #endif
