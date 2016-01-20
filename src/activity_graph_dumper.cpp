@@ -266,6 +266,11 @@ void ActivityGraphDumper::postDumpingPass()
 				_g.printNodeId(out,*(itGotos->second));
 				return;
 			}
+			itGotos = _labelled_gotos.find(bb);
+			if (itGotos != _labelled_gotos.cend()) {
+				_g.printNodeId(out,*(itGotos->second));
+				return;
+			}
 			//ups...
 		};
 		if (!bbs.empty()) {
@@ -365,6 +370,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 	if (e->_label) {
 		auto label = getLabel(e->_label->getUid());
 		_g.addEdge(gotol, label);
+		_labelled_gotos[_current_bb] = make_unique<kayrebt::Identifier>(label);
 		_outgoing_transitions_handled = true;
 	}
 	updateLast(gotol);
@@ -420,6 +426,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	for (auto casel : e->_labels) {
 		auto l = getLabel(casel->getUid());
 		_g.addGuard(switchnode, l, "[" + e->_var->print() + " == " + casel->print() + "]");
+		_labelled_gotos[_current_bb] = make_unique<kayrebt::Identifier>(l);
 	}
 	_outgoing_transitions_handled = true;
 

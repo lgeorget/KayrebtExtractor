@@ -170,6 +170,7 @@ class ActivityGraphDumper : public Dumper
 		 * unconditionally
 		 */
 		std::map<basic_block,std::unique_ptr<kayrebt::Identifier>> _gotos;
+		std::map<basic_block,std::unique_ptr<kayrebt::Identifier>> _labelled_gotos;
 
 		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,PhiExpr*>> _phiNodes;
 

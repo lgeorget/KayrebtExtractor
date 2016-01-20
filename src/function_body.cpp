@@ -60,7 +60,11 @@ FunctionBody::FunctionBody(function* fn) : _fn(fn)
 #ifndef NDEBUG
 			std::cerr << "Next expression " << gimple_code_name[gimple_code(inner)]  << std::endl;
 #endif
-			stmts.push_back(ExprFactory::INSTANCE.build(inner));
+			// Special case. If there is a label, then it has to be dumped first
+			if (gimple_code(inner) == GIMPLE_LABEL)
+				stmts.insert(stmts.begin(), ExprFactory::INSTANCE.build(inner));
+			else
+				stmts.push_back(ExprFactory::INSTANCE.build(inner));
 		}
 		_bb.emplace_back(bb,stmts);
 	}
