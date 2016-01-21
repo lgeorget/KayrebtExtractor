@@ -130,19 +130,11 @@ void ActivityGraphDumper::dumpAssignExpr(AssignExpr* const e)
 #ifndef NDEBUG
 	std::cerr << "got a label for assign stmt" << std::endl;
 #endif
-	if (e->_anonymous) {
-		auto i = _g.addAction(label);
-		addLineAndFileAttributes(i,e->_line,e->_file);
-		_g.addNodeAttribute(i,"type",std::string("assign"));
-		addAttributesForCategory(i,_categorizer(label));
-		updateLast(i);
-	} else {
-		auto i = _g.addObject(label);
-		addLineAndFileAttributes(i,e->_line,e->_file);
-		_g.addNodeAttribute(i,"type",std::string("assign"));
-		addAttributesForCategory(i,_categorizer(label));
-		updateLast(i);
-	}
+	auto i = _g.addAction(label);
+	addLineAndFileAttributes(i,e->_line,e->_file);
+	_g.addNodeAttribute(i,"type",std::string("assign"));
+	addAttributesForCategory(i,_categorizer(label));
+	updateLast(i);
 }
 
 void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
@@ -296,12 +288,7 @@ void ActivityGraphDumper::postDumpingPass()
 
 void ActivityGraphDumper::dumpCallExpr(CallExpr* const e)
 {
-	kayrebt::Identifier i = _g.initialNode(); //i has to be initialized with something but see below
-
-	if (e->_anonymous)
-		i = _g.addAction(e->_built_str);
-	else
-		i = _g.addObject(e->_built_str);
+	kayrebt::Identifier i = _g.addAction(e->_built_str);
 
 	addLineAndFileAttributes(i,e->_line,e->_file);
 	_g.addNodeAttribute(i,"type",std::string("call"));

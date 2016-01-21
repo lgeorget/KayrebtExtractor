@@ -50,8 +50,6 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 	if (_var) {
 		std::string _varname = _var->print();
 		_built_str += _varname + " = ";
-		_anonymous = _varname.find('<') != std::string::npos ||
-			     _varname.find('.') != std::string::npos;
 	}
 
 	if (_name)
