@@ -13,7 +13,6 @@
 #include <functional>
 #include <stack>
 #include <utility>
-#include <memory>
 #include <activity_graph.h>
 #include "dumper.h"
 #include "label.h"
@@ -143,11 +142,11 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * The identifier of the last node added to the graph
 		 */
-		std::unique_ptr<kayrebt::Identifier> _last;
+		kayrebt::Identifier _last;
 		/**
 		 * The identifier of the last-but-one node added to the graph
 		 */
-		std::unique_ptr<kayrebt::Identifier> _last_but_one;
+		kayrebt::Identifier _last_but_one;
 		/**
 		 * The values built while dumping the graph
 		 */
@@ -156,23 +155,23 @@ class ActivityGraphDumper : public Dumper
 		 * Mapping between the basic blocks of the function body and the
 		 * first node of the corresponding subgraph
 		 */
-		std::map<basic_block,std::unique_ptr<kayrebt::MergeIdentifier>> _init_bb;
+		std::map<basic_block,kayrebt::MergeIdentifier> _init_bb;
 		/**
 		 * Mapping between the basic blocks of the function body and a
 		 * pair consisting of the decision node corresponding to a
 		 * condition point (a 'if' in the function body) and the
 		 * textual condition associated to it
 		 */
-		std::map<basic_block,std::pair<std::unique_ptr<kayrebt::MergeIdentifier>,std::string>> _ifs;
+		std::map<basic_block,std::pair<kayrebt::MergeIdentifier,std::string>> _ifs;
 		/**
 		 * Mapping between nodes at the end of their basic block
 		 * to the destination basic block the control flows to
 		 * unconditionally
 		 */
-		std::map<basic_block,std::unique_ptr<kayrebt::Identifier>> _gotos;
-		std::map<basic_block,std::unique_ptr<kayrebt::Identifier>> _labelled_gotos;
+		std::map<basic_block,kayrebt::Identifier> _gotos;
+		std::map<basic_block,kayrebt::Identifier> _labelled_gotos;
 
-		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,PhiExpr*>> _phiNodes;
+		std::vector<std::pair<kayrebt::Identifier,PhiExpr*>> _phiNodes;
 
 		/**
 		 * \brief Map case labels to control flow blocks in switch/case
@@ -210,13 +209,7 @@ class ActivityGraphDumper : public Dumper
 		 * last by \a node
 		 * \param node the new node that must replace \a last
 		 */
-		void updateLast(kayrebt::Identifier&& node);
-		/**
-		 * \brief Replace the last-but-one node by the last, and the
-		 * last by \a node
-		 * \param node the new node that must replace \a last
-		 */
-		void updateLast(kayrebt::Identifier& node);
+		void updateLast(kayrebt::Identifier node);
 		/**
 		 * \brief Walk the entire function body after all nodes are
 		 * dumped for post-treatment
