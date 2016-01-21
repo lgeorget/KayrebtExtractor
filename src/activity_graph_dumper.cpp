@@ -88,7 +88,11 @@ inline void ActivityGraphDumper::addLineAndFileAttributes(
 		_g.addNodeAttribute(i,"filename",filename);
 }
 
+#ifndef NDEBUG
 void ActivityGraphDumper::dumpExpression(Expression* const e)
+#else
+void ActivityGraphDumper::dumpExpression(Expression* const)
+#endif
 {
 #ifndef NDEBUG
 	std::cerr << "Discarded: " << *e << std::endl;
