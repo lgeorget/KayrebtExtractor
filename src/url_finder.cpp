@@ -7,11 +7,13 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
 #include <sqlite3.h>
 #include <functional>
 #include "url_finder.h"
 
-UrlFinder::UrlFinder() : _db(nullptr), _urlFetcher(nullptr)
+UrlFinder::UrlFinder(std::string prefix) :
+	_db(nullptr), _urlFetcher(nullptr), _prefix(prefix)
 {}
 
 void UrlFinder::open(const char* filename, const char* dbname)
@@ -57,22 +59,44 @@ std::string UrlFinder::operator()(const std::string& function)
 #ifndef NDEBUG
 	std::cerr << "Looking for function " << function << " in the database" << std::endl;
 #endif
-	// handle optimizing symbols such as ISRA
+	// strip optimizing symbols such as ISRA
 	// This should be correct, dots are not allowed in identifiers
-	std::string realSymbol = function.substr(0, function.find('.'));
-	sqlite3_bind_text(_urlFetcher, 1, realSymbol.c_str(), realSymbol.length(), SQLITE_STATIC);
-	std::string res("./" + realSymbol);
+	std::string originalSymbol = function.substr(0, function.find('.'));
+	sqlite3_bind_text(_urlFetcher, 1, originalSymbol.c_str(), originalSymbol.length(), SQLITE_STATIC);
+	std::string res;
 	if (sqlite3_step(_urlFetcher) == SQLITE_ROW) {
 		sqlite3_column_text(_urlFetcher, 0);
 		const char *dir;
 		const char *file;
 		dir = reinterpret_cast<const char*>(sqlite3_column_blob(_urlFetcher, 0));
 		file = reinterpret_cast<const char*>(sqlite3_column_blob(_urlFetcher, 1));
-		res = dir;
-		res += "/";
-		res += file;
-		res += "/" + realSymbol;
+		std::string temp(dir);
+		temp += file;
+		auto ittemp = temp.begin();
+		auto itpref = _prefix.begin();
+		auto pos = temp.begin();
+		for ( ; ittemp != temp.end() && itpref != _prefix.end() ;
+		     ++ittemp, ++itpref) {
+			if (*ittemp != *itpref)
+				break;
+			if (*ittemp == '/') {
+				pos = ittemp;
+				pos++;
+			}
+		}
+		std::cerr << "temp: " << temp << "\tprefix: " << _prefix << std::endl;
+
+		int count = std::count(itpref, _prefix.end(), '/');
+		for (int i = 0 ; i <= count ; i++)
+			res += "../";
+		std::copy(pos, temp.end(), std::back_inserter(res));
+		res += "/" + function;
+	} else {
+		res = function; // we no longer use the original symbol
+				// (== function with optimization suffixes stripped)
+				// but the real symbol name
 	}
+
 	sqlite3_reset(_urlFetcher);
 
 	return res;

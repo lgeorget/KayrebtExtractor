@@ -38,7 +38,9 @@ class Expression
 	protected:
 		/** The line number at which the expression is found in the
 		 * source file */
-		int _line = 0;
+		int _line = -1;
+		/** The file in which the expression is defined */
+		std::string _file;
 
 	private:
 		/** The gimple expression */

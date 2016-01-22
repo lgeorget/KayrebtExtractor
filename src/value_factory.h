@@ -38,6 +38,8 @@ class ValueFactory
 		std::map<tree,std::shared_ptr<Value>> integers;
 		/** A memoization map for identifiers */
 		std::map<tree,std::shared_ptr<Value>> idents;
+		/** A memoization map for ssa names */
+		std::map<tree,std::shared_ptr<Value>> ssas;
 };
 
 #endif

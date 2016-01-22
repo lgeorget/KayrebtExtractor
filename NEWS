@@ -75,3 +75,8 @@ Kayrebt::Extractor NEWS -- history of user visible changes.
 	* Fix the dependencies for libactivity_diagram
 
 	== version 3.1 released on 2015-10-27 ==
+
+* 4.0.0
+	* Dump the activity diagrams after the "optimized" pass, in SSA form
+
+	== version 4.0 released on 2016-01-22 ==

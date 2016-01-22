@@ -254,10 +254,29 @@ namespace kayrebt
 					NodeDescriptor pred = *(maybe_pred.first);
 					auto newEdge = add_edge(pred,succ,g).first;
 					g[newEdge].condition = g[edge(pred,n,g).first].condition;
+
+					//we cannot remove vertices because some references
+					//to identifiers might still be alive somewhere
+					//we must redirect the attributes of the node
+					//to be deleted to those of its replacement and
+					//mark it for later deletion
+					_nodeAttrs[n] = _nodeAttrs[pred];
+					_d->inner[n] = _d->inner[pred];
 				}
 				clear_vertex(n,g);
-				remove_vertex(n,g);
+				_d->spuriousNodes.push_back(n);
 			}
 		}
+	}
+
+	void ActivityGraph::purgeGraph()
+	{
+		for (auto&& node : _d->spuriousNodes)
+			remove_vertex(node, _d->inner);
+	}
+
+	void ActivityGraph::printNodeId(std::ostream& out, const kayrebt::Identifier& id)
+	{
+		out << _d->inner[*id].id;
 	}
 }

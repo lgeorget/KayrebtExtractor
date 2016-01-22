@@ -146,9 +146,9 @@ extern "C" int plugin_init (struct plugin_name_args *plugin_args,
 
 	struct register_pass_info actdiag_extractor_pass_info = {
 		.pass				= &actdiag_extractor_pass.pass,
-		.reference_pass_name		= "ssa",
+		.reference_pass_name		= "optimized",
 		.ref_pass_instance_number	= 1,
-		.pos_op				= PASS_POS_INSERT_BEFORE
+		.pos_op				= PASS_POS_INSERT_AFTER
 	};
 
 	functions = plugin_args;
@@ -233,12 +233,12 @@ extern "C" unsigned int actdiag_extractor()
 #endif
 		std::string file;
 		int line = 0;
-		if (LOCATION_LOCUS (cfun->function_start_locus) != UNKNOWN_LOCATION) {
-			line = LOCATION_LINE(cfun->function_start_locus);
-			if (LOCATION_FILE(cfun->function_start_locus))
+		if (DECL_SOURCE_LOCATION (cfun->decl) != UNKNOWN_LOCATION) {
+			line = DECL_SOURCE_LINE(cfun->decl);
+			if (DECL_SOURCE_FILE(cfun->decl))
 				//we cannot rely on main_input filename
 				//because "compilation unit" != "source file"
-				file.assign(LOCATION_FILE(cfun->function_start_locus));
+				file.assign(DECL_SOURCE_FILE(cfun->decl));
 		}
 		auto dumper = ActivityGraphDumper(*global_config, file, line);
 #ifndef NDEBUG

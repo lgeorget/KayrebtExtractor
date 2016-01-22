@@ -21,8 +21,6 @@ AssignExpr::AssignExpr(gimple t) : Expression(t)
 
 	_whatToSet = ValueFactory::INSTANCE.build(gimple_assign_lhs(t));
 	std::string name = _whatToSet->print();
-	_anonymous =  name.find('<') != std::string::npos ||
-		      name.find('.') != std::string::npos;
 
 	_op  = gimple_assign_rhs_code(t);
 	_rhs1 = ValueFactory::INSTANCE.build(gimple_assign_rhs1(t));

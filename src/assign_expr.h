@@ -32,7 +32,6 @@ class AssignExpr : public Expression
 		tree_code		_op; /*!< The operation in the right-hand value */
 		std::shared_ptr<Value>	_rhs1; /*!< The first operand */
 		std::shared_ptr<Value>	_rhs2; /*!< The second operand */
-		bool _anonymous; /*!< Whether the variable is a temporary */
 
 	friend class ActivityGraphDumper;
 };

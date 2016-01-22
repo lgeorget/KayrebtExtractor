@@ -13,7 +13,6 @@
 #include <functional>
 #include <stack>
 #include <utility>
-#include <memory>
 #include <activity_graph.h>
 #include "dumper.h"
 #include "label.h"
@@ -22,6 +21,7 @@
 class AssignExpr;
 class FunctionBody;
 class CallExpr;
+class PhiExpr;
 class CondExpr;
 class GotoExpr;
 class LabelExpr;
@@ -74,6 +74,11 @@ class ActivityGraphDumper : public Dumper
 		 */
 		void dumpCallExpr(CallExpr* const e) override;
 		/**
+		 * \brief Build the subgraph corresponding to a phi node
+		 * \param e the phi expression to dump
+		 */
+		void dumpPhiExpr(PhiExpr* const e) override;
+		/**
 		 * \brief Build the subgraph corresponding to a condition
 		 * \param e the condition expression to dump
 		 */
@@ -108,6 +113,7 @@ class ActivityGraphDumper : public Dumper
 		 * \param e the untyped expression to dump
 		 */
 		void dumpExpression(Expression* const e) override;
+
 		/**
 		 * \brief Return the graph built
 		 *
@@ -136,11 +142,11 @@ class ActivityGraphDumper : public Dumper
 		/**
 		 * The identifier of the last node added to the graph
 		 */
-		std::unique_ptr<kayrebt::Identifier> _last;
+		kayrebt::Identifier _last;
 		/**
 		 * The identifier of the last-but-one node added to the graph
 		 */
-		std::unique_ptr<kayrebt::Identifier> _last_but_one;
+		kayrebt::Identifier _last_but_one;
 		/**
 		 * The values built while dumping the graph
 		 */
@@ -149,19 +155,23 @@ class ActivityGraphDumper : public Dumper
 		 * Mapping between the basic blocks of the function body and the
 		 * first node of the corresponding subgraph
 		 */
-		std::map<basic_block,std::unique_ptr<kayrebt::MergeIdentifier>> _init_bb;
+		std::map<basic_block,kayrebt::MergeIdentifier> _init_bb;
 		/**
 		 * Mapping between the basic blocks of the function body and a
 		 * pair consisting of the decision node corresponding to a
 		 * condition point (a 'if' in the function body) and the
 		 * textual condition associated to it
 		 */
-		std::map<basic_block,std::pair<std::unique_ptr<kayrebt::MergeIdentifier>,std::string>> _ifs;
+		std::map<basic_block,std::pair<kayrebt::MergeIdentifier,std::string>> _ifs;
 		/**
-		 * List of pairs mapping nodes at the end of their basic block
+		 * Mapping between nodes at the end of their basic block
 		 * to the destination basic block the control flows to
+		 * unconditionally
 		 */
-		std::vector<std::pair<std::unique_ptr<kayrebt::Identifier>,basic_block>> _gotos;
+		std::map<basic_block,kayrebt::Identifier> _gotos;
+		std::map<basic_block,kayrebt::Identifier> _labelled_gotos;
+
+		std::vector<std::pair<kayrebt::Identifier,PhiExpr*>> _phiNodes;
 
 		/**
 		 * \brief Map case labels to control flow blocks in switch/case
@@ -199,13 +209,12 @@ class ActivityGraphDumper : public Dumper
 		 * last by \a node
 		 * \param node the new node that must replace \a last
 		 */
-		void updateLast(kayrebt::Identifier&& node);
+		void updateLast(kayrebt::Identifier node);
 		/**
-		 * \brief Replace the last-but-one node by the last, and the
-		 * last by \a node
-		 * \param node the new node that must replace \a last
+		 * \brief Walk the entire function body after all nodes are
+		 * dumped for post-treatment
 		 */
-		void updateLast(kayrebt::Identifier& node);
+		void postDumpingPass();
 
 		/**
 		 * \brief Return the control flow block entry node corresponding
@@ -223,6 +232,9 @@ class ActivityGraphDumper : public Dumper
 
 		void addAttributesForCategory(const kayrebt::Identifier& i,
 						   unsigned int cat);
+
+		void addLineAndFileAttributes(const kayrebt::Identifier& i,
+				int line, const std::string& filename);
 };
 
 

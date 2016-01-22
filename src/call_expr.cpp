@@ -30,8 +30,17 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 		_var = ValueFactory::INSTANCE.build(var);
 
 	tree fn = gimple_call_fndecl(t);
-	if (fn != NULL && fn != NULL_TREE)
-		_name = ValueFactory::INSTANCE.build(DECL_NAME(fn));
+	if (fn == NULL) {
+		fn = gimple_call_fn(t);
+	} else {
+		fn = DECL_NAME(fn);
+		_internalOrDynamicCall = gimple_call_internal_p(t) ||
+			                 gimple_call_builtin_p(t,BUILT_IN_NORMAL);
+	}
+
+	if (fn != NULL && fn != NULL_TREE) {
+		_name = ValueFactory::INSTANCE.build(fn);
+	}
 
 	_nbArgs = gimple_call_num_args(t);
 	for (unsigned int i = 0 ; i < _nbArgs ; i++) {
@@ -41,14 +50,12 @@ CallExpr::CallExpr(gimple t) : Expression(t)
 	if (_var) {
 		std::string _varname = _var->print();
 		_built_str += _varname + " = ";
-		_anonymous = _varname.find('<') != std::string::npos ||
-			     _varname.find('.') != std::string::npos;
 	}
 
 	if (_name)
 		_built_str += _name->print();
 	else
-		_built_str += "<anonymous_function>";
+		_built_str += "<anonymous_function>"; //should not occur
 	_built_str += "(";
 	if (_nbArgs > 0) {
 		_built_str += _args.front()->print();
