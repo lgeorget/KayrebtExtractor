@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Kayrebt::Extractor], [4.0.0], [laurent.georget@irisa.fr])
+AC_INIT([Kayrebt::Extractor], [4.0.1], [laurent.georget@irisa.fr])
 AM_INIT_AUTOMAKE([1.11 foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/integer_cst.h])
 AC_CONFIG_HEADERS([config.h])

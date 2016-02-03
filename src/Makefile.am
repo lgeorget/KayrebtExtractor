@@ -70,7 +70,7 @@ libkayrebt_extractor_la_SOURCES=\
 	phi_expr.h\
 	doxygen.h
 libkayrebt_extractor_la_CXXFLAGS = -std=c++11 -I @gcc_includes@ -I @srcdir@/../activity_diagram/src/ $(YAML_CPP_CFLAGS) $(SQLITE3_CFLAGS)
-libkayrebt_extractor_la_LDFLAGS  = -version-info 3:0:1
+libkayrebt_extractor_la_LDFLAGS  = -version-info 3:0:2
 libkayrebt_extractor_la_LIBADD = ../activity_diagram/src/libactivity_diagram.la $(YAML_CPP_LIBS) $(SQLITE3_LIBS)
 
 install-exec-local:
