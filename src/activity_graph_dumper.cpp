@@ -354,7 +354,7 @@ void ActivityGraphDumper::dumpGotoExpr(GotoExpr* const e)
 	if (e->_label) {
 		auto label = getLabel(e->_label->getUid());
 		_g.addEdge(gotol, label);
-		_labelled_gotos.emplace(_current_bb, label);
+		_labelled_gotos.emplace(_current_bb, gotol);
 		_outgoing_transitions_handled = true;
 	}
 	updateLast(gotol);
@@ -410,7 +410,7 @@ void ActivityGraphDumper::dumpSwitchExpr(SwitchExpr* const e)
 	for (auto casel : e->_labels) {
 		auto l = getLabel(casel->getUid());
 		_g.addGuard(switchnode, l, "[" + e->_var->print() + " == " + casel->print() + "]");
-		_labelled_gotos.emplace(_current_bb, l);
+		_labelled_gotos.emplace(_current_bb, switchnode);
 	}
 	_outgoing_transitions_handled = true;
 
