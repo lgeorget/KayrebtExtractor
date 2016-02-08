@@ -122,6 +122,7 @@ namespace kayrebt
 	bool ActivityGraph::validate() const
 	{
 		std::vector<unsigned int> reachable;
+		std::vector<NodeDescriptor> initNodes;
 		std::vector<NodeDescriptor> wrongEndingNodes;
 		std::vector<NodeDescriptor> mergeNodesOutEdgesWithoutGuards;
 		std::map<NodeDescriptor, boost::default_color_type> c_m;
@@ -140,23 +141,30 @@ namespace kayrebt
 								std::any_of(it.first, it.second,
 								[&g](decltype(*(it.first)) edge) -> bool { return g[edge].condition.empty(); });
 							}),
+					make_pair(
+					filter_nodes(std::back_inserter(initNodes),
+						     [](NodeDescriptor v, const GraphType& g) -> bool {
+						        return in_degree(v,g) == 0; }),
 					filter_nodes(std::back_inserter(wrongEndingNodes),
 						     [](NodeDescriptor v, const GraphType& g) -> bool {
 						        return out_degree(v,g) == 0 &&
 							       g[v].shape != END_OF_FLOW &&
 							       g[v].shape != END_OF_ACTIVITY; })
-					))),
+					)))),
 				make_assoc_property_map(c_m));
 		bool testReachability = reachable.size() == num_vertices(_d->inner);
 		bool testBranchesEnding = wrongEndingNodes.size() == 0;
 		bool testGuards = mergeNodesOutEdgesWithoutGuards.size() == 0;
+		bool testInit = initNodes.size() == 1 && _d->inner[initNodes[0]].shape == INIT;
 		if (!testReachability)
 			std::cerr << "WARNING: not all the edges are accessible from the INIT node" << std::endl;
 		if (!testBranchesEnding)
 			std::cerr << "WARNING: not all the branches end with an END node" << std::endl;
 		if (!testGuards)
 			std::cerr << "WARNING: some conditional edges have no guards" << std::endl;
-		return testReachability && testGuards && testBranchesEnding;
+		if (!testInit)
+			std::cerr << "WARNING: there is not a unique node without predecessors or it has not type INIT" << std::endl;
+		return testReachability && testGuards && testBranchesEnding && testInit;
 	}
 
 	bool ActivityGraph::validateConnexity() const
