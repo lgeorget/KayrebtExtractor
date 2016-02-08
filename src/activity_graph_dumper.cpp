@@ -420,7 +420,7 @@ const ActivityGraph& ActivityGraphDumper::graph()
 	return _g;
 }
 
-kayrebt::Identifier ActivityGraphDumper::getLabel(unsigned int uid)
+kayrebt::MergeIdentifier ActivityGraphDumper::getLabel(unsigned int uid)
 {
 	auto it = _labels.find(uid);
 	if (it == _labels.end()) {

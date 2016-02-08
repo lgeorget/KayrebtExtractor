@@ -183,7 +183,7 @@ class ActivityGraphDumper : public Dumper
 		 * because the order is which the nodes are discovered/dumped
 		 * is not always the same from function to function.
 		 */
-		std::map<unsigned int, kayrebt::Identifier> _labels;
+		std::map<unsigned int, kayrebt::MergeIdentifier> _labels;
 		/**
 		 * Tell that the next Expression is to be skipped instead of dumped
 		 */
@@ -228,7 +228,7 @@ class ActivityGraphDumper : public Dumper
 		 * beginning of the control flow block for the case identified
 		 * by \a uid
 		 */
-		kayrebt::Identifier getLabel(unsigned int uid);
+		kayrebt::MergeIdentifier getLabel(unsigned int uid);
 
 		void addAttributesForCategory(const kayrebt::Identifier& i,
 						   unsigned int cat);
