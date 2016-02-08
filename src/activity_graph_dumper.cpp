@@ -12,6 +12,8 @@
 #include <regex>
 #include <gcc-plugin.h>
 #include <basic-block.h>
+#include <cfgloop.h>
+#include <tree-flow.h>
 #include <activity_graph.h>
 #include "activity_graph_dumper.h"
 #include "asm_expr.h"
@@ -153,6 +155,8 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 		_current_bb = bb.first;
 		for (const auto& expr : bb.second) {
 			expr->accept(*this);
+			if (bb_loop_header_p(_current_bb))
+				_g.addNodeAttribute(_last, "header", true);
 			if (!_skip) {
 				_g.addEdge(_last_but_one, _last);
 			} else {
