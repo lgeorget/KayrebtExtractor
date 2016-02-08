@@ -241,6 +241,9 @@ void ActivityGraphDumper::dumpFunctionBody(FunctionBody* const e)
 
 void ActivityGraphDumper::postDumpingPass()
 {
+	//Ensure the graph won't change anymore
+	_g.simplifyMergeNodes();
+
 	auto outputter = [this](std::ostream& out,
 			const std::vector<basic_block>& bbs)
 	{

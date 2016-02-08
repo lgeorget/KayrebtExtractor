@@ -247,7 +247,7 @@ namespace kayrebt
 
 			[](NodeDescriptor v, const GraphType& g) -> bool
 			{
-				return (g[v].shape == MERGE && in_degree(v,g) <= 1 && out_degree(v,g) == 1);
+				return (g[v].shape == MERGE && in_degree(v,g) == 0 && out_degree(v,g) == 1);
 			})),
 				make_assoc_property_map(c_m));
 
