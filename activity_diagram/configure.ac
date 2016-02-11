@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Kayrebt::Actdiags], [2.0.1], [laurent.georget@irisa.fr])
+AC_INIT([Kayrebt::Actdiags], [2.0.2], [laurent.georget@irisa.fr])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([1.11 foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/end_of_flow_identifier.h])
